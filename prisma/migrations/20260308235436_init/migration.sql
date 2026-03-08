@@ -1,0 +1,31 @@
+-- CreateTable
+CREATE TABLE "Lead" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "vehicleBrand" TEXT NOT NULL,
+    "vehicleModel" TEXT NOT NULL,
+    "vehicleYear" TEXT NOT NULL,
+    "km" TEXT NOT NULL,
+    "urgency" TEXT NOT NULL,
+    "discountAcceptance" TEXT NOT NULL,
+    "docsStatus" TEXT NOT NULL,
+    "financeStatus" TEXT NOT NULL,
+    "score" INTEGER NOT NULL DEFAULT 0,
+    "tier" TEXT NOT NULL DEFAULT 'cold',
+    "qualified" BOOLEAN NOT NULL DEFAULT false,
+    "photos" TEXT NOT NULL DEFAULT '[]',
+    "utmSource" TEXT NOT NULL DEFAULT '',
+    "utmMedium" TEXT NOT NULL DEFAULT '',
+    "utmCampaign" TEXT NOT NULL DEFAULT '',
+    "gclid" TEXT NOT NULL DEFAULT '',
+    "status" TEXT NOT NULL DEFAULT 'new',
+    "notes" TEXT NOT NULL DEFAULT '',
+    "lgpdConsent" BOOLEAN NOT NULL DEFAULT false,
+    "lgpdConsentAt" TIMESTAMP(3),
+
+    CONSTRAINT "Lead_pkey" PRIMARY KEY ("id")
+);
