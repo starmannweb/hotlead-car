@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import HeroSection from "@/components/HeroSection";
 import HowItWorks from "@/components/HowItWorks";
 import Benefits from "@/components/Benefits";
 import QualificationSection from "@/components/QualificationSection";
-import MultiStepForm from "@/components/MultiStepForm";
 import TrustSection from "@/components/TrustSection";
 import FAQ from "@/components/FAQ";
 import FinalCTA from "@/components/FinalCTA";
@@ -13,16 +13,8 @@ import Footer from "@/components/Footer";
 import MobileCTA from "@/components/MobileCTA";
 
 export default function Home() {
-  const [quickFormData, setQuickFormData] = useState<{
-    vehicle_brand: string;
-    vehicle_model: string;
-    vehicle_year: string;
-    city: string;
-    phone: string;
-  } | null>(null);
-
+  const router = useRouter();
   const [showMobileCta, setShowMobileCta] = useState(false);
-  const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,11 +24,8 @@ export default function Home() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToForm = () => {
-    const el = document.getElementById("formulario-completo");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
+  const goToCadastro = () => {
+    router.push("/cadastro");
   };
 
   const handleQuickSubmit = (data: {
@@ -46,8 +35,14 @@ export default function Home() {
     city: string;
     phone: string;
   }) => {
-    setQuickFormData(data);
-    setTimeout(() => scrollToForm(), 100);
+    const params = new URLSearchParams({
+      brand: data.vehicle_brand,
+      model: data.vehicle_model,
+      year: data.vehicle_year,
+      city: data.city,
+      phone: data.phone,
+    });
+    router.push(`/cadastro?${params.toString()}`);
   };
 
   return (
@@ -55,18 +50,13 @@ export default function Home() {
       <HeroSection onQuickSubmit={handleQuickSubmit} />
       <HowItWorks />
       <Benefits />
-      <QualificationSection onStartForm={scrollToForm} />
-
-      <div ref={formRef}>
-        <MultiStepForm initialData={quickFormData || undefined} />
-      </div>
-
+      <QualificationSection onStartForm={goToCadastro} />
       <TrustSection />
       <FAQ />
-      <FinalCTA onCtaClick={scrollToForm} />
+      <FinalCTA onCtaClick={goToCadastro} />
       <Footer />
 
-      {showMobileCta && <MobileCTA onClick={scrollToForm} />}
+      {showMobileCta && <MobileCTA onClick={goToCadastro} />}
     </main>
   );
 }

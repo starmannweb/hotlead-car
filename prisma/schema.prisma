@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Dados pessoais
+  name  String
+  phone String
+  city  String
+
+  // Dados do veículo
+  vehicleBrand String
+  vehicleModel String
+  vehicleYear  String
+  km           String
+
+  // Qualificação
+  urgency            String // hoje, 3dias, 7dias, sem_pressa
+  discountAcceptance String // 10, 15, 20, fipe
+  docsStatus         String // regular, pendencias, nao_sei
+  financeStatus      String // sim, nao
+
+  // Scoring
+  score     Int    @default(0) // 0-100
+  tier      String @default("cold") // hot, warm, cold
+  qualified Boolean @default(false)
+
+  // Fotos (JSON array de URLs)
+  photos String @default("[]")
+
+  // Tracking
+  utmSource   String @default("")
+  utmMedium   String @default("")
+  utmCampaign String @default("")
+  gclid       String @default("")
+
+  // Status do lead
+  status    String @default("new") // new, contacted, negotiating, converted, lost
+  notes     String @default("")
+
+  // Consentimento LGPD
+  lgpdConsent   Boolean  @default(false)
+  lgpdConsentAt DateTime?
+}
