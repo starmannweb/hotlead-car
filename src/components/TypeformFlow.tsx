@@ -397,15 +397,15 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   // ------ Success screen ------
   if (submitted) {
     return (
-      <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 px-4">
+      <div className="min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-50 dark:from-gray-900 dark:to-gray-800 px-4">
         <div className="max-w-md w-full text-center animate-[fadeInUp_0.6s_ease-out]">
-          <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 animate-[scaleIn_0.5s_ease-out]">
-            <Check className="w-12 h-12 text-green-600" />
+          <div className="w-24 h-24 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mx-auto mb-8 animate-[scaleIn_0.5s_ease-out]">
+            <Check className="w-12 h-12 text-green-600 dark:text-green-400" />
           </div>
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-4">
+          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white mb-4">
             Cadastro realizado!
           </h1>
-          <p className="text-gray-500 text-lg mb-6">
+          <p className="text-gray-500 dark:text-gray-400 text-lg mb-6">
             Recebemos seus dados. Nossa equipe vai validar e lojistas da sua
             região poderão enviar propostas em breve.
           </p>
@@ -424,7 +424,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
                 : "Recebido — analisaremos seu veículo"}
             </div>
           )}
-          <p className="text-gray-400 text-sm mt-6">
+          <p className="text-gray-400 dark:text-gray-500 text-sm mt-6">
             Fique atento ao seu WhatsApp.
           </p>
         </div>
@@ -606,9 +606,9 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   };
 
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-white">
+    <div className="min-h-[100dvh] flex flex-col bg-white dark:bg-gray-900">
       {/* Progress bar */}
-      <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-gray-100">
+      <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-gray-100 dark:bg-gray-800">
         <div
           className="h-full bg-primary transition-all duration-500 ease-out"
           style={{ width: `${progress}%` }}
@@ -616,13 +616,13 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
       </div>
 
       {/* Header */}
-      <div className="fixed top-1.5 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+      <div className="fixed top-1.5 left-0 right-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
               <Car className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-gray-900 text-sm">AutoOportunidade</span>
+            <span className="font-bold text-gray-900 dark:text-white text-sm">AutoOportunidade</span>
           </div>
           <span className="text-xs text-gray-400 font-medium">
             {currentStep + 1} de {totalSteps}
@@ -651,11 +651,11 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
             </div>
 
             {/* Title */}
-            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 mb-2 leading-tight">
+            <h2 className="text-2xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-2 leading-tight">
               {step.title}
             </h2>
             {step.subtitle && (
-              <p className="text-base md:text-lg text-gray-400 mb-8">
+              <p className="text-base md:text-lg text-gray-400 dark:text-gray-500 mb-8">
                 {step.subtitle}
               </p>
             )}
@@ -676,15 +676,15 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
       </div>
 
       {/* Footer navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-100 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800 z-40">
         <div className="max-w-xl mx-auto px-4 py-4 flex items-center justify-between">
           <button
             onClick={goPrev}
             disabled={currentStep === 0}
             className={`flex items-center gap-2 py-2.5 px-5 rounded-xl font-medium transition-all cursor-pointer ${
               currentStep === 0
-                ? "text-gray-300 cursor-not-allowed"
-                : "text-gray-600 hover:bg-gray-100"
+                ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
+                : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
             }`}
           >
             <ArrowLeft className="w-4 h-4" />

@@ -91,36 +91,36 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
         <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Painel de Leads</h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Painel de Leads</h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {leads.length} leads capturados • Sistema de Qualificação AutoLead
               </p>
             </div>
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <div className="text-2xl font-bold text-primary">{leads.filter((l) => l.tier === "hot").length}</div>
-                <div className="text-xs text-gray-500">Leads HOT</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Leads HOT</div>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-yellow-600">{leads.filter((l) => l.tier === "warm").length}</div>
-                <div className="text-xs text-gray-500">Leads WARM</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Leads WARM</div>
               </div>
               <div className="text-right">
                 <div className="text-2xl font-bold text-blue-600">{leads.filter((l) => l.tier === "cold").length}</div>
-                <div className="text-xs text-gray-500">Leads COLD</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Leads COLD</div>
               </div>
             </div>
           </div>
@@ -129,10 +129,10 @@ export default function AdminPage() {
 
       {/* Filtros */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Qualificação</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Qualificação</label>
               <div className="flex gap-2">
                 {["all", "hot", "warm", "cold"].map((tier) => (
                   <button
@@ -147,7 +147,7 @@ export default function AdminPage() {
                           : tier === "cold"
                           ? "bg-blue-100 text-blue-700"
                           : "bg-gray-100 text-gray-900"
-                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                        : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                     }`}
                   >
                     {tier === "all" ? "Todos" : tier.toUpperCase()}
@@ -157,11 +157,11 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">Status</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Status</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
-                className="px-4 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               >
                 <option value="all">Todos</option>
                 <option value="new">Novo</option>
@@ -177,18 +177,18 @@ export default function AdminPage() {
         {/* Lista de Leads */}
         <div className="space-y-4">
           {filteredLeads.length === 0 ? (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Car className="w-8 h-8 text-gray-400" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum lead encontrado</h3>
-              <p className="text-gray-500">Os leads aparecerão aqui quando forem capturados pelo formulário.</p>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhum lead encontrado</h3>
+              <p className="text-gray-500 dark:text-gray-400">Os leads aparecerão aqui quando forem capturados pelo formulário.</p>
             </div>
           ) : (
             filteredLeads.map((lead) => (
               <div
                 key={lead.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -202,7 +202,7 @@ export default function AdminPage() {
                       >
                         {lead.tier} • Score {lead.score}/100
                       </span>
-                      <span className="flex items-center gap-1 text-sm text-gray-500">
+                      <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                         {getStatusIcon(lead.status)}
                         {lead.status}
                       </span>
@@ -211,70 +211,70 @@ export default function AdminPage() {
                     {/* Informações do Lead */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Nome</p>
-                        <p className="font-semibold text-gray-900">{lead.name}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Nome</p>
+                        <p className="font-semibold text-gray-900 dark:text-white">{lead.name}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Contato</p>
-                        <p className="font-medium text-gray-900 flex items-center gap-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Contato</p>
+                        <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                           <Phone className="w-4 h-4 text-gray-400" />
                           {lead.phone}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Cidade</p>
-                        <p className="font-medium text-gray-900 flex items-center gap-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cidade</p>
+                        <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                           <MapPin className="w-4 h-4 text-gray-400" />
                           {lead.city}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider">Data</p>
-                        <p className="font-medium text-gray-900">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Data</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {new Date(lead.createdAt).toLocaleDateString("pt-BR")}
                         </p>
                       </div>
                     </div>
 
                     {/* Veículo */}
-                    <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Veículo</p>
-                      <p className="font-semibold text-gray-900">
+                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-4">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Veículo</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">
                         {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear} • {lead.km} km
                       </p>
                     </div>
 
                     {/* Critérios de Qualificação */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-500">Urgência</p>
-                        <p className="font-medium">
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Urgência</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {lead.urgency === "hoje" && "🔥 Hoje"}
                           {lead.urgency === "3dias" && "⚡ 3 dias"}
                           {lead.urgency === "7dias" && "📅 7 dias"}
                           {lead.urgency === "sem_pressa" && "😌 Sem pressa"}
                         </p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-500">Desconto FIPE</p>
-                        <p className="font-medium">
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Desconto FIPE</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {lead.discountAcceptance === "20" && "💰 20% abaixo"}
                           {lead.discountAcceptance === "15" && "💰 15% abaixo"}
                           {lead.discountAcceptance === "10" && "💰 10% abaixo"}
                           {lead.discountAcceptance === "fipe" && "📊 Tabela FIPE"}
                         </p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-500">Documentação</p>
-                        <p className="font-medium">
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Documentação</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {lead.docsStatus === "regular" && "✅ Regular"}
                           {lead.docsStatus === "pendencias" && "⚠️ Pendências"}
                           {lead.docsStatus === "nao_sei" && "❓ Não sei"}
                         </p>
                       </div>
-                      <div className="bg-gray-50 rounded-lg p-3">
-                        <p className="text-xs text-gray-500">Financiamento</p>
-                        <p className="font-medium">
+                      <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3">
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Financiamento</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
                           {lead.financeStatus === "nao" ? "✅ Quitado" : "🏦 Com financiamento"}
                         </p>
                       </div>
@@ -286,7 +286,7 @@ export default function AdminPage() {
                     <select
                       value={lead.status}
                       onChange={(e) => updateStatus(lead.id, e.target.value)}
-                      className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+                      className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
                     >
                       <option value="new">Novo</option>
                       <option value="contacted">Contactado</option>
