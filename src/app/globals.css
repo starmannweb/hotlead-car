@@ -41,13 +41,13 @@
     @apply bg-secondary text-white font-bold py-4 px-8 rounded-xl text-lg transition-all duration-200 hover:bg-secondary-dark hover:scale-[1.02] active:scale-[0.98] shadow-lg hover:shadow-xl cursor-pointer;
   }
   .input-field {
-    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-base transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white;
+    @apply w-full px-4 py-3 border-2 border-gray-200 dark:border-gray-700 rounded-xl text-base transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white dark:bg-gray-800 dark:text-white;
   }
   .section-title {
-    @apply text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 text-center;
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white text-center;
   }
   .section-subtitle {
-    @apply text-lg text-gray-500 text-center max-w-2xl mx-auto mt-4;
+    @apply text-lg text-gray-500 dark:text-gray-400 text-center max-w-2xl mx-auto mt-4;
   }
 }
 
