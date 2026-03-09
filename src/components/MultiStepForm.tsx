@@ -148,7 +148,7 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
     const utm = getUTMParams();
     const leadData: LeadData = {
       ...formData,
-      photos: photos.filter(Boolean) as File[],
+      photos: photoPreviewUrls.filter(Boolean) as string[],
       utm_source: utm.utm_source,
       utm_medium: utm.utm_medium,
       utm_campaign: utm.utm_campaign,

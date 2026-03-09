@@ -10,7 +10,7 @@ export interface LeadData {
   discount_acceptance: string;
   docs_status: string;
   finance_status: string;
-  photos: File[];
+  photos: string[];
   utm_source: string;
   utm_medium: string;
   utm_campaign: string;
