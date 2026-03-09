@@ -154,6 +154,7 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
       utm_campaign: utm.utm_campaign,
       gclid: utm.gclid,
       created_at: new Date().toISOString(),
+      lgpd_consent: lgpdConsent,
     };
 
     const result = await submitLead(leadData);

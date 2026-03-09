@@ -16,6 +16,7 @@ export interface LeadData {
   utm_campaign: string;
   gclid: string;
   created_at: string;
+  lgpd_consent: boolean;
 }
 
 export interface QuickFormData {
