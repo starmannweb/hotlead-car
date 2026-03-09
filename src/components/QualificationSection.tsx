@@ -26,7 +26,7 @@ interface QualificationSectionProps {
 
 export default function QualificationSection({ onStartForm }: QualificationSectionProps) {
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="section-title">
           Para te enviar propostas reais, precisamos entender:
@@ -39,16 +39,16 @@ export default function QualificationSection({ onStartForm }: QualificationSecti
           {questions.map((item, index) => (
             <div
               key={index}
-              className="flex items-start gap-5 bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200"
+              className="flex items-start gap-5 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow duration-200"
             >
               <div className="shrink-0 w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
                 <item.icon className="w-6 h-6 text-primary" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-900">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
                   {item.question}
                 </h3>
-                <p className="text-gray-500 text-sm mt-1">{item.hint}</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{item.hint}</p>
               </div>
             </div>
           ))}

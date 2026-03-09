@@ -31,7 +31,7 @@ const benefits = [
 
 export default function Benefits() {
   return (
-    <section className="py-16 md:py-24 bg-white">
+    <section className="py-16 md:py-24 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2 className="section-title">Por que vender seu carro aqui?</h2>
         <p className="section-subtitle">
@@ -42,15 +42,15 @@ export default function Benefits() {
           {benefits.map((item, index) => (
             <div
               key={index}
-              className="bg-gray-50 rounded-2xl p-6 hover:bg-white hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100"
+              className="bg-gray-50 dark:bg-gray-800 rounded-2xl p-6 hover:bg-white dark:hover:bg-gray-700 hover:shadow-lg transition-all duration-300 border border-transparent hover:border-gray-100 dark:hover:border-gray-600"
             >
               <div className="w-14 h-14 bg-primary/10 rounded-xl flex items-center justify-center mb-5">
                 <item.icon className="w-7 h-7 text-primary" />
               </div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
                 {item.title}
               </h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
+              <p className="text-gray-500 dark:text-gray-400 text-sm leading-relaxed">
                 {item.description}
               </p>
             </div>
