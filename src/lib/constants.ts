@@ -92,9 +92,11 @@ export const FAQ_ITEMS = [
 ];
 
 export const REGIONS = [
+  "São Paulo (Capital)",
   "Grande SP",
   "ABC",
   "Santos",
   "Campinas",
   "São José dos Campos",
+  "Sorocaba",
 ];

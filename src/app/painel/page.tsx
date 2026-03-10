@@ -7,7 +7,7 @@ import {
     ChevronDown, ChevronUp, Download, FileText,
     FileSpreadsheet, Flame, Snowflake, TrendingUp, Clock,
     Image as ImageIcon, X, CheckCircle, XCircle, Calendar,
-    Search, Filter,
+    Search, Filter, TrendingDown, Banknote, Bell
 } from "lucide-react";
 
 interface Lead {
@@ -37,9 +37,17 @@ export default function PainelPage() {
     const [expandedLeads, setExpandedLeads] = useState<Set<string>>(new Set());
     const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
     const [exportMenuOpen, setExportMenuOpen] = useState(false);
+    const [newLeadNotification, setNewLeadNotification] = useState(false);
+    const prevLeadsLen = useRef(0);
     const exportRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => { checkAuth(); }, []);
+    useEffect(() => {
+        checkAuth();
+        const interval = setInterval(() => {
+            fetchLeads(true);
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
     useEffect(() => {
         const h = (e: MouseEvent) => { if (exportRef.current && !exportRef.current.contains(e.target as Node)) setExportMenuOpen(false); };
         document.addEventListener("mousedown", h); return () => document.removeEventListener("mousedown", h);
@@ -55,10 +63,19 @@ export default function PainelPage() {
         } catch { router.push("/login"); }
     };
 
-    const fetchLeads = async () => {
-        try { const res = await fetch("/api/leads"); const data = await res.json(); if (data.success) setLeads(data.data); }
-        catch (err) { console.error("Erro:", err); }
-        finally { setLoading(false); }
+    const fetchLeads = async (isPolling = false) => {
+        try {
+            const res = await fetch("/api/leads");
+            const data = await res.json();
+            if (data.success) {
+                setLeads(data.data);
+                if (isPolling && data.data.length > prevLeadsLen.current && prevLeadsLen.current > 0) {
+                    setNewLeadNotification(true);
+                    setTimeout(() => setNewLeadNotification(false), 5000);
+                }
+                prevLeadsLen.current = data.data.length;
+            }
+        } catch { /* erro silencioso */ } finally { setLoading(false); }
     };
 
     const handleLogout = async () => {
@@ -306,6 +323,22 @@ export default function PainelPage() {
                             <div className="flex justify-center gap-2 mt-4">{photoModal.photos.map((photo, idx) => <button key={idx} onClick={() => setPhotoModal({ ...photoModal, index: idx })} className={`w-12 h-12 rounded-lg overflow-hidden border-2 cursor-pointer ${idx === photoModal.index ? "border-white" : "border-transparent opacity-60 hover:opacity-100"}`}><img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" /></button>)}</div>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Notification Toast */}
+            {newLeadNotification && (
+                <div className="fixed bottom-6 right-6 z-50 animate-[fadeInUp_0.4s_ease-out] shadow-xl rounded-xl border border-green-200 bg-white p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0 animate-pulse">
+                        <Bell className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p className="font-bold text-gray-900 text-sm">Novo lead capturado!</p>
+                        <p className="text-xs text-gray-500">A lista foi atualizada com sucesso.</p>
+                    </div>
+                    <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 ml-2">
+                        <X className="w-4 h-4" />
+                    </button>
                 </div>
             )}
         </div>

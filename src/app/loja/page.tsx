@@ -8,6 +8,7 @@ import {
     CreditCard, Flame, Snowflake, TrendingUp, Clock,
     Image as ImageIcon, X, Download, FileText,
     FileSpreadsheet, CheckCircle, XCircle, Calendar,
+    TrendingDown, Banknote, Bell
 } from "lucide-react";
 
 interface Lead {
@@ -63,8 +64,16 @@ export default function LojaPage() {
     const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
     const [unlocking, setUnlocking] = useState<string | null>(null);
     const [credits, setCredits] = useState(0);
+    const [buyModalOpen, setBuyModalOpen] = useState(false);
+    const [newLeadNotification, setNewLeadNotification] = useState(false);
+    const prevLeadsLen = useRef(0);
+
     useEffect(() => {
         checkAuth();
+        const interval = setInterval(() => {
+            fetchLeads(true);
+        }, 30000);
+        return () => clearInterval(interval);
     }, []);
 
     const checkAuth = async () => {
@@ -83,11 +92,18 @@ export default function LojaPage() {
         }
     };
 
-    const fetchLeads = async () => {
+    const fetchLeads = async (isPolling = false) => {
         try {
             const res = await fetch("/api/leads");
             const data = await res.json();
-            if (data.success) setLeads(data.data);
+            if (data.success) {
+                setLeads(data.data);
+                if (isPolling && data.data.length > prevLeadsLen.current && prevLeadsLen.current > 0) {
+                    setNewLeadNotification(true);
+                    setTimeout(() => setNewLeadNotification(false), 5000);
+                }
+                prevLeadsLen.current = data.data.length;
+            }
         } catch (err) {
             console.error("Erro ao carregar leads:", err);
         } finally {
@@ -118,7 +134,7 @@ export default function LojaPage() {
                 setUnlockedLeads((prev) => new Set([...prev, `${leadId}_${field}`]));
                 if (data.credits !== undefined) setCredits(data.credits);
             } else if (res.status === 402) {
-                alert(`Creditos insuficientes. Necessario: ${data.required}, Saldo: ${data.balance}`);
+                setBuyModalOpen(true);
             } else {
                 alert(data.message || "Erro ao desbloquear");
             }
@@ -492,7 +508,9 @@ export default function LojaPage() {
 
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                                 <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500">Urgencia</p>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                        <Clock className="w-3.5 h-3.5" /> Urgencia
+                                                    </p>
                                                     <p className="font-medium text-gray-900">
                                                         {lead.urgency === "hoje" && "Hoje"}
                                                         {lead.urgency === "3dias" && "3 dias"}
@@ -501,7 +519,9 @@ export default function LojaPage() {
                                                     </p>
                                                 </div>
                                                 <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500">Desconto FIPE</p>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                        <TrendingDown className="w-3.5 h-3.5" /> Desconto FIPE
+                                                    </p>
                                                     <p className="font-medium text-gray-900">
                                                         {lead.discountAcceptance === "acima_20" && "Acima de 20%"}
                                                         {lead.discountAcceptance === "10_20" && "Entre 10 a 20%"}
@@ -512,7 +532,9 @@ export default function LojaPage() {
                                                     </p>
                                                 </div>
                                                 <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500">Documentacao</p>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                        <FileText className="w-3.5 h-3.5" /> Documentacao
+                                                    </p>
                                                     <p className="font-medium text-gray-900">
                                                         {lead.docsStatus === "regular" && "Regular"}
                                                         {lead.docsStatus === "pendencias" && "Pendencias"}
@@ -520,7 +542,9 @@ export default function LojaPage() {
                                                     </p>
                                                 </div>
                                                 <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500">Financiamento</p>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                        <Banknote className="w-3.5 h-3.5" /> Financiamento
+                                                    </p>
                                                     <p className="font-medium text-gray-900">
                                                         {lead.financeStatus === "nao" ? "Quitado" : "Com financiamento"}
                                                     </p>
@@ -553,6 +577,43 @@ export default function LojaPage() {
                             </div>
                         )}
                     </div>
+                </div>
+            )}
+
+            {/* Buy Credits Modal */}
+            {buyModalOpen && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative animate-[fadeInUp_0.3s_ease-out]">
+                        <button onClick={() => setBuyModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                            <X className="w-5 h-5" />
+                        </button>
+                        <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-4 mx-auto">
+                            <Coins className="w-6 h-6" />
+                        </div>
+                        <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Creditos insuficientes</h3>
+                        <p className="text-sm text-center text-gray-600 mb-6">
+                            Para visualizar os dados reais dos clientes mais qualificados do mercado, voce precisa adquirir um pacote de creditos.
+                        </p>
+                        <button onClick={() => setBuyModalOpen(false)} className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
+                            <span>Falar com o comercial</span>
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Notification Toast */}
+            {newLeadNotification && (
+                <div className="fixed bottom-6 right-6 z-50 animate-[fadeInUp_0.4s_ease-out] shadow-xl rounded-xl border border-green-200 bg-white p-4 flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0 animate-pulse">
+                        <Bell className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <p className="font-bold text-gray-900 text-sm">Oba! Novo lead!</p>
+                        <p className="text-xs text-gray-500">Acabamos de receber uma nova oportunidade.</p>
+                    </div>
+                    <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 ml-2">
+                        <X className="w-4 h-4" />
+                    </button>
                 </div>
             )}
         </div>

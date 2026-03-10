@@ -27,6 +27,9 @@ import {
   Search,
   Filter,
   LogOut,
+  TrendingDown,
+  Banknote,
+  Bell
 } from "lucide-react";
 
 const TIER_LABELS: Record<string, string> = {
@@ -56,10 +59,16 @@ export default function AdminPage() {
   const [expandedLeads, setExpandedLeads] = useState<Set<string>>(new Set());
   const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const [newLeadNotification, setNewLeadNotification] = useState(false);
+  const prevLeadsLen = useRef(0);
   const exportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchLeads();
+    const interval = setInterval(() => {
+      fetchLeads(true);
+    }, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -72,12 +81,17 @@ export default function AdminPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const fetchLeads = async () => {
+  const fetchLeads = async (isPolling = false) => {
     try {
       const response = await fetch("/api/leads");
       const data = await response.json();
       if (data.success) {
         setLeads(data.data);
+        if (isPolling && data.data.length > prevLeadsLen.current && prevLeadsLen.current > 0) {
+          setNewLeadNotification(true);
+          setTimeout(() => setNewLeadNotification(false), 5000);
+        }
+        prevLeadsLen.current = data.data.length;
       }
     } catch (error) {
       console.error("Erro ao carregar leads:", error);
@@ -676,7 +690,9 @@ export default function AdminPage() {
                       {/* Qualification criteria */}
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Urgencia</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5" /> Urgencia
+                          </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.urgency === "hoje" && "Hoje"}
                             {lead.urgency === "3dias" && "3 dias"}
@@ -685,7 +701,9 @@ export default function AdminPage() {
                           </p>
                         </div>
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Desconto FIPE</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <TrendingDown className="w-3.5 h-3.5" /> Desconto FIPE
+                          </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.discountAcceptance === "acima_20" && "Acima de 20%"}
                             {lead.discountAcceptance === "10_20" && "Entre 10 a 20%"}
@@ -696,7 +714,9 @@ export default function AdminPage() {
                           </p>
                         </div>
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Documentacao</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <FileText className="w-3.5 h-3.5" /> Documentacao
+                          </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.docsStatus === "regular" && "Regular"}
                             {lead.docsStatus === "pendencias" && "Pendencias"}
@@ -704,7 +724,9 @@ export default function AdminPage() {
                           </p>
                         </div>
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
-                          <p className="text-xs text-gray-500 dark:text-gray-400">Financiamento</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                            <Banknote className="w-3.5 h-3.5" /> Financiamento
+                          </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.financeStatus === "nao" ? "Quitado" : "Com financiamento"}
                           </p>
@@ -728,13 +750,13 @@ export default function AdminPage() {
           <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={() => setPhotoModal(null)}
-              className="absolute -top-10 right-0 text-white hover:text-gray-300 cursor-pointer"
+              className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors cursor-pointer"
             >
               <X className="w-6 h-6" />
             </button>
             <img
               src={photoModal.photos[photoModal.index]}
-              alt="Foto do veiculo"
+              alt="Foto do veiculo em tamanho real"
               className="max-w-full max-h-[85vh] object-contain rounded-lg"
             />
             {photoModal.photos.length > 1 && (
@@ -752,6 +774,22 @@ export default function AdminPage() {
               </div>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Notification Toast */}
+      {newLeadNotification && (
+        <div className="fixed bottom-6 right-6 z-50 animate-[fadeInUp_0.4s_ease-out] shadow-xl rounded-xl border border-green-200 bg-white dark:bg-gray-800 dark:border-gray-700 p-4 flex items-center gap-3">
+          <div className="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center text-green-600 dark:text-green-400 flex-shrink-0 animate-pulse">
+            <Bell className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="font-bold text-gray-900 dark:text-white text-sm">Novo lead capturado!</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">A lista foi atualizada com sucesso.</p>
+          </div>
+          <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-2 cursor-pointer">
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>
