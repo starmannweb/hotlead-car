@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getAuthUser } from "@/lib/auth";
 
 export async function PATCH(
   request: NextRequest,
@@ -60,5 +61,33 @@ export async function GET(
       { success: false, message: "Erro ao buscar lead" },
       { status: 500 }
     );
+  }
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = await getAuthUser();
+    if (!user || user.role !== "admin") {
+      return NextResponse.json({ success: false, message: "Sem permissao para deletar" }, { status: 403 });
+    }
+
+    const { id } = await params;
+
+    // Deletar os viewLogs associados primeiro?
+    // O prisma já fará cascata se configurado ou então precisaremos deletar manualmente.
+    // Vamos usar em transação para apagar logs antes ou prisma fará com ondelete cascade.
+    // Na dúvida, vamos deletar logs do lead.
+    await prisma.$transaction([
+      prisma.viewLog.deleteMany({ where: { leadId: id } }),
+      prisma.lead.delete({ where: { id } }),
+    ]);
+
+    return NextResponse.json({ success: true, message: "Lead removido com sucesso" });
+  } catch (error) {
+    console.error("Erro ao remover lead:", error);
+    return NextResponse.json({ success: false, message: "Erro ao remover lead" }, { status: 500 });
   }
 }

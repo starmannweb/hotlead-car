@@ -29,7 +29,8 @@ import {
   LogOut,
   TrendingDown,
   Banknote,
-  Bell
+  Bell,
+  Trash2
 } from "lucide-react";
 
 const TIER_LABELS: Record<string, string> = {
@@ -112,6 +113,22 @@ export default function AdminPage() {
       }
     } catch (error) {
       console.error("Erro ao atualizar status:", error);
+    }
+  };
+
+  const deleteLead = async (id: string) => {
+    if (!confirm("Tem certeza que deseja apagar este lead? Esta ação não pode ser desfeita.")) return;
+    try {
+      const response = await fetch(`/api/leads/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        fetchLeads();
+      } else {
+        alert("Erro ao remover lead.");
+      }
+    } catch (error) {
+      console.error("Erro ao remover lead:", error);
     }
   };
 
@@ -644,13 +661,22 @@ export default function AdminPage() {
                             <option key={value} value={value}>{label}</option>
                           ))}
                         </select>
-                        <button
-                          onClick={() => toggleExpand(lead.id)}
-                          className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-primary cursor-pointer"
-                        >
-                          {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                          {isExpanded ? "Recolher" : "Detalhes"}
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => deleteLead(lead.id)}
+                            className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 cursor-pointer transition-colors"
+                            title="Apagar lead"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => toggleExpand(lead.id)}
+                            className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-primary cursor-pointer"
+                          >
+                            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                            {isExpanded ? "Recolher" : "Detalhes"}
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
