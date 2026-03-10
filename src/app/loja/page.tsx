@@ -8,7 +8,7 @@ import {
     CreditCard, Flame, Snowflake, TrendingUp, Clock,
     Image as ImageIcon, X, Download, FileText,
     FileSpreadsheet, CheckCircle, XCircle, Calendar,
-    TrendingDown, Banknote, Bell
+    TrendingDown, Banknote, Bell, Loader2
 } from "lucide-react";
 
 interface Lead {
@@ -147,13 +147,13 @@ export default function LojaPage() {
         }
     };
 
-    const handleGeneratePix = async () => {
+    const handleGeneratePix = async (amount: number, credits: number) => {
         setLoadingPix(true);
         try {
             const res = await fetch("/api/checkout/pix", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ amount: 50, credits: 50 }), // Pacote fixo de 50 créditos/reais por enquanto
+                body: JSON.stringify({ amount, credits }), 
             });
             const data = await res.json();
             if (data.success) {
@@ -644,17 +644,36 @@ export default function LojaPage() {
                                 </div>
                                 <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Compre Créditos</h3>
                                 <p className="text-sm text-center text-gray-600 mb-6">
-                                    Para visualizar os dados reais dos clientes mais qualificados, você precisa adquirir um pacote de créditos. Um crédito equivale a R$ 1,00.
+                                    Para visualizar os dados reais dos clientes mais qualificados, você precisa adquirir um pacote de créditos.
                                 </p>
+                                
+                                <div className="space-y-3 mb-4">
+                                    <div className="border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:border-primary transition" onClick={() => handleGeneratePix(30, 30)}>
+                                        <p className="font-bold text-gray-800 text-lg">30 Créditos</p>
+                                        <p className="text-sm text-gray-500">Por R$ 30,00</p>
+                                    </div>
 
-                                <div className="border border-green-200 bg-green-50 rounded-lg p-4 mb-4 text-center cursor-pointer hover:bg-green-100 transition" onClick={handleGeneratePix}>
-                                    <p className="font-bold text-green-800 text-lg">50 Créditos</p>
-                                    <p className="text-sm text-green-700">Por apenas R$ 50,00</p>
+                                    <div className="border border-green-200 bg-green-50 relative rounded-lg p-3 text-center cursor-pointer hover:bg-green-100 transition" onClick={() => handleGeneratePix(55, 60)}>
+                                        <span className="absolute -top-2.5 right-2 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Mais Popular</span>
+                                        <p className="font-bold text-green-800 text-lg flex items-center justify-center gap-1">
+                                            <Flame className="w-4 h-4" /> 60 Créditos
+                                        </p>
+                                        <p className="text-sm text-green-700">Por R$ 55,00 (Economize R$5)</p>
+                                    </div>
+
+                                    <div className="border shadow-sm border-gray-200 bg-gray-50 rounded-lg p-3 text-center cursor-pointer hover:border-primary transition" onClick={() => handleGeneratePix(130, 150)}>
+                                        <p className="font-bold text-gray-800 text-lg flex items-center justify-center gap-1">
+                                            <TrendingUp className="w-4 h-4 text-blue-600" /> 150 Créditos
+                                        </p>
+                                        <p className="text-sm text-gray-500">Por R$ 130,00 (Melhor custo/benefício)</p>
+                                    </div>
                                 </div>
 
-                                <button onClick={handleGeneratePix} disabled={loadingPix} className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
-                                    {loadingPix ? "Aguarde..." : "Pagar R$ 50 via PIX"}
-                                </button>
+                                {loadingPix && (
+                                    <div className="w-full bg-gray-100 text-gray-600 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
+                                        <Loader2 className="w-4 h-4 animate-spin" /> Gerando QR Code...
+                                    </div>
+                                )}
                             </>
                         ) : (
                             <div className="text-center">

@@ -81,9 +81,9 @@ export function getTokenName() {
  */
 export function getUnlockCost(tier: string): number {
     switch (tier) {
-        case "hot": return 5;
-        case "warm": return 3;
-        case "cold": return 1;
-        default: return 1;
+        case "hot": return 30;
+        case "warm": return 15;
+        case "cold": return 5;
+        default: return 5;
     }
 }

@@ -7,9 +7,9 @@ export async function GET() {
         const results = { hot: 0, warm: 0, cold: 0 };
 
         for (const lead of leads) {
-            let cost = 1;
-            if (lead.tier === "hot") cost = 5;
-            else if (lead.tier === "warm") cost = 3;
+            let cost = 5;
+            if (lead.tier === "hot") cost = 30;
+            else if (lead.tier === "warm") cost = 15;
 
             await prisma.lead.update({
                 where: { id: lead.id },
