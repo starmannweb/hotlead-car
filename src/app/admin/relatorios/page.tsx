@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import {
     BarChart3, Eye, Download, Users, ArrowLeft, Car,
     LogOut, Calendar, User, FileSpreadsheet, Clock,
+    Plus, Trash2, X, Banknote
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface ViewLogEntry {
     id: string;
@@ -32,6 +34,7 @@ interface SummaryData {
     totalExports: number;
     totalUsers: number;
     totalLeads: number;
+    totalCreditsSold: number;
     topViewers: { userId: string; viewCount: number; user?: { id: string; name: string; email: string; role: string } }[];
 }
 
@@ -47,6 +50,11 @@ export default function RelatoriosPage() {
     const [users, setUsers] = useState<UserSummary[]>([]);
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
     const [days, setDays] = useState(30);
+    
+    // User creation state
+    const [userModalOpen, setUserModalOpen] = useState(false);
+    const [isSubmittingUser, setIsSubmittingUser] = useState(false);
+    const [newUserForm, setNewUserForm] = useState({ name: "", email: "", role: "client", password: "" });
 
     useEffect(() => {
         checkAuth();
@@ -95,6 +103,48 @@ export default function RelatoriosPage() {
         router.push("/login");
     };
 
+    const handleCreateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSubmittingUser(true);
+        try {
+            const res = await fetch("/api/users", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newUserForm),
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert("Usuário criado com sucesso!");
+                setUserModalOpen(false);
+                setNewUserForm({ name: "", email: "", role: "client", password: "" });
+                fetchUsers();
+            } else {
+                alert(data.message || "Erro ao criar usuário.");
+            }
+        } catch (error) {
+            console.error("Erro ao criar usuário:", error);
+            alert("Erro de conexão.");
+        } finally {
+            setIsSubmittingUser(false);
+        }
+    };
+
+    const handleDeleteUser = async (id: string) => {
+        if (!confirm("Tem certeza que deseja apagar este usuário? Esta ação não pode ser desfeita.")) return;
+        try {
+            const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
+            const data = await res.json();
+            if (data.success) {
+                fetchUsers();
+            } else {
+                alert(data.message || "Erro ao remover usuário.");
+            }
+        } catch (error) {
+            console.error("Erro ao remover usuário:", error);
+            alert("Erro de conexão.");
+        }
+    };
+
     if (loading) {
         return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" /></div>;
     }
@@ -118,6 +168,7 @@ export default function RelatoriosPage() {
                                 <option value={30}>Ultimos 30 dias</option>
                                 <option value={90}>Ultimos 90 dias</option>
                             </select>
+                            <ThemeToggle />
                             <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer"><LogOut className="w-5 h-5" /></button>
                         </div>
                     </div>
@@ -158,6 +209,10 @@ export default function RelatoriosPage() {
                             <div className="bg-white rounded-xl border border-gray-200 p-5">
                                 <div className="flex items-center gap-2 text-gray-500 text-sm mb-2"><Car className="w-4 h-4" />Leads</div>
                                 <p className="text-3xl font-bold text-gray-900">{summary.totalLeads}</p>
+                            </div>
+                            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                                <div className="flex items-center gap-2 text-green-600 text-sm mb-2"><Banknote className="w-4 h-4" />Créditos Vendidos</div>
+                                <p className="text-3xl font-bold text-green-700">{summary.totalCreditsSold}</p>
                             </div>
                         </div>
 
@@ -237,7 +292,13 @@ export default function RelatoriosPage() {
 
                 {/* Users Tab */}
                 {tab === "users" && (
-                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div className="space-y-4">
+                        <div className="flex justify-end">
+                            <button onClick={() => setUserModalOpen(true)} className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors cursor-pointer shadow-sm">
+                                <Plus className="w-4 h-4" /> Criar Usuário
+                            </button>
+                        </div>
+                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50 border-b border-gray-200">
                                 <tr>
@@ -265,18 +326,65 @@ export default function RelatoriosPage() {
                                         <td className="px-4 py-3 font-medium">{u._count.exportLogs}</td>
                                         <td className="px-4 py-3 text-gray-600">{new Date(u.createdAt).toLocaleDateString("pt-BR")}</td>
                                         <td className="px-4 py-3">
-                                            <button onClick={() => { setSelectedUser(u.id); setTab("views"); }} className="flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer">
-                                                <Eye className="w-3.5 h-3.5" /> Ver atividade
-                                            </button>
+                                            <div className="flex items-center gap-3">
+                                                <button onClick={() => { setSelectedUser(u.id); setTab("views"); }} className="flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer" title="Ver Atividade">
+                                                    <Eye className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => handleDeleteUser(u.id)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-600 cursor-pointer" title="Remover Usuário">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}
                                 {users.length === 0 && <tr><td colSpan={7} className="text-center text-gray-500 py-8">Nenhum usuario cadastrado.</td></tr>}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 )}
             </div>
+
+            {/* User creation modal */}
+            {userModalOpen && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
+                            <h2 className="text-lg font-bold text-gray-900">Novo Usuário</h2>
+                            <button onClick={() => setUserModalOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleCreateUser} className="p-5 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome completo</label>
+                                <input required type="text" value={newUserForm.name} onChange={e => setNewUserForm({ ...newUserForm, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">E-mail de acesso</label>
+                                <input required type="email" value={newUserForm.email} onChange={e => setNewUserForm({ ...newUserForm, email: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Função no painel</label>
+                                <select required value={newUserForm.role} onChange={e => setNewUserForm({ ...newUserForm, role: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                                    <option value="client">Lojista / Cliente (Compra Leads)</option>
+                                    <option value="seller">Vendedor (Opcional interno)</option>
+                                    <option value="admin">Administrador Geral</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
+                                <input required minLength={6} type="password" value={newUserForm.password} onChange={e => setNewUserForm({ ...newUserForm, password: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+                            </div>
+                            <div className="pt-2">
+                                <button type="submit" disabled={isSubmittingUser} className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 disabled:opacity-70">
+                                    {isSubmittingUser ? "Criando..." : "Criar Usuário"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

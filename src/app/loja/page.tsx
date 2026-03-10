@@ -10,6 +10,7 @@ import {
     FileSpreadsheet, CheckCircle, XCircle, Calendar,
     TrendingDown, Banknote, Bell, Loader2, Gauge
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 interface Lead {
     id: string;
@@ -17,6 +18,7 @@ interface Lead {
     phone: string;
     state: string;
     city: string;
+    region?: string;
     vehicleBrand: string;
     vehicleModel: string;
     vehicleYear: string;
@@ -194,9 +196,9 @@ export default function LojaPage() {
         }
     };
 
-    const isUnlocked = (leadId: string, field: string) => {
+    const isUnlocked = (leadId: string) => {
         if (user?.role === "admin" || user?.role === "seller") return true;
-        return unlockedLeads.has(`${leadId}_${field}`);
+        return Array.from(unlockedLeads).some(k => k.startsWith(`${leadId}_`));
     };
 
     const maskValue = (value: string) =>
@@ -243,14 +245,15 @@ export default function LojaPage() {
     // Filtering and sorting
     const filteredLeads = leads
         .filter((l) => filter === "all" || l.tier === filter)
-        .filter((l) => stateFilter === "all" || l.state === stateFilter)
+        .filter((l) => stateFilter === "all" || l.region === stateFilter || l.state === stateFilter)
         .filter((l) => {
             if (!searchQuery) return true;
             const q = searchQuery.toLowerCase();
             return (
                 l.vehicleBrand.toLowerCase().includes(q) ||
                 l.vehicleModel.toLowerCase().includes(q) ||
-                l.city.toLowerCase().includes(q)
+                l.city.toLowerCase().includes(q) ||
+                (l.region && l.region.toLowerCase().includes(q))
             );
         })
         .sort((a, b) => {
@@ -258,7 +261,7 @@ export default function LojaPage() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-    const states = Array.from(new Set(leads.map(l => l.state))).filter(Boolean).sort();
+    const states = Array.from(new Set(leads.map(l => l.region || l.state))).filter(Boolean).sort();
 
     if (loading) {
         return (
@@ -312,7 +315,9 @@ export default function LojaPage() {
 
                             {/* Export removed per request */}
 
-                            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer" title="Sair">
+                            <ThemeToggle />
+
+                            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" title="Sair do painel">
                                 <LogOut className="w-5 h-5" />
                             </button>
                         </div>
@@ -344,7 +349,7 @@ export default function LojaPage() {
                             </div>
                         </div>
 
-                        {/* State Filter */}
+                        {/* Region filter */}
                         <div>
                             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Região</label>
                             <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs">
@@ -392,10 +397,11 @@ export default function LojaPage() {
                         filteredLeads.map((lead) => {
                             const photos = getPhotos(lead);
                             const isExpanded = expandedLeads.has(lead.id);
-                            const nameUnlocked = isUnlocked(lead.id, "name");
-                            const phoneUnlocked = isUnlocked(lead.id, "phone");
-                            const kmUnlocked = isUnlocked(lead.id, "km");
-                            const detailsUnlocked = isUnlocked(lead.id, "details");
+                            const itemUnlocked = isUnlocked(lead.id);
+                            const nameUnlocked = itemUnlocked;
+                            const phoneUnlocked = itemUnlocked;
+                            const kmUnlocked = itemUnlocked;
+                            const detailsUnlocked = itemUnlocked;
 
                             return (
                                 <div key={lead.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
@@ -426,23 +432,6 @@ export default function LojaPage() {
                                                             <p className="font-semibold text-gray-900">
                                                                 {nameUnlocked ? lead.name : maskValue(lead.name)}
                                                             </p>
-                                                            {!nameUnlocked && (
-                                                                <button
-                                                                    onClick={() => unlockLead(lead.id, "name")}
-                                                                    disabled={unlocking === lead.id}
-                                                                    className="flex items-center gap-1 text-amber-600 hover:text-amber-700 cursor-pointer text-xs"
-                                                                    title={`Desbloquear (${lead.unlockCost} creditos)`}
-                                                                >
-                                                                    {unlocking === lead.id ? (
-                                                                        <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-                                                                    ) : (
-                                                                        <>
-                                                                            <Eye className="w-4 h-4" />
-                                                                            <Lock className="w-3 h-3" />
-                                                                        </>
-                                                                    )}
-                                                                </button>
-                                                            )}
                                                             {nameUnlocked && user?.role !== "admin" && user?.role !== "seller" && (
                                                                 <EyeOff className="w-4 h-4 text-green-500" />
                                                             )}
@@ -461,17 +450,6 @@ export default function LojaPage() {
                                                                     </a>
                                                                 ) : maskPhone(lead.phone)}
                                                             </p>
-                                                            {!phoneUnlocked && (
-                                                                <button
-                                                                    onClick={() => unlockLead(lead.id, "phone")}
-                                                                    disabled={unlocking === lead.id}
-                                                                    className="flex items-center gap-1 text-amber-600 hover:text-amber-700 cursor-pointer text-xs"
-                                                                    title={`Desbloquear (${lead.unlockCost} creditos)`}
-                                                                >
-                                                                    <Eye className="w-4 h-4" />
-                                                                    <Lock className="w-3 h-3" />
-                                                                </button>
-                                                            )}
                                                         </div>
                                                     </div>
 
@@ -481,6 +459,7 @@ export default function LojaPage() {
                                                         <p className="font-medium text-gray-900 flex items-center gap-1">
                                                             <MapPin className="w-4 h-4 text-gray-400" />
                                                             {lead.city}{lead.state ? ` - ${lead.state}` : ""}
+                                                            {lead.region && <span className="text-gray-500 text-xs ml-1">({lead.region})</span>}
                                                         </p>
                                                     </div>
 
@@ -496,17 +475,6 @@ export default function LojaPage() {
                                                                 <Gauge className="w-4 h-4 text-gray-400" />
                                                                 {kmUnlocked ? lead.km : '*** km'}
                                                             </p>
-                                                            {!kmUnlocked && (
-                                                                <button
-                                                                    onClick={() => unlockLead(lead.id, "km")}
-                                                                    disabled={unlocking === lead.id}
-                                                                    className="flex items-center gap-1 text-amber-600 hover:text-amber-700 cursor-pointer text-[10px]"
-                                                                    title={`Desbloquear quilometragem`}
-                                                                >
-                                                                    <Eye className="w-3 h-3" />
-                                                                    <Lock className="w-2.5 h-2.5" />
-                                                                </button>
-                                                            )}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -515,12 +483,25 @@ export default function LojaPage() {
                                             {/* Actions */}
                                             <div className="ml-4 flex flex-col gap-2 items-end">
                                                 {/* Cost indicator */}
-                                                {user?.role === "client" && (
-                                                    <div className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200">
-                                                        <Coins className="w-3.5 h-3.5" />
-                                                        {lead.unlockCost} creditos
+                                                {!itemUnlocked && user?.role === "client" && (
+                                                    <div className="flex flex-col items-center gap-2">
+                                                      <button
+                                                          onClick={() => unlockLead(lead.id, "all")}
+                                                          disabled={unlocking === lead.id}
+                                                          className="flex items-center gap-1 text-sm bg-amber-500 text-white hover:bg-amber-600 px-3 py-1.5 rounded-lg border border-amber-600 transition-colors shadow-sm"
+                                                          title={`Desbloquear contato`}
+                                                      >
+                                                          {unlocking === lead.id ? (
+                                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                            ) : (
+                                                                <>
+                                                                  <Eye className="w-4 h-4" /> Desbloquear Card
+                                                                </>
+                                                            )}
+                                                      </button>
                                                     </div>
                                                 )}
+
                                                 <button
                                                     onClick={() => {
                                                         if (!detailsUnlocked && user?.role === "client") {
@@ -532,10 +513,10 @@ export default function LojaPage() {
                                                             return next;
                                                         });
                                                     }}
-                                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary cursor-pointer"
+                                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary cursor-pointer mt-2"
                                                 >
                                                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                                                    {isExpanded ? "Recolher" : "Ver detalhes"}
+                                                    {isExpanded ? "Recolher detalhes" : "Ver detalhes"}
                                                 </button>
                                             </div>
                                         </div>

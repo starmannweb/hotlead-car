@@ -537,7 +537,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
 
   /* ---------- MAIN RENDER ---------- */
   return (
-    <div className="min-h-[100dvh] flex flex-col bg-white dark:bg-gray-900">
+    <div className="min-h-[100dvh] flex flex-col bg-white">
       <div className="fixed top-0 left-0 right-0 z-50 h-1.5 bg-gray-100"><div className="h-full bg-primary transition-all duration-500 ease-out" style={{ width: `${progress}%` }} /></div>
       <div className="fixed top-1.5 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">

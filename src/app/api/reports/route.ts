@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
                 return NextResponse.json({ success: false, message: "Sem permissao" }, { status: 403 });
             }
 
-            const [totalViews, totalExports, totalUsers, totalLeads, viewsByUser] = await Promise.all([
+            const [totalViews, totalExports, totalUsers, totalLeads, viewsByUser, creditsSold] = await Promise.all([
                 prisma.viewLog.count({ where: { createdAt: { gte: since } } }),
                 prisma.exportLog.count({ where: { createdAt: { gte: since } } }),
                 prisma.user.count({ where: { isActive: true } }),
@@ -99,6 +99,10 @@ export async function GET(request: NextRequest) {
                     orderBy: { _count: { id: "desc" } },
                     take: 10,
                 }),
+                prisma.creditTransaction.aggregate({
+                    where: { type: "purchase", createdAt: { gte: since } },
+                    _sum: { amount: true }
+                })
             ]);
 
             // Get user names for the top viewers
@@ -121,7 +125,7 @@ export async function GET(request: NextRequest) {
 
             return NextResponse.json({
                 success: true,
-                data: { totalViews, totalExports, totalUsers, totalLeads, topViewers },
+                data: { totalViews, totalExports, totalUsers, totalLeads, topViewers, totalCreditsSold: creditsSold._sum.amount || 0 },
             });
         }
 

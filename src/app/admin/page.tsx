@@ -2,36 +2,14 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Lead } from "@prisma/client";
 import {
-  Flame,
-  Snowflake,
-  TrendingUp,
-  Phone,
-  MapPin,
-  Car,
-  Calendar,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Eye,
-  EyeOff,
-  Download,
-  FileSpreadsheet,
-  FileText,
-  ChevronDown,
-  ChevronUp,
-  Image as ImageIcon,
-  X,
-  BarChart3,
-  Search,
-  Filter,
-  LogOut,
-  TrendingDown,
-  Banknote,
-  Bell,
-  Trash2
+  Car, Download, MapPin, Eye, Search, FileText,
+  FileSpreadsheet, XCircle, CheckCircle, Calendar,
+  TrendingDown, Banknote, LogOut, TrendingUp, Flame,
+  Snowflake, Trash2, EyeOff, BarChart3, Bell, X, Phone, Clock, ChevronDown, ChevronUp, Image as ImageIcon, Filter
 } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Lead } from "@prisma/client";
 
 const TIER_LABELS: Record<string, string> = {
   hot: "Quente",
@@ -465,6 +443,7 @@ export default function AdminPage() {
               <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer" title="Sair">
                 <LogOut className="w-5 h-5" />
               </button>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -672,20 +651,21 @@ export default function AdminPage() {
                             <option key={value} value={value}>{label}</option>
                           ))}
                         </select>
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => deleteLead(lead.id)}
-                            className="flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500 hover:text-red-500 cursor-pointer transition-colors"
-                            title="Apagar lead"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                        <div className="flex flex-col items-end gap-3 h-full justify-between">
                           <button
                             onClick={() => toggleExpand(lead.id)}
-                            className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-primary cursor-pointer"
+                            className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-primary cursor-pointer mb-2"
                           >
                             {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                             {isExpanded ? "Recolher" : "Detalhes"}
+                          </button>
+
+                          <button
+                            onClick={() => deleteLead(lead.id)}
+                            className="flex items-center justify-center w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/40 cursor-pointer transition-colors mt-auto"
+                            title="Apagar lead"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </div>
