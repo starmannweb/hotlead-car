@@ -66,6 +66,8 @@ export default function LojaPage() {
     const [credits, setCredits] = useState(0);
     const [buyModalOpen, setBuyModalOpen] = useState(false);
     const [newLeadNotification, setNewLeadNotification] = useState(false);
+    const [pixData, setPixData] = useState<{ qrCodeUrl: string, pixCopiaECola: string, txid: string, message?: string } | null>(null);
+    const [loadingPix, setLoadingPix] = useState(false);
     const prevLeadsLen = useRef(0);
 
     useEffect(() => {
@@ -142,6 +144,53 @@ export default function LojaPage() {
             alert("Erro de conexao");
         } finally {
             setUnlocking(null);
+        }
+    };
+
+    const handleGeneratePix = async () => {
+        setLoadingPix(true);
+        try {
+            const res = await fetch("/api/checkout/pix", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount: 50, credits: 50 }), // Pacote fixo de 50 créditos/reais por enquanto
+            });
+            const data = await res.json();
+            if (data.success) {
+                setPixData(data);
+            } else {
+                alert(data.message || "Erro ao gerar PIX");
+            }
+        } catch {
+            alert("Erro de conexão");
+        } finally {
+            setLoadingPix(false);
+        }
+    };
+
+    const handleConfirmPayment = async () => {
+        if (!pixData?.txid) return;
+        setLoadingPix(true);
+        try {
+            const res = await fetch("/api/checkout/pix/confirm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ txid: pixData.txid }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setCredits(data.newCredits);
+                setPixData({ ...pixData, message: "Pagamento Aprovado!" });
+                setTimeout(() => {
+                    setBuyModalOpen(false);
+                    setPixData(null);
+                }, 2000);
+            } else {
+                alert("Pagamento ainda nao detectado. Tente novamente.");
+            }
+        } catch {
+        } finally {
+            setLoadingPix(false);
         }
     };
 
@@ -584,19 +633,55 @@ export default function LojaPage() {
             {buyModalOpen && (
                 <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
                     <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative animate-[fadeInUp_0.3s_ease-out]">
-                        <button onClick={() => setBuyModalOpen(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                        <button onClick={() => { setBuyModalOpen(false); setPixData(null); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
                             <X className="w-5 h-5" />
                         </button>
-                        <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-4 mx-auto">
-                            <Coins className="w-6 h-6" />
-                        </div>
-                        <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Créditos insuficientes</h3>
-                        <p className="text-sm text-center text-gray-600 mb-6">
-                            Para visualizar os dados reais dos clientes mais qualificados do mercado, você precisa adquirir um pacote de créditos.
-                        </p>
-                        <button onClick={() => setBuyModalOpen(false)} className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
-                            <span>Falar com o comercial</span>
-                        </button>
+
+                        {!pixData ? (
+                            <>
+                                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-4 mx-auto">
+                                    <Coins className="w-6 h-6" />
+                                </div>
+                                <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Compre Créditos</h3>
+                                <p className="text-sm text-center text-gray-600 mb-6">
+                                    Para visualizar os dados reais dos clientes mais qualificados, você precisa adquirir um pacote de créditos. Um crédito equivale a R$ 1,00.
+                                </p>
+
+                                <div className="border border-green-200 bg-green-50 rounded-lg p-4 mb-4 text-center cursor-pointer hover:bg-green-100 transition" onClick={handleGeneratePix}>
+                                    <p className="font-bold text-green-800 text-lg">50 Créditos</p>
+                                    <p className="text-sm text-green-700">Por apenas R$ 50,00</p>
+                                </div>
+
+                                <button onClick={handleGeneratePix} disabled={loadingPix} className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
+                                    {loadingPix ? "Aguarde..." : "Pagar R$ 50 via PIX"}
+                                </button>
+                            </>
+                        ) : (
+                            <div className="text-center">
+                                {pixData.message ? (
+                                    <>
+                                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-4 mx-auto">
+                                            <CheckCircle className="w-8 h-8" />
+                                        </div>
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">Pagamento Aprovado!</h3>
+                                    </>
+                                ) : (
+                                    <>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Pague pelo PIX</h3>
+                                        <p className="text-sm text-gray-600 mb-4">Escaneie o QR Code abaixo ou copie e cole a chave no seu app bancário.</p>
+                                        <img src={pixData.qrCodeUrl} alt="QR Code PIX" className="w-48 h-48 mx-auto mb-4 border" />
+
+                                        <div className="bg-gray-100 p-2 rounded-lg break-all text-xs text-gray-600 mb-4 font-mono select-all">
+                                            {pixData.pixCopiaECola}
+                                        </div>
+
+                                        <button onClick={handleConfirmPayment} disabled={loadingPix} className="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
+                                            {loadingPix ? "Verificando..." : "Já Paguei! (Confirmar)"}
+                                        </button>
+                                    </>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

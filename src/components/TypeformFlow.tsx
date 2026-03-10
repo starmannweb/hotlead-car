@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import {
   URGENCY_OPTIONS, DISCOUNT_OPTIONS, DOCS_OPTIONS,
-  FINANCE_OPTIONS, PHOTO_LABELS, BRAZILIAN_STATES, REGIONS
+  FINANCE_OPTIONS, PHOTO_LABELS, BRAZILIAN_STATES,
 } from "@/lib/constants";
 import { POPULAR_BRANDS, getDisplayName } from "@/lib/fipe";
 import type { FipeBrand } from "@/lib/fipe";
@@ -35,7 +35,7 @@ interface StepDef {
 const STEPS: StepDef[] = [
   { id: "name", field: "name", title: "Qual é o seu nome?", subtitle: "Precisamos saber quem está vendendo", icon: User, type: "text", placeholder: "Digite seu nome completo", required: true, validate: (v) => (!v.trim() ? "Informe seu nome" : null) },
   { id: "phone", field: "phone", title: "Qual seu WhatsApp?", subtitle: "Os lojistas entrarão em contato por aqui", icon: Phone, type: "tel", placeholder: "(11) 99999-9999", required: true, maxLength: 16, validate: (v) => (!validatePhone(v) ? "Número inválido. Use DDD + número" : null), format: formatPhone },
-  { id: "region", field: "city", title: "Em qual região você está?", subtitle: "Atendemos o estado de São Paulo", icon: MapPin, type: "options", options: REGIONS.map(r => ({ value: r, label: r })), required: true, validate: (v) => (!v ? "Selecione uma região" : null) },
+  { id: "state_city", field: "state", title: "Onde você está?", subtitle: "Selecione o estado e depois a cidade", icon: MapPin, type: "state_city", required: true, validate: (_v, extra) => { if (!extra?.state) return "Selecione o estado"; if (!extra?.city) return "Selecione a cidade"; return null; } },
   { id: "vehicle_brand", field: "vehicle_brand", title: "Qual a marca do seu carro?", subtitle: "Selecione a marca do veículo", icon: Car, type: "brand_picker", required: true, validate: (v) => (!v ? "Selecione a marca" : null) },
   { id: "vehicle_model", field: "vehicle_model", title: "Qual o modelo?", subtitle: "Comece a digitar para buscar modelos", icon: Car, type: "model_picker", placeholder: "Buscar modelo...", required: true, validate: (v) => (!v.trim() ? "Informe o modelo" : null) },
   { id: "vehicle_year", field: "vehicle_year", title: "Qual o ano do veículo?", subtitle: "Selecione o ano de fabricação", icon: Car, type: "year_picker", required: true, validate: (v) => (!v.trim() ? "Selecione o ano" : null) },
@@ -88,7 +88,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   });
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [formValues, setFormValues] = useState<Record<string, string>>({
-    name: initialData?.name || "", phone: initialData?.phone || "", state: "SP", city: "",
+    name: initialData?.name || "", phone: initialData?.phone || "", state: "", city: "",
     vehicle_brand: "", vehicle_model: "",
     vehicle_year: "", km: "", urgency: "",
     discount_acceptance: "", docs_status: "", finance_status: "", lgpd_consent: "",
@@ -133,9 +133,15 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   // Track start
   useEffect(() => { if (!hasTrackedStart.current) { trackEvent({ event: "form_start" }); hasTrackedStart.current = true; } }, []);
 
-  // GeoIP on mount (Disabling it since we only use SP and user selects Regions directly now)
+  // GeoIP on mount
   useEffect(() => {
-    // keeping effect empty but preserved to avoid huge diff
+    fetch("/api/cities?action=geoip").then(r => r.json()).then(data => {
+      if (data.success && data.data?.state) {
+        setFormValues(prev => ({ ...prev, state: data.data.state }));
+        setGeoDetected(true);
+        fetchCities(data.data.state);
+      }
+    }).catch(() => { });
   }, []);
 
   // Load brands

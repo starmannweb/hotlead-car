@@ -44,10 +44,12 @@ model Lead {
   updatedAt DateTime @updatedAt
 
   // Dados pessoais
-  name  String
-  phone String
-  state String @default("")
-  city  String
+  name   String
+  phone  String
+  state  String @default("")
+  city   String
+  region String @default("")
+  ip     String @default("")
 
   // Dados do veiculo
   vehicleBrand String

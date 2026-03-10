@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       phone,
-      state = "",
+      state = "SP",
       city,
       vehicle_brand,
       vehicle_model,
@@ -36,13 +36,38 @@ export async function POST(request: NextRequest) {
       financeStatus: finance_status,
     });
 
+    // Pega IP do usuário
+    const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "0.0.0.0";
+
+    // Mapeia cidade para Região (IBGE)
+    let region = city || ""; // Fallback
+    if (city && state) {
+      try {
+        const ibgeRes = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`);
+        if (ibgeRes.ok) {
+          const municipios = await ibgeRes.json();
+          const pCity = city.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+          const match = municipios.find((m: any) =>
+            m.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === pCity
+          );
+          if (match && match.microrregiao && match.microrregiao.mesorregiao) {
+            region = match.microrregiao.mesorregiao.nome;
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao buscar região no IBGE", error);
+      }
+    }
+
     // Salvar no banco
-    const lead = await prisma.lead.create({
+    const lead = await (prisma as any).lead.create({
       data: {
         name,
         phone,
         state,
         city,
+        region,
+        ip,
         vehicleBrand: vehicle_brand,
         vehicleModel: vehicle_model,
         vehicleYear: vehicle_year,
@@ -110,9 +135,13 @@ export async function GET(request: NextRequest) {
       prisma.lead.count({ where }),
     ]);
 
+    // Calcular as regiões (unique) para enviar para o frontend e mostrar no menu de opções
+    const uniqueRegions = Array.from(new Set(leads.map((l: any) => l.region).filter(Boolean))).sort();
+
     return NextResponse.json({
       success: true,
       data: leads,
+      uniqueRegions,
       pagination: {
         page,
         limit,

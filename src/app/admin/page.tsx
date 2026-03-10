@@ -634,11 +634,15 @@ export default function AdminPage() {
                           </div>
 
                           <div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Localidade</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Localidade / IP</p>
                             <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                               <MapPin className="w-4 h-4 text-gray-400" />
                               {lead.city}{leadState ? ` - ${leadState}` : ""}
+                              {(lead as any).region && <span className="text-gray-500 text-xs ml-1">({(lead as any).region})</span>}
                             </p>
+                            {(lead as any).ip && (
+                              <p className="text-xs text-gray-400 mt-1">IP: {(lead as any).ip}</p>
+                            )}
                           </div>
 
                           <div>
