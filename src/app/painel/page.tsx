@@ -29,6 +29,7 @@ export default function PainelPage() {
     const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
+    const [stateFilter, setStateFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [sortBy, setSortBy] = useState<"recent" | "score">("score");
     const [searchQuery, setSearchQuery] = useState("");
@@ -105,9 +106,12 @@ export default function PainelPage() {
 
     const filteredLeads = leads
         .filter((l) => filter === "all" || l.tier === filter)
+        .filter((l) => stateFilter === "all" || l.state === stateFilter)
         .filter((l) => statusFilter === "all" || l.status === statusFilter)
         .filter((l) => { if (!searchQuery) return true; const q = searchQuery.toLowerCase(); return l.vehicleBrand.toLowerCase().includes(q) || l.vehicleModel.toLowerCase().includes(q) || l.city.toLowerCase().includes(q); })
         .sort((a, b) => sortBy === "score" ? b.score - a.score : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const states = Array.from(new Set(leads.map(l => l.state))).filter(Boolean).sort();
 
     const logExport = async (format: string) => { try { await fetch("/api/leads/view-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: "export", field: `export_${format}` }) }); } catch { /* */ } };
     const exportCSV = () => {
@@ -172,6 +176,13 @@ export default function PainelPage() {
                                     <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${filter === tier ? tier === "hot" ? "bg-red-100 text-red-700" : tier === "warm" ? "bg-yellow-100 text-yellow-700" : tier === "cold" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-900" : "bg-gray-50 text-gray-600 hover:bg-gray-100"}`}>{tier === "all" ? "Todos" : TIER_LABELS[tier]}</button>
                                 ))}
                             </div>
+                        </div>
+                        <div>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Regiao (Estado)</label>
+                            <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-900 text-xs">
+                                <option value="all">Todos os Estados</option>
+                                {states.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
                         </div>
                         <div>
                             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Status</label>

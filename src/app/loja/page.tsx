@@ -55,28 +55,16 @@ export default function LojaPage() {
     const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
+    const [stateFilter, setStateFilter] = useState<string>("all");
     const [sortBy, setSortBy] = useState<"recent" | "score">("recent");
     const [searchQuery, setSearchQuery] = useState("");
     const [unlockedLeads, setUnlockedLeads] = useState<Set<string>>(new Set());
     const [expandedLeads, setExpandedLeads] = useState<Set<string>>(new Set());
     const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
-    const [exportMenuOpen, setExportMenuOpen] = useState(false);
     const [unlocking, setUnlocking] = useState<string | null>(null);
     const [credits, setCredits] = useState(0);
-    const exportRef = useRef<HTMLDivElement>(null);
-
     useEffect(() => {
         checkAuth();
-    }, []);
-
-    useEffect(() => {
-        const handleClickOutside = (e: MouseEvent) => {
-            if (exportRef.current && !exportRef.current.contains(e.target as Node)) {
-                setExportMenuOpen(false);
-            }
-        };
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     const checkAuth = async () => {
@@ -190,6 +178,7 @@ export default function LojaPage() {
     // Filtering and sorting
     const filteredLeads = leads
         .filter((l) => filter === "all" || l.tier === filter)
+        .filter((l) => stateFilter === "all" || l.state === stateFilter)
         .filter((l) => {
             if (!searchQuery) return true;
             const q = searchQuery.toLowerCase();
@@ -204,52 +193,7 @@ export default function LojaPage() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-    const logExport = async (format: string) => {
-        try {
-            await fetch("/api/leads/view-log", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ leadId: "export", field: `export_${format}` }),
-            });
-        } catch { /* silent */ }
-    };
-
-    const exportCSV = () => {
-        const headers = ["Marca", "Modelo", "Ano", "KM", "Cidade", "Score", "Qualificacao", "Status", "Data"];
-        const rows = filteredLeads.map((l) => [
-            l.vehicleBrand, l.vehicleModel, l.vehicleYear, l.km, l.city,
-            l.score, TIER_LABELS[l.tier] || l.tier, STATUS_LABELS[l.status] || l.status,
-            new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }),
-        ]);
-        const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
-        const BOM = "\uFEFF";
-        const blob = new Blob([BOM + csv], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "leads.csv"; a.click();
-        URL.revokeObjectURL(url);
-        logExport("csv");
-    };
-
-    const exportExcel = () => {
-        const headers = ["Marca", "Modelo", "Ano", "KM", "Cidade", "Score", "Qualificacao", "Status", "Data"];
-        const rows = filteredLeads.map((l) => [
-            l.vehicleBrand, l.vehicleModel, l.vehicleYear, l.km, l.city,
-            l.score, TIER_LABELS[l.tier] || l.tier, STATUS_LABELS[l.status] || l.status,
-            new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" }),
-        ]);
-        let table = "<table><thead><tr>";
-        headers.forEach((h) => (table += `<th>${h}</th>`));
-        table += "</tr></thead><tbody>";
-        rows.forEach((r) => { table += "<tr>"; r.forEach((c) => (table += `<td>${c}</td>`)); table += "</tr>"; });
-        table += "</tbody></table>";
-        const blob = new Blob([`<html><head><meta charset="utf-8"></head><body>${table}</body></html>`], { type: "application/vnd.ms-excel;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "leads.xls"; a.click();
-        URL.revokeObjectURL(url);
-        logExport("excel");
-    };
+    const states = Array.from(new Set(leads.map(l => l.state))).filter(Boolean).sort();
 
     if (loading) {
         return (
@@ -301,22 +245,7 @@ export default function LojaPage() {
                                 </div>
                             </div>
 
-                            {/* Export */}
-                            <div className="relative" ref={exportRef}>
-                                <button onClick={() => setExportMenuOpen(!exportMenuOpen)} className="flex items-center gap-2 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 cursor-pointer">
-                                    <Download className="w-4 h-4" /> Exportar
-                                </button>
-                                {exportMenuOpen && (
-                                    <div className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-lg shadow-xl z-20">
-                                        <button onClick={() => { exportCSV(); setExportMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer rounded-t-lg">
-                                            <FileText className="w-4 h-4 text-green-600" /> CSV
-                                        </button>
-                                        <button onClick={() => { exportExcel(); setExportMenuOpen(false); }} className="w-full flex items-center gap-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer rounded-b-lg">
-                                            <FileSpreadsheet className="w-4 h-4 text-blue-600" /> Excel
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+                            {/* Export removed per request */}
 
                             <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer" title="Sair">
                                 <LogOut className="w-5 h-5" />
@@ -338,16 +267,25 @@ export default function LojaPage() {
                             <div className="flex gap-2">
                                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
                                     <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${filter === tier
-                                            ? tier === "hot" ? "bg-red-100 text-red-700"
-                                                : tier === "warm" ? "bg-yellow-100 text-yellow-700"
-                                                    : tier === "cold" ? "bg-blue-100 text-blue-700"
-                                                        : "bg-gray-200 text-gray-900"
-                                            : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                        ? tier === "hot" ? "bg-red-100 text-red-700"
+                                            : tier === "warm" ? "bg-yellow-100 text-yellow-700"
+                                                : tier === "cold" ? "bg-blue-100 text-blue-700"
+                                                    : "bg-gray-200 text-gray-900"
+                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
                                         }`}>
                                         {tier === "all" ? "Todos" : TIER_LABELS[tier]}
                                     </button>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* State Filter */}
+                        <div>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Regiao (Estado)</label>
+                            <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs">
+                                <option value="all">Todos os Estados</option>
+                                {states.map(s => <option key={s} value={s}>{s}</option>)}
+                            </select>
                         </div>
 
                         {/* Sort */}

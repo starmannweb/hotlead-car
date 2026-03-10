@@ -48,6 +48,7 @@ export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
+  const [stateFilter, setStateFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"score" | "recent">("score");
   const [searchQuery, setSearchQuery] = useState("");
@@ -151,6 +152,7 @@ export default function AdminPage() {
 
   const filteredLeads = leads
     .filter((lead) => (filter === "all" ? true : lead.tier === filter))
+    .filter((lead) => (stateFilter === "all" ? true : (lead as any).state === stateFilter))
     .filter((lead) => (statusFilter === "all" ? true : lead.status === statusFilter))
     .filter((lead) => {
       if (!searchQuery) return true;
@@ -158,6 +160,8 @@ export default function AdminPage() {
       return lead.vehicleBrand.toLowerCase().includes(q) || lead.vehicleModel.toLowerCase().includes(q) || lead.city.toLowerCase().includes(q) || lead.name.toLowerCase().includes(q);
     })
     .sort((a, b) => sortBy === "score" ? b.score - a.score : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const states = Array.from(new Set(leads.map(l => (l as any).state))).filter(Boolean).sort();
 
   const getPhotos = (lead: Lead): string[] => {
     try {
@@ -461,6 +465,20 @@ export default function AdminPage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Regiao (Estado)</label>
+              <select
+                value={stateFilter}
+                onChange={(e) => setStateFilter(e.target.value)}
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                <option value="all">Todos os Estados</option>
+                {states.map((s) => (
+                  <option key={s as string} value={s as string}>{s as string}</option>
+                ))}
+              </select>
             </div>
 
             <div>
