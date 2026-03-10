@@ -225,7 +225,7 @@ export default function AdminPage() {
       l.score,
       TIER_LABELS[l.tier] || l.tier,
       STATUS_LABELS[l.status] || l.status,
-      new Date(l.createdAt).toLocaleDateString("pt-BR"),
+      new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
     ]);
     const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
     downloadFile(csv, "leads.csv", "text/csv;charset=utf-8;");
@@ -253,7 +253,7 @@ export default function AdminPage() {
       l.score,
       TIER_LABELS[l.tier] || l.tier,
       STATUS_LABELS[l.status] || l.status,
-      new Date(l.createdAt).toLocaleDateString("pt-BR"),
+      new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" }),
     ]);
     let table = "<table><thead><tr>";
     headers.forEach((h) => (table += `<th>${h}</th>`));
@@ -291,7 +291,7 @@ export default function AdminPage() {
           <td>${l.score}</td>
           <td>${TIER_LABELS[l.tier] || l.tier}</td>
           <td>${STATUS_LABELS[l.status] || l.status}</td>
-          <td>${new Date(l.createdAt).toLocaleDateString("pt-BR")}</td>
+          <td>${new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td>
         </tr>`
       )
       .join("");
@@ -491,7 +491,7 @@ export default function AdminPage() {
                             {STATUS_LABELS[lead.status] || lead.status}
                           </span>
                           <span className="text-xs text-gray-400 dark:text-gray-500">
-                            {new Date(lead.createdAt).toLocaleDateString("pt-BR")}
+                            {new Date(lead.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                           </span>
                         </div>
 
@@ -541,7 +541,7 @@ export default function AdminPage() {
                           <div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Data</p>
                             <p className="font-medium text-gray-900 dark:text-white">
-                              {new Date(lead.createdAt).toLocaleDateString("pt-BR")}
+                              {new Date(lead.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                             </p>
                           </div>
                         </div>
