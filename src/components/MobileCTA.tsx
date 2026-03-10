@@ -8,10 +8,10 @@ interface MobileCTAProps {
 
 export default function MobileCTA({ onClick }: MobileCTAProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white/95 dark:bg-gray-900/95 backdrop-blur-lg border-t border-gray-200 dark:border-gray-700 p-3 shadow-[0_-4px_30px_rgba(0,0,0,0.12)]">
       <button
         onClick={onClick}
-        className="btn-primary w-full flex items-center justify-center gap-2 py-3.5 text-base"
+        className="w-full flex items-center justify-center gap-2 bg-accent hover:bg-accent-light text-white font-bold py-3.5 px-6 rounded-xl text-base transition-all duration-200 active:scale-[0.98] shadow-lg shadow-accent/30 cursor-pointer"
       >
         Receber propostas agora
         <ArrowRight className="w-5 h-5" />
