@@ -9,6 +9,7 @@ import Image from "next/image";
 interface HeroSectionProps {
   onQuickSubmit: (data: {
     name: string;
+    email: string;
     phone: string;
   }) => void;
 }
@@ -16,6 +17,7 @@ interface HeroSectionProps {
 export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     phone: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -45,7 +47,8 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
   const validate = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = "Informe seu nome";
-    if (!validatePhone(formData.phone)) newErrors.phone = "WhatsApp invalido";
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "E-mail inválido";
+    if (!validatePhone(formData.phone)) newErrors.phone = "WhatsApp inválido";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -192,10 +195,24 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                   placeholder="Seu nome completo"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.name ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
+                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.name ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
                 />
                 {errors.name && (
                   <p className="text-red-500 text-xs mt-1 animate-[shake_0.5s_ease-in-out]">{errors.name}</p>
+                )}
+              </div>
+
+              <div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Seu melhor e-mail"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.email ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
+                />
+                {errors.email && (
+                  <p className="text-red-500 text-xs mt-1 animate-[shake_0.5s_ease-in-out]">{errors.email}</p>
                 )}
               </div>
 
@@ -207,7 +224,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                   value={formData.phone}
                   onChange={handleChange}
                   maxLength={16}
-                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.phone ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
+                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.phone ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
                 />
                 {errors.phone && (
                   <p className="text-red-500 text-xs mt-1 animate-[shake_0.5s_ease-in-out]">{errors.phone}</p>

@@ -30,10 +30,12 @@ export default function Home() {
 
   const handleQuickSubmit = (data: {
     name: string;
+    email: string;
     phone: string;
   }) => {
     const params = new URLSearchParams({
       name: data.name,
+      email: data.email,
       phone: data.phone,
     });
     router.push(`/cadastro?${params.toString()}`);

@@ -9,6 +9,7 @@ function CadastroContent() {
 
   const initialData = {
     name: searchParams.get("name") || undefined,
+    email: searchParams.get("email") || undefined,
     phone: searchParams.get("phone") || undefined,
   };
 

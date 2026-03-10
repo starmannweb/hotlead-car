@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import {
   ArrowRight, ArrowLeft, Check, Car, User, Phone, MapPin,
   Gauge, Clock, TrendingDown, FileText, Banknote, Camera,
-  X, ChevronDown, Search, Loader2,
+  X, ChevronDown, Search, Loader2, Mail
 } from "lucide-react";
 import {
   URGENCY_OPTIONS, DISCOUNT_OPTIONS, DOCS_OPTIONS,
@@ -34,6 +34,7 @@ interface StepDef {
 
 const STEPS: StepDef[] = [
   { id: "name", field: "name", title: "Qual é o seu nome?", subtitle: "Precisamos saber quem está vendendo", icon: User, type: "text", placeholder: "Digite seu nome completo", required: true, validate: (v) => (!v.trim() ? "Informe seu nome" : null) },
+  { id: "email", field: "email", title: "Qual é o seu e-mail?", subtitle: "Para enviarmos o comprovante de cadastro", icon: Mail, type: "text", placeholder: "Seu melhor e-mail", required: true, validate: (v) => (!v.trim() || !/\S+@\S+\.\S+/.test(v) ? "E-mail inválido" : null) },
   { id: "phone", field: "phone", title: "Qual seu WhatsApp?", subtitle: "Os lojistas entrarão em contato por aqui", icon: Phone, type: "tel", placeholder: "(11) 99999-9999", required: true, maxLength: 16, validate: (v) => (!validatePhone(v) ? "Número inválido. Use DDD + número" : null), format: formatPhone },
   { id: "state_city", field: "state", title: "Onde você está?", subtitle: "Selecione o estado e depois a cidade", icon: MapPin, type: "state_city", required: true, validate: (_v, extra) => { if (!extra?.state) return "Selecione o estado"; if (!extra?.city) return "Selecione a cidade"; return null; } },
   { id: "vehicle_brand", field: "vehicle_brand", title: "Qual a marca do seu carro?", subtitle: "Selecione a marca do veículo", icon: Car, type: "brand_picker", required: true, validate: (v) => (!v ? "Selecione a marca" : null) },
@@ -72,7 +73,7 @@ interface FipeModel { code: string; name: string }
 interface FipeYear { code: string; name: string }
 
 interface TypeformFlowProps {
-  initialData?: { name?: string; phone?: string; };
+  initialData?: { name?: string; email?: string; phone?: string; };
   onComplete?: () => void;
 }
 
@@ -81,14 +82,14 @@ interface TypeformFlowProps {
 /* ========================================================= */
 export default function TypeformFlow({ initialData, onComplete }: TypeformFlowProps) {
   const [currentStep, setCurrentStep] = useState(() => {
-    if (initialData?.name && initialData?.phone && validatePhone(initialData.phone)) {
-      return 2; // Jump to state_city if name and phone are already valid
+    if (initialData?.name && initialData?.email && initialData?.phone && validatePhone(initialData.phone)) {
+      return 3; // Jump to state_city if name, email, and phone are already valid
     }
     return 0;
   });
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [formValues, setFormValues] = useState<Record<string, string>>({
-    name: initialData?.name || "", phone: initialData?.phone || "", state: "", city: "",
+    name: initialData?.name || "", email: initialData?.email || "", phone: initialData?.phone || "", state: "", city: "",
     vehicle_brand: "", vehicle_model: "",
     vehicle_year: "", km: "", urgency: "",
     discount_acceptance: "", docs_status: "", finance_status: "", lgpd_consent: "",
@@ -230,7 +231,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     const validPhotos = photos.filter(Boolean) as File[];
     const photoBase64 = await Promise.all(validPhotos.map(f => fileToBase64(f)));
     const payload: SubmitLeadPayload = {
-      name: formValues.name, phone: formValues.phone, state: formValues.state, city: formValues.city,
+      name: formValues.name, email: formValues.email, phone: formValues.phone, state: formValues.state, city: formValues.city,
       vehicle_brand: formValues.vehicle_brand, vehicle_model: formValues.vehicle_model,
       vehicle_year: formValues.vehicle_year, km: formValues.km, urgency: formValues.urgency,
       discount_acceptance: formValues.discount_acceptance, docs_status: formValues.docs_status,

@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
 
     const {
       name,
+      email = "",
       phone,
       state = "SP",
       city,
@@ -63,6 +64,7 @@ export async function POST(request: NextRequest) {
     const lead = await (prisma as any).lead.create({
       data: {
         name,
+        email,
         phone,
         state,
         city,
@@ -93,6 +95,11 @@ export async function POST(request: NextRequest) {
     console.log(
       `[NEW LEAD] ${lead.id} | ${lead.name} | Score: ${scoring.score} | Tier: ${scoring.tier}`
     );
+
+    if (email) {
+      console.log(`[EMAIL DISPATCH] Enviando confirmação de cadastro para: ${email}`);
+      // Aqui integraria SendGrid, Resend ou AWS SES
+    }
 
     return NextResponse.json(
       {

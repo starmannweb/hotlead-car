@@ -101,14 +101,21 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            // Check if already unlocked
-            const existingView = await prisma.viewLog.findFirst({
+            // Check if already unlocked exactly this field
+            const existingViewExact = await prisma.viewLog.findFirst({
                 where: { leadId, userId: user.id, field: field || "details" },
             });
 
-            if (existingView) {
+            if (existingViewExact) {
                 return NextResponse.json({ success: true, creditsUsed: 0, alreadyUnlocked: true });
             }
+
+            // Check if already unlocked any field of this lead (so we don't charge double)
+            const existingViewAny = await prisma.viewLog.findFirst({
+                where: { leadId, userId: user.id },
+            });
+
+            const hasPaidBefore = !!existingViewAny;
 
             // Get lead to determine cost
             const lead = await prisma.lead.findUnique({
@@ -123,7 +130,7 @@ export async function POST(request: NextRequest) {
                 );
             }
 
-            const cost = lead.unlockCost;
+            const cost = hasPaidBefore ? 0 : lead.unlockCost;
 
             // Check balance
             const currentUser = await prisma.user.findUnique({
@@ -131,7 +138,7 @@ export async function POST(request: NextRequest) {
                 select: { credits: true },
             });
 
-            if (!currentUser || currentUser.credits < cost) {
+            if (!currentUser || (cost > 0 && currentUser.credits < cost)) {
                 return NextResponse.json(
                     {
                         success: false,
@@ -144,36 +151,55 @@ export async function POST(request: NextRequest) {
             }
 
             // Deduct credits and log
-            const [updatedUser] = await prisma.$transaction([
-                prisma.user.update({
-                    where: { id: user.id },
-                    data: { credits: { decrement: cost } },
-                }),
-                prisma.creditTransaction.create({
-                    data: {
-                        userId: user.id,
-                        type: "spent",
-                        amount: -cost,
-                        leadId,
-                        description: `Desbloqueio de lead (${field || "details"})`,
-                    },
-                }),
-                prisma.viewLog.create({
+            if (cost > 0) {
+                const [updatedUser] = await prisma.$transaction([
+                    prisma.user.update({
+                        where: { id: user.id },
+                        data: { credits: { decrement: cost } },
+                    }),
+                    prisma.creditTransaction.create({
+                        data: {
+                            userId: user.id,
+                            type: "spent",
+                            amount: -cost,
+                            leadId,
+                            description: `Desbloqueio de lead (${field || "details"})`,
+                        },
+                    }),
+                    prisma.viewLog.create({
+                        data: {
+                            leadId,
+                            userId: user.id,
+                            field: field || "details",
+                            creditsUsed: cost,
+                            ip: "",
+                        },
+                    }),
+                ]);
+
+                return NextResponse.json({
+                    success: true,
+                    creditsUsed: cost,
+                    credits: updatedUser.credits,
+                });
+            } else {
+                // Just log the new field view, no cost
+                await prisma.viewLog.create({
                     data: {
                         leadId,
                         userId: user.id,
                         field: field || "details",
-                        creditsUsed: cost,
+                        creditsUsed: 0,
                         ip: "",
                     },
-                }),
-            ]);
+                });
 
-            return NextResponse.json({
-                success: true,
-                creditsUsed: cost,
-                credits: updatedUser.credits,
-            });
+                return NextResponse.json({
+                    success: true,
+                    creditsUsed: 0,
+                    credits: currentUser.credits, // unchanged
+                });
+            }
         }
 
         return NextResponse.json(

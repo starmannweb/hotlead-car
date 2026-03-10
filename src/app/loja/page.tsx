@@ -8,7 +8,7 @@ import {
     CreditCard, Flame, Snowflake, TrendingUp, Clock,
     Image as ImageIcon, X, Download, FileText,
     FileSpreadsheet, CheckCircle, XCircle, Calendar,
-    TrendingDown, Banknote, Bell, Loader2
+    TrendingDown, Banknote, Bell, Loader2, Gauge
 } from "lucide-react";
 
 interface Lead {
@@ -394,6 +394,7 @@ export default function LojaPage() {
                             const isExpanded = expandedLeads.has(lead.id);
                             const nameUnlocked = isUnlocked(lead.id, "name");
                             const phoneUnlocked = isUnlocked(lead.id, "phone");
+                            const kmUnlocked = isUnlocked(lead.id, "km");
                             const detailsUnlocked = isUnlocked(lead.id, "details");
 
                             return (
@@ -483,12 +484,30 @@ export default function LojaPage() {
                                                         </p>
                                                     </div>
 
-                                                    {/* Vehicle */}
+                                                    {/* Vehicle & KM */}
                                                     <div>
                                                         <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Veículo</p>
-                                                        <p className="font-medium text-gray-900">
+                                                        <p className="font-medium text-gray-900 leading-tight">
                                                             {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear}
                                                         </p>
+                                                        
+                                                        <div className="flex items-center gap-2 mt-1">
+                                                            <p className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                                                                <Gauge className="w-4 h-4 text-gray-400" />
+                                                                {kmUnlocked ? lead.km : '*** km'}
+                                                            </p>
+                                                            {!kmUnlocked && (
+                                                                <button
+                                                                    onClick={() => unlockLead(lead.id, "km")}
+                                                                    disabled={unlocking === lead.id}
+                                                                    className="flex items-center gap-1 text-amber-600 hover:text-amber-700 cursor-pointer text-[10px]"
+                                                                    title={`Desbloquear quilometragem`}
+                                                                >
+                                                                    <Eye className="w-3 h-3" />
+                                                                    <Lock className="w-2.5 h-2.5" />
+                                                                </button>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

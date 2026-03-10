@@ -45,6 +45,7 @@ model Lead {
 
   // Dados pessoais
   name   String
+  email  String @default("")
   phone  String
   state  String @default("")
   city   String

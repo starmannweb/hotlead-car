@@ -599,7 +599,7 @@ export default function AdminPage() {
                         </div>
 
                         {/* Lead info with eye toggle */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                           <div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nome</p>
                             <div className="flex items-center gap-2">
@@ -618,18 +618,25 @@ export default function AdminPage() {
 
                           <div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Contato</p>
-                            <div className="flex items-center gap-2">
-                              <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
-                                <Phone className="w-4 h-4 text-gray-400" />
-                                {isFieldRevealed(lead.id, "phone") ? lead.phone : maskPhone(lead.phone)}
-                              </p>
-                              <button
-                                onClick={() => toggleField(lead.id, "phone")}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
-                                title={isFieldRevealed(lead.id, "phone") ? "Ocultar" : "Revelar"}
-                              >
-                                {isFieldRevealed(lead.id, "phone") ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
+                            <div className="flex flex-col gap-1">
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1 text-sm">
+                                  <Phone className="w-3.5 h-3.5 text-gray-400" />
+                                  {isFieldRevealed(lead.id, "phone") ? lead.phone : maskPhone(lead.phone)}
+                                </p>
+                                <button
+                                  onClick={() => toggleField(lead.id, "phone")}
+                                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
+                                  title={isFieldRevealed(lead.id, "phone") ? "Ocultar" : "Revelar"}
+                                >
+                                  {isFieldRevealed(lead.id, "phone") ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                </button>
+                              </div>
+                              {((lead as any).email) && (
+                                <p className="text-xs text-gray-500 truncate max-w-[150px]" title={(lead as any).email}>
+                                  {(lead as any).email}
+                                </p>
+                              )}
                             </div>
                           </div>
 
