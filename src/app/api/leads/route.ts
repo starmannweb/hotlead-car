@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { calculateLeadScore } from "@/lib/scoring";
+import { getUnlockCost } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -53,6 +54,7 @@ export async function POST(request: NextRequest) {
         score: scoring.score,
         tier: scoring.tier,
         qualified: scoring.qualified,
+        unlockCost: getUnlockCost(scoring.tier),
         photos: JSON.stringify(photos),
         utmSource: utm_source,
         utmMedium: utm_medium,

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { Lead } from "@prisma/client";
 import {
   Flame,
@@ -22,6 +23,10 @@ import {
   ChevronUp,
   Image as ImageIcon,
   X,
+  BarChart3,
+  Search,
+  Filter,
+  LogOut,
 } from "lucide-react";
 
 const TIER_LABELS: Record<string, string> = {
@@ -39,10 +44,13 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 export default function AdminPage() {
+  const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"score" | "recent">("score");
+  const [searchQuery, setSearchQuery] = useState("");
   const [revealedFields, setRevealedFields] = useState<Record<string, Set<string>>>({});
   const [expandedLeads, setExpandedLeads] = useState<Set<string>>(new Set());
   const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
@@ -136,10 +144,20 @@ export default function AdminPage() {
     });
   };
 
+  const handleLogout = async () => {
+    await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "logout" }) });
+    router.push("/login");
+  };
+
   const filteredLeads = leads
     .filter((lead) => (filter === "all" ? true : lead.tier === filter))
     .filter((lead) => (statusFilter === "all" ? true : lead.status === statusFilter))
-    .sort((a, b) => b.score - a.score);
+    .filter((lead) => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return lead.vehicleBrand.toLowerCase().includes(q) || lead.vehicleModel.toLowerCase().includes(q) || lead.city.toLowerCase().includes(q) || lead.name.toLowerCase().includes(q);
+    })
+    .sort((a, b) => sortBy === "score" ? b.score - a.score : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const getPhotos = (lead: Lead): string[] => {
     try {
@@ -399,6 +417,19 @@ export default function AdminPage() {
                   </div>
                 )}
               </div>
+
+              {/* Reports */}
+              <button
+                onClick={() => router.push("/admin/relatorios")}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
+              >
+                <BarChart3 className="w-4 h-4" />
+                Relatorios
+              </button>
+
+              <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer" title="Sair">
+                <LogOut className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>
@@ -415,17 +446,16 @@ export default function AdminPage() {
                   <button
                     key={tier}
                     onClick={() => setFilter(tier)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                      filter === tier
-                        ? tier === "hot"
-                          ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
-                          : tier === "warm"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${filter === tier
+                      ? tier === "hot"
+                        ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
+                        : tier === "warm"
                           ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400"
                           : tier === "cold"
-                          ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
-                          : "bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-white"
-                        : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
-                    }`}
+                            ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
+                            : "bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-white"
+                      : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                      }`}
                   >
                     {tier === "all" ? "Todos" : TIER_LABELS[tier]}
                   </button>
@@ -445,6 +475,30 @@ export default function AdminPage() {
                   <option key={value} value={value}>{label}</option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Ordenar</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as "score" | "recent")}
+                className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+              >
+                <option value="score">Maior score</option>
+                <option value="recent">Mais recentes</option>
+              </select>
+            </div>
+
+            <div className="flex-1 min-w-[200px]">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block flex items-center gap-1">
+                <Search className="w-3.5 h-3.5" /> Buscar
+              </label>
+              <input
+                type="text"
+                placeholder="Nome, marca, modelo ou cidade..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
+              />
             </div>
 
             <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">
@@ -615,10 +669,12 @@ export default function AdminPage() {
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400">Desconto FIPE</p>
                           <p className="font-medium text-gray-900 dark:text-white">
+                            {lead.discountAcceptance === "acima_20" && "Acima de 20%"}
+                            {lead.discountAcceptance === "10_20" && "Entre 10 a 20%"}
+                            {lead.discountAcceptance === "fipe" && "Tabela FIPE"}
                             {lead.discountAcceptance === "20" && "20% abaixo"}
                             {lead.discountAcceptance === "15" && "15% abaixo"}
                             {lead.discountAcceptance === "10" && "10% abaixo"}
-                            {lead.discountAcceptance === "fipe" && "Tabela FIPE"}
                           </p>
                         </div>
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
@@ -669,9 +725,8 @@ export default function AdminPage() {
                   <button
                     key={idx}
                     onClick={() => setPhotoModal({ ...photoModal, index: idx })}
-                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 cursor-pointer ${
-                      idx === photoModal.index ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
-                    }`}
+                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 cursor-pointer ${idx === photoModal.index ? "border-white" : "border-transparent opacity-60 hover:opacity-100"
+                      }`}
                   >
                     <img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
                   </button>

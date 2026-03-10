@@ -39,9 +39,8 @@ export const URGENCY_OPTIONS = [
 ];
 
 export const DISCOUNT_OPTIONS = [
-  { value: "10", label: "Até 10%" },
-  { value: "15", label: "Até 15%" },
-  { value: "20", label: "Até 20%" },
+  { value: "10_20", label: "Entre 10 a 20%" },
+  { value: "acima_20", label: "Acima de 20%" },
   { value: "fipe", label: "Somente FIPE" },
 ];
 

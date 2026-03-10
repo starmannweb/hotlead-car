@@ -11,6 +11,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── Users ───────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email    String @unique
+  password String // bcrypt hash
+  name     String
+
+  // admin | seller | client
+  role     String @default("client")
+
+  // Credits balance (only for client role)
+  credits  Int    @default(0)
+
+  isActive Boolean @default(true)
+
+  // Relations
+  viewLogs           ViewLog[]
+  creditTransactions CreditTransaction[]
+  exportLogs         ExportLog[]
+}
+
+// ─── Leads ───────────────────────────────────────────────
+
 model Lead {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
@@ -22,22 +49,25 @@ model Lead {
   state String @default("")
   city  String
 
-  // Dados do veículo
+  // Dados do veiculo
   vehicleBrand String
   vehicleModel String
   vehicleYear  String
   km           String
 
-  // Qualificação
+  // Qualificacao
   urgency            String // hoje, 3dias, 7dias, sem_pressa
-  discountAcceptance String // 10, 15, 20, fipe
+  discountAcceptance String // 10_20, acima_20, fipe
   docsStatus         String // regular, pendencias, nao_sei
   financeStatus      String // sim, nao
 
   // Scoring
-  score     Int    @default(0) // 0-100
-  tier      String @default("cold") // hot, warm, cold
+  score     Int     @default(0) // 0-100
+  tier      String  @default("cold") // hot, warm, cold
   qualified Boolean @default(false)
+
+  // Credit cost for unlocking (auto-calculated from score)
+  unlockCost Int @default(1)
 
   // Fotos (JSON array de URLs)
   photos String @default("[]")
@@ -49,18 +79,86 @@ model Lead {
   gclid       String @default("")
 
   // Status do lead
-  status    String @default("new") // new, contacted, negotiating, converted, lost
-  notes     String @default("")
+  status String @default("new") // new, contacted, negotiating, converted, lost
+  notes  String @default("")
 
   // Consentimento LGPD
   lgpdConsent   Boolean  @default(false)
   lgpdConsentAt DateTime?
+
+  // Relations
+  viewLogs           ViewLog[]
+  creditTransactions CreditTransaction[]
 }
+
+// ─── View Logs (tracking all reveal actions) ─────────────
 
 model ViewLog {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
-  leadId    String
-  field     String
-  ip        String   @default("")
+
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id])
+
+  userId String?
+  user   User?  @relation(fields: [userId], references: [id])
+
+  // What was revealed: "name", "phone", "photos", "details" (full)
+  field String
+
+  // Credits spent for this view (0 for admin/seller)
+  creditsUsed Int @default(0)
+
+  ip String @default("")
+
+  @@index([leadId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ─── Credit Transactions ─────────────────────────────────
+
+model CreditTransaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // purchase, spent, refund, bonus
+  type   String
+
+  // Positive for purchase/refund/bonus, negative for spent
+  amount Int
+
+  // Lead that credits were spent on (if type = "spent")
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id])
+
+  description String @default("")
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+// ─── Export Logs (track exports per user) ─────────────────
+
+model ExportLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // csv, excel, pdf
+  format    String
+  
+  // Number of leads exported
+  leadCount Int @default(0)
+
+  // Filters applied (JSON)
+  filters String @default("{}")
+
+  @@index([userId])
+  @@index([createdAt])
 }

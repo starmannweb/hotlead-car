@@ -113,10 +113,16 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
               Como funciona
             </a>
             <a href="#beneficios" className="text-white/70 hover:text-white text-sm font-medium transition-colors">
-              Benefícios
+              Beneficios
             </a>
             <a href="#faq" className="text-white/70 hover:text-white text-sm font-medium transition-colors">
               FAQ
+            </a>
+            <a
+              href="/login"
+              className="text-white/70 hover:text-white text-sm font-medium transition-colors"
+            >
+              Area do Lojista
             </a>
             <a
               href="#como-funciona"
@@ -214,7 +220,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                   onChange={handleChange}
                   className={`input-field ${errors.vehicle_brand ? "!border-red-400 !ring-red-100" : ""}`}
                 >
-                  <option value="">🚗 Marca do veículo</option>
+                  <option value="">Marca do veiculo</option>
                   {VEHICLE_BRANDS.map((brand) => (
                     <option key={brand} value={brand}>
                       {brand}
@@ -230,7 +236,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                 <input
                   type="text"
                   name="vehicle_model"
-                  placeholder="📋 Modelo (ex: Civic, Onix, HB20)"
+                  placeholder="Modelo (ex: Civic, Onix, HB20)"
                   value={formData.vehicle_model}
                   onChange={handleChange}
                   className={`input-field ${errors.vehicle_model ? "!border-red-400 !ring-red-100" : ""}`}
@@ -245,7 +251,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                   <input
                     type="text"
                     name="vehicle_year"
-                    placeholder="📅 Ano"
+                    placeholder="Ano"
                     maxLength={4}
                     value={formData.vehicle_year}
                     onChange={handleChange}
@@ -259,7 +265,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                   <input
                     type="text"
                     name="city"
-                    placeholder="📍 Cidade"
+                    placeholder="Cidade"
                     value={formData.city}
                     onChange={handleChange}
                     className={`input-field ${errors.city ? "!border-red-400 !ring-red-100" : ""}`}
@@ -274,7 +280,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="📱 WhatsApp (DDD + número)"
+                  placeholder="WhatsApp (DDD + numero)"
                   value={formData.phone}
                   onChange={handleChange}
                   maxLength={16}

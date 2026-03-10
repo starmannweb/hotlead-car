@@ -117,7 +117,7 @@ export default function Benefits() {
               <div className="absolute bottom-4 left-4 right-4">
                 <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-5 py-3">
                   <p className="text-white text-sm font-medium">
-                    ⭐ Mais de 2.000 veículos conectados com lojistas
+                    Mais de 2.000 veiculos conectados com lojistas
                   </p>
                 </div>
               </div>

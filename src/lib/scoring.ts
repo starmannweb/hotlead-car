@@ -40,9 +40,8 @@ const URGENCY_SCORES: Record<string, number> = {
 };
 
 const DISCOUNT_SCORES: Record<string, number> = {
-  "20": 30,
-  "15": 25,
-  "10": 15,
+  acima_20: 30,
+  "10_20": 20,
   fipe: 5,
 };
 
