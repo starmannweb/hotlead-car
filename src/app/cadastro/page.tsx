@@ -8,10 +8,7 @@ function CadastroContent() {
   const searchParams = useSearchParams();
 
   const initialData = {
-    vehicle_brand: searchParams.get("brand") || undefined,
-    vehicle_model: searchParams.get("model") || undefined,
-    vehicle_year: searchParams.get("year") || undefined,
-    city: searchParams.get("city") || undefined,
+    name: searchParams.get("name") || undefined,
     phone: searchParams.get("phone") || undefined,
   };
 

@@ -29,15 +29,11 @@ export default function Home() {
   };
 
   const handleQuickSubmit = (data: {
-    vehicle_brand: string;
-    vehicle_model: string;
-    vehicle_year: string;
+    name: string;
     phone: string;
   }) => {
     const params = new URLSearchParams({
-      brand: data.vehicle_brand,
-      model: data.vehicle_model,
-      year: data.vehicle_year,
+      name: data.name,
       phone: data.phone,
     });
     router.push(`/cadastro?${params.toString()}`);

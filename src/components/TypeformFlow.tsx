@@ -72,7 +72,7 @@ interface FipeModel { code: string; name: string }
 interface FipeYear { code: string; name: string }
 
 interface TypeformFlowProps {
-  initialData?: { vehicle_brand?: string; vehicle_model?: string; vehicle_year?: string; city?: string; phone?: string };
+  initialData?: { name?: string; phone?: string; };
   onComplete?: () => void;
 }
 
@@ -80,12 +80,17 @@ interface TypeformFlowProps {
 /* Component                                                 */
 /* ========================================================= */
 export default function TypeformFlow({ initialData, onComplete }: TypeformFlowProps) {
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (initialData?.name && initialData?.phone && validatePhone(initialData.phone)) {
+      return 2; // Jump to state_city if name and phone are already valid
+    }
+    return 0;
+  });
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [formValues, setFormValues] = useState<Record<string, string>>({
-    name: "", phone: initialData?.phone || "", state: "", city: initialData?.city || "",
-    vehicle_brand: initialData?.vehicle_brand || "", vehicle_model: initialData?.vehicle_model || "",
-    vehicle_year: initialData?.vehicle_year || "", km: "", urgency: "",
+    name: initialData?.name || "", phone: initialData?.phone || "", state: "", city: "",
+    vehicle_brand: "", vehicle_model: "",
+    vehicle_year: "", km: "", urgency: "",
     discount_acceptance: "", docs_status: "", finance_status: "", lgpd_consent: "",
   });
   const [photos, setPhotos] = useState<(File | null)[]>(Array(PHOTO_LABELS.length).fill(null));
@@ -131,11 +136,10 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   // GeoIP on mount
   useEffect(() => {
     fetch("/api/cities?action=geoip").then(r => r.json()).then(data => {
-      if (data.success && data.data?.city && data.data?.state) {
-        setFormValues(prev => ({ ...prev, state: data.data.state, city: data.data.city }));
-        setCitySearch(data.data.city);
+      if (data.success && data.data?.state) {
+        setFormValues(prev => ({ ...prev, state: data.data.state }));
         setGeoDetected(true);
-        // Load cities for detected state
+        // Load cities for detected state, city should be filled manually by user
         fetchCities(data.data.state);
       }
     }).catch(() => { });
