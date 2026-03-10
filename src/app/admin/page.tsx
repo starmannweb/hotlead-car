@@ -442,7 +442,7 @@ export default function AdminPage() {
                 className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer"
               >
                 <BarChart3 className="w-4 h-4" />
-                Relatorios
+                Relatórios
               </button>
 
               <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer" title="Sair">
@@ -458,7 +458,7 @@ export default function AdminPage() {
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
           <div className="flex flex-wrap items-center gap-4">
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Qualificacao</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Qualificação</label>
               <div className="flex gap-2">
                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
                   <button
@@ -482,13 +482,13 @@ export default function AdminPage() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Regiao (Estado)</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Região</label>
               <select
                 value={stateFilter}
                 onChange={(e) => setStateFilter(e.target.value)}
                 className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               >
-                <option value="all">Todos os Estados</option>
+                <option value="all">Todas as Regiões</option>
                 {states.map((s) => (
                   <option key={s as string} value={s as string}>{s as string}</option>
                 ))}
@@ -661,7 +661,7 @@ export default function AdminPage() {
                       {/* Vehicle + Photos */}
                       <div className="flex flex-col lg:flex-row gap-4 mb-4">
                         <div className="flex-1 bg-white dark:bg-gray-700 rounded-lg p-4">
-                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Veiculo</p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Veículo</p>
                           <p className="font-semibold text-gray-900 dark:text-white text-lg">
                             {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear} - {lead.km} km
                           </p>
@@ -691,7 +691,7 @@ export default function AdminPage() {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                            <Clock className="w-3.5 h-3.5" /> Urgencia
+                            <Clock className="w-3.5 h-3.5" /> Urgência
                           </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.urgency === "hoje" && "Hoje"}
@@ -715,7 +715,7 @@ export default function AdminPage() {
                         </div>
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
                           <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                            <FileText className="w-3.5 h-3.5" /> Documentacao
+                            <FileText className="w-3.5 h-3.5" /> Documentação
                           </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.docsStatus === "regular" && "Regular"}
@@ -756,7 +756,7 @@ export default function AdminPage() {
             </button>
             <img
               src={photoModal.photos[photoModal.index]}
-              alt="Foto do veiculo em tamanho real"
+              alt="Foto do veículo em tamanho real"
               className="max-w-full max-h-[85vh] object-contain rounded-lg"
             />
             {photoModal.photos.length > 1 && (
@@ -784,7 +784,7 @@ export default function AdminPage() {
             <Bell className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-bold text-gray-900 dark:text-white text-sm">Novo lead capturado!</p>
+            <p className="font-bold text-gray-900 dark:text-white text-sm">Oba! Novo lead capturado!</p>
             <p className="text-xs text-gray-500 dark:text-gray-400">A lista foi atualizada com sucesso.</p>
           </div>
           <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-2 cursor-pointer">

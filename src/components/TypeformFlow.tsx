@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import {
   URGENCY_OPTIONS, DISCOUNT_OPTIONS, DOCS_OPTIONS,
-  FINANCE_OPTIONS, PHOTO_LABELS, BRAZILIAN_STATES,
+  FINANCE_OPTIONS, PHOTO_LABELS, BRAZILIAN_STATES, REGIONS
 } from "@/lib/constants";
 import { POPULAR_BRANDS, getDisplayName } from "@/lib/fipe";
 import type { FipeBrand } from "@/lib/fipe";
@@ -33,19 +33,19 @@ interface StepDef {
 }
 
 const STEPS: StepDef[] = [
-  { id: "name", field: "name", title: "Qual e o seu nome?", subtitle: "Precisamos saber quem esta vendendo", icon: User, type: "text", placeholder: "Digite seu nome completo", required: true, validate: (v) => (!v.trim() ? "Informe seu nome" : null) },
-  { id: "phone", field: "phone", title: "Qual seu WhatsApp?", subtitle: "Os lojistas entrarao em contato por aqui", icon: Phone, type: "tel", placeholder: "(11) 99999-9999", required: true, maxLength: 16, validate: (v) => (!validatePhone(v) ? "Numero invalido. Use DDD + numero" : null), format: formatPhone },
-  { id: "state_city", field: "state", title: "Onde voce esta?", subtitle: "Selecione o estado e depois a cidade", icon: MapPin, type: "state_city", required: true, validate: (_v, extra) => { if (!extra?.state) return "Selecione o estado"; if (!extra?.city) return "Selecione a cidade"; return null; } },
-  { id: "vehicle_brand", field: "vehicle_brand", title: "Qual a marca do seu carro?", subtitle: "Selecione a marca do veiculo", icon: Car, type: "brand_picker", required: true, validate: (v) => (!v ? "Selecione a marca" : null) },
+  { id: "name", field: "name", title: "Qual é o seu nome?", subtitle: "Precisamos saber quem está vendendo", icon: User, type: "text", placeholder: "Digite seu nome completo", required: true, validate: (v) => (!v.trim() ? "Informe seu nome" : null) },
+  { id: "phone", field: "phone", title: "Qual seu WhatsApp?", subtitle: "Os lojistas entrarão em contato por aqui", icon: Phone, type: "tel", placeholder: "(11) 99999-9999", required: true, maxLength: 16, validate: (v) => (!validatePhone(v) ? "Número inválido. Use DDD + número" : null), format: formatPhone },
+  { id: "region", field: "city", title: "Em qual região você está?", subtitle: "Atendemos o estado de São Paulo", icon: MapPin, type: "options", options: REGIONS.map(r => ({ value: r, label: r })), required: true, validate: (v) => (!v ? "Selecione uma região" : null) },
+  { id: "vehicle_brand", field: "vehicle_brand", title: "Qual a marca do seu carro?", subtitle: "Selecione a marca do veículo", icon: Car, type: "brand_picker", required: true, validate: (v) => (!v ? "Selecione a marca" : null) },
   { id: "vehicle_model", field: "vehicle_model", title: "Qual o modelo?", subtitle: "Comece a digitar para buscar modelos", icon: Car, type: "model_picker", placeholder: "Buscar modelo...", required: true, validate: (v) => (!v.trim() ? "Informe o modelo" : null) },
-  { id: "vehicle_year", field: "vehicle_year", title: "Qual o ano do veiculo?", subtitle: "Selecione o ano de fabricacao", icon: Car, type: "year_picker", required: true, validate: (v) => (!v.trim() ? "Selecione o ano" : null) },
+  { id: "vehicle_year", field: "vehicle_year", title: "Qual o ano do veículo?", subtitle: "Selecione o ano de fabricação", icon: Car, type: "year_picker", required: true, validate: (v) => (!v.trim() ? "Selecione o ano" : null) },
   { id: "km", field: "km", title: "Qual a quilometragem?", subtitle: "Valor aproximado em km", icon: Gauge, type: "text", placeholder: "Ex: 45.000", required: true, validate: (v) => (!v.trim() ? "Informe a quilometragem" : null), format: formatKm },
-  { id: "urgency", field: "urgency", title: "Quando voce precisa vender?", subtitle: "Quanto mais urgente, mais rapido conectamos", icon: Clock, type: "options", options: URGENCY_OPTIONS, required: true, validate: (v) => (!v ? "Selecione a urgencia" : null) },
-  { id: "discount_acceptance", field: "discount_acceptance", title: "Aceita propostas abaixo da FIPE?", subtitle: "Lojistas compram para revender - propostas abaixo da tabela sao comuns", icon: TrendingDown, type: "options", options: DISCOUNT_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opcao" : null) },
-  { id: "docs_status", field: "docs_status", title: "Como esta a documentacao?", subtitle: "Documentacao em dia facilita propostas melhores", icon: FileText, type: "options", options: DOCS_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opcao" : null) },
-  { id: "finance_status", field: "finance_status", title: "O veiculo tem financiamento ativo?", subtitle: "Isso nao impede a venda, apenas precisamos saber", icon: Banknote, type: "options", options: FINANCE_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opcao" : null) },
-  { id: "photos", field: "photos", title: "Tem fotos do veiculo?", subtitle: "Opcional - fotos aumentam as chances de propostas melhores", icon: Camera, type: "photos" },
-  { id: "consent", field: "lgpd_consent", title: "Quase la! Confirme para receber propostas", subtitle: "Seus dados sao protegidos conforme a LGPD", icon: Check, type: "consent", required: true },
+  { id: "urgency", field: "urgency", title: "Quando você precisa vender?", subtitle: "Quanto mais urgente, mais rápido conectamos", icon: Clock, type: "options", options: URGENCY_OPTIONS, required: true, validate: (v) => (!v ? "Selecione a urgência" : null) },
+  { id: "discount_acceptance", field: "discount_acceptance", title: "Aceita propostas abaixo da FIPE?", subtitle: "Lojistas compram para revender - propostas abaixo da tabela são comuns", icon: TrendingDown, type: "options", options: DISCOUNT_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opção" : null) },
+  { id: "docs_status", field: "docs_status", title: "Como está a documentação?", subtitle: "Documentação em dia facilita propostas melhores", icon: FileText, type: "options", options: DOCS_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opção" : null) },
+  { id: "finance_status", field: "finance_status", title: "O veículo tem financiamento ativo?", subtitle: "Isso não impede a venda, apenas precisamos saber", icon: Banknote, type: "options", options: FINANCE_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opção" : null) },
+  { id: "photos", field: "photos", title: "Tem fotos do veículo?", subtitle: "Opcional - fotos aumentam as chances de propostas melhores", icon: Camera, type: "photos" },
+  { id: "consent", field: "lgpd_consent", title: "Quase lá! Confirme para receber propostas", subtitle: "Seus dados são protegidos conforme a LGPD", icon: Check, type: "consent", required: true },
 ];
 
 /* --------------------------------------------------------- */
@@ -88,7 +88,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   });
   const [direction, setDirection] = useState<"next" | "prev">("next");
   const [formValues, setFormValues] = useState<Record<string, string>>({
-    name: initialData?.name || "", phone: initialData?.phone || "", state: "", city: "",
+    name: initialData?.name || "", phone: initialData?.phone || "", state: "SP", city: "",
     vehicle_brand: "", vehicle_model: "",
     vehicle_year: "", km: "", urgency: "",
     discount_acceptance: "", docs_status: "", finance_status: "", lgpd_consent: "",
@@ -133,16 +133,9 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   // Track start
   useEffect(() => { if (!hasTrackedStart.current) { trackEvent({ event: "form_start" }); hasTrackedStart.current = true; } }, []);
 
-  // GeoIP on mount
+  // GeoIP on mount (Disabling it since we only use SP and user selects Regions directly now)
   useEffect(() => {
-    fetch("/api/cities?action=geoip").then(r => r.json()).then(data => {
-      if (data.success && data.data?.state) {
-        setFormValues(prev => ({ ...prev, state: data.data.state }));
-        setGeoDetected(true);
-        // Load cities for detected state, city should be filled manually by user
-        fetchCities(data.data.state);
-      }
-    }).catch(() => { });
+    // keeping effect empty but preserved to avoid huge diff
   }, []);
 
   // Load brands
@@ -189,7 +182,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
 
   const validateCurrent = (): boolean => {
     if (step.type === "photos") return true;
-    if (step.type === "consent") { if (formValues.lgpd_consent !== "true") { setError("Voce precisa aceitar para continuar"); return false; } return true; }
+    if (step.type === "consent") { if (formValues.lgpd_consent !== "true") { setError("Você precisa aceitar para continuar"); return false; } return true; }
     if (step.type === "state_city") { const err = step.validate?.("", { state: formValues.state, city: formValues.city }); if (err) { setError(err); return false; } return true; }
     if (step.validate) { const err = step.validate(formValues[step.field]); if (err) { setError(err); return false; } }
     return true;
@@ -316,7 +309,6 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
                   {loadingCities && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary animate-spin" />}
                 </div>
 
-                {/* City suggestions */}
                 {citySearch.length >= 1 && filteredCities.length > 0 && (
                   <div className="mt-2 max-h-[250px] overflow-y-auto space-y-1 bg-white border border-gray-200 rounded-xl shadow-lg">
                     {filteredCities.map(c => (

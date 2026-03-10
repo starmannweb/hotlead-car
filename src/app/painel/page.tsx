@@ -187,7 +187,9 @@ export default function PainelPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
                     <div className="flex flex-wrap items-center gap-4">
                         <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block"><Filter className="w-3.5 h-3.5 inline mr-1" />Qualificacao</label>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
+                                <Filter className="w-3.5 h-3.5 inline mr-1" />Qualificação
+                            </label>
                             <div className="flex gap-2">
                                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
                                     <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${filter === tier ? tier === "hot" ? "bg-red-100 text-red-700" : tier === "warm" ? "bg-yellow-100 text-yellow-700" : tier === "cold" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-900" : "bg-gray-50 text-gray-600 hover:bg-gray-100"}`}>{tier === "all" ? "Todos" : TIER_LABELS[tier]}</button>
@@ -195,9 +197,9 @@ export default function PainelPage() {
                             </div>
                         </div>
                         <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Regiao (Estado)</label>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Região</label>
                             <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-900 text-xs">
-                                <option value="all">Todos os Estados</option>
+                                <option value="all">Todas as Regiões</option>
                                 {states.map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                         </div>
@@ -289,7 +291,7 @@ export default function PainelPage() {
                                         <div className="border-t border-gray-100 p-5 bg-gray-50/50">
                                             <div className="flex flex-col lg:flex-row gap-4 mb-4">
                                                 <div className="flex-1 bg-white rounded-lg p-4">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Veiculo</p>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Veículo</p>
                                                     <p className="font-semibold text-gray-900 text-lg">{lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear} - {lead.km} km</p>
                                                 </div>
                                                 {photos.length > 0 && (
@@ -300,9 +302,9 @@ export default function PainelPage() {
                                                 )}
                                             </div>
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                                <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Urgencia</p><p className="font-medium text-gray-900">{lead.urgency === "hoje" && "Hoje"}{lead.urgency === "3dias" && "3 dias"}{lead.urgency === "7dias" && "7 dias"}{lead.urgency === "sem_pressa" && "Sem pressa"}</p></div>
+                                                <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Urgência</p><p className="font-medium text-gray-900">{lead.urgency === "hoje" && "Hoje"}{lead.urgency === "3dias" && "3 dias"}{lead.urgency === "7dias" && "7 dias"}{lead.urgency === "sem_pressa" && "Sem pressa"}</p></div>
                                                 <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Desconto FIPE</p><p className="font-medium text-gray-900">{lead.discountAcceptance === "acima_20" && "Acima de 20%"}{lead.discountAcceptance === "10_20" && "Entre 10 a 20%"}{lead.discountAcceptance === "fipe" && "Tabela FIPE"}{lead.discountAcceptance === "20" && "20% abaixo"}{lead.discountAcceptance === "15" && "15% abaixo"}{lead.discountAcceptance === "10" && "10% abaixo"}</p></div>
-                                                <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Documentacao</p><p className="font-medium text-gray-900">{lead.docsStatus === "regular" && "Regular"}{lead.docsStatus === "pendencias" && "Pendencias"}{lead.docsStatus === "nao_sei" && "Nao sei"}</p></div>
+                                                <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Documentação</p><p className="font-medium text-gray-900">{lead.docsStatus === "regular" && "Regular"}{lead.docsStatus === "pendencias" && "Pendencias"}{lead.docsStatus === "nao_sei" && "Não sei"}</p></div>
                                                 <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Financiamento</p><p className="font-medium text-gray-900">{lead.financeStatus === "nao" ? "Quitado" : "Com financiamento"}</p></div>
                                             </div>
                                         </div>
@@ -317,8 +319,10 @@ export default function PainelPage() {
             {photoModal && (
                 <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPhotoModal(null)}>
                     <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
-                        <button onClick={() => setPhotoModal(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300 cursor-pointer"><X className="w-6 h-6" /></button>
-                        <img src={photoModal.photos[photoModal.index]} alt="Foto" className="max-w-full max-h-[85vh] object-contain rounded-lg" />
+                        <button onClick={() => setPhotoModal(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300 transition-colors cursor-pointer">
+                            <X className="w-6 h-6" />
+                        </button>
+                        <img src={photoModal.photos[photoModal.index]} alt="Foto do veículo em tamanho real" className="max-w-full max-h-[85vh] object-contain rounded-lg" />
                         {photoModal.photos.length > 1 && (
                             <div className="flex justify-center gap-2 mt-4">{photoModal.photos.map((photo, idx) => <button key={idx} onClick={() => setPhotoModal({ ...photoModal, index: idx })} className={`w-12 h-12 rounded-lg overflow-hidden border-2 cursor-pointer ${idx === photoModal.index ? "border-white" : "border-transparent opacity-60 hover:opacity-100"}`}><img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" /></button>)}</div>
                         )}
@@ -333,7 +337,7 @@ export default function PainelPage() {
                         <Bell className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="font-bold text-gray-900 text-sm">Novo lead capturado!</p>
+                        <p className="font-bold text-gray-900 text-sm">Oba! Novo lead capturado!</p>
                         <p className="text-xs text-gray-500">A lista foi atualizada com sucesso.</p>
                     </div>
                     <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 ml-2">

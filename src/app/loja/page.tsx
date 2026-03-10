@@ -234,7 +234,7 @@ export default function LojaPage() {
                             </div>
                             {user && (
                                 <span className="text-sm text-gray-500">
-                                    Ola, <strong>{user.name}</strong>
+                                    Olá, <strong>{user.name}</strong>
                                 </span>
                             )}
                         </div>
@@ -297,9 +297,9 @@ export default function LojaPage() {
 
                         {/* State Filter */}
                         <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Regiao (Estado)</label>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Região</label>
                             <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs">
-                                <option value="all">Todos os Estados</option>
+                                <option value="all">Todas as Regiões</option>
                                 {states.map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                         </div>
@@ -432,7 +432,7 @@ export default function LojaPage() {
 
                                                     {/* Vehicle */}
                                                     <div>
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Veiculo</p>
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Veículo</p>
                                                         <p className="font-medium text-gray-900">
                                                             {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear}
                                                         </p>
@@ -474,7 +474,7 @@ export default function LojaPage() {
                                         <div className="border-t border-gray-100 p-5 bg-gray-50/50">
                                             <div className="flex flex-col lg:flex-row gap-4 mb-4">
                                                 <div className="flex-1 bg-white rounded-lg p-4">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Veiculo</p>
+                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Veículo</p>
                                                     <p className="font-semibold text-gray-900 text-lg">
                                                         {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear} - {lead.km} km
                                                     </p>
@@ -509,7 +509,7 @@ export default function LojaPage() {
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                                 <div className="bg-white rounded-lg p-3">
                                                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                                        <Clock className="w-3.5 h-3.5" /> Urgencia
+                                                        <Clock className="w-3.5 h-3.5" /> Urgência
                                                     </p>
                                                     <p className="font-medium text-gray-900">
                                                         {lead.urgency === "hoje" && "Hoje"}
@@ -533,7 +533,7 @@ export default function LojaPage() {
                                                 </div>
                                                 <div className="bg-white rounded-lg p-3">
                                                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                                        <FileText className="w-3.5 h-3.5" /> Documentacao
+                                                        <FileText className="w-3.5 h-3.5" /> Documentação
                                                     </p>
                                                     <p className="font-medium text-gray-900">
                                                         {lead.docsStatus === "regular" && "Regular"}
@@ -566,7 +566,7 @@ export default function LojaPage() {
                         <button onClick={() => setPhotoModal(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300 cursor-pointer">
                             <X className="w-6 h-6" />
                         </button>
-                        <img src={photoModal.photos[photoModal.index]} alt="Foto do veiculo" className="max-w-full max-h-[85vh] object-contain rounded-lg" />
+                        <img src={photoModal.photos[photoModal.index]} alt="Foto do veículo em tamanho real" className="max-w-full max-h-[85vh] object-contain rounded-lg" />
                         {photoModal.photos.length > 1 && (
                             <div className="flex justify-center gap-2 mt-4">
                                 {photoModal.photos.map((photo, idx) => (
@@ -590,9 +590,9 @@ export default function LojaPage() {
                         <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-4 mx-auto">
                             <Coins className="w-6 h-6" />
                         </div>
-                        <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Creditos insuficientes</h3>
+                        <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Créditos insuficientes</h3>
                         <p className="text-sm text-center text-gray-600 mb-6">
-                            Para visualizar os dados reais dos clientes mais qualificados do mercado, voce precisa adquirir um pacote de creditos.
+                            Para visualizar os dados reais dos clientes mais qualificados do mercado, você precisa adquirir um pacote de créditos.
                         </p>
                         <button onClick={() => setBuyModalOpen(false)} className="w-full bg-primary hover:bg-primary/90 text-white font-medium py-2.5 rounded-lg flex items-center justify-center gap-2">
                             <span>Falar com o comercial</span>
