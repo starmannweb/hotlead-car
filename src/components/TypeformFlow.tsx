@@ -10,7 +10,6 @@ import {
   Phone,
   MapPin,
   Gauge,
-  Calendar,
   Clock,
   TrendingDown,
   FileText,
@@ -18,9 +17,9 @@ import {
   Camera,
   X,
   ChevronDown,
+  Search,
 } from "lucide-react";
 import {
-  VEHICLE_BRANDS,
   URGENCY_OPTIONS,
   DISCOUNT_OPTIONS,
   DOCS_OPTIONS,
@@ -28,6 +27,8 @@ import {
   PHOTO_LABELS,
   BRAZILIAN_STATES,
 } from "@/lib/constants";
+import { POPULAR_BRANDS, getDisplayName } from "@/lib/fipe";
+import type { FipeBrand } from "@/lib/fipe";
 import { formatPhone, validatePhone, formatKm } from "@/lib/validators";
 import { trackEvent, getUTMParams } from "@/lib/tracking";
 import { submitLead } from "@/lib/api";
@@ -43,7 +44,7 @@ interface StepDef {
   title: string;
   subtitle?: string;
   icon: React.ElementType;
-  type: "text" | "tel" | "select" | "options" | "photos" | "consent";
+  type: "text" | "tel" | "select" | "options" | "photos" | "consent" | "brand_picker" | "model_picker" | "year_picker";
   placeholder?: string;
   options?: { value: string; label: string }[];
   selectOptions?: string[];
@@ -57,8 +58,8 @@ const STEPS: StepDef[] = [
   {
     id: "name",
     field: "name",
-    title: "Qual é o seu nome?",
-    subtitle: "Precisamos saber quem está vendendo",
+    title: "Qual e o seu nome?",
+    subtitle: "Precisamos saber quem esta vendendo",
     icon: User,
     type: "text",
     placeholder: "Digite seu nome completo",
@@ -69,13 +70,13 @@ const STEPS: StepDef[] = [
     id: "phone",
     field: "phone",
     title: "Qual seu WhatsApp?",
-    subtitle: "Os lojistas entrarão em contato por aqui",
+    subtitle: "Os lojistas entrarao em contato por aqui",
     icon: Phone,
     type: "tel",
     placeholder: "(11) 99999-9999",
     required: true,
     maxLength: 16,
-    validate: (v) => (!validatePhone(v) ? "Número inválido. Use DDD + número" : null),
+    validate: (v) => (!validatePhone(v) ? "Numero invalido. Use DDD + numero" : null),
     format: formatPhone,
   },
   {
@@ -92,11 +93,11 @@ const STEPS: StepDef[] = [
   {
     id: "city",
     field: "city",
-    title: "Em qual cidade você está?",
-    subtitle: "Vamos conectar com lojistas da sua região",
+    title: "Em qual cidade voce esta?",
+    subtitle: "Vamos conectar com lojistas da sua regiao",
     icon: MapPin,
     type: "text",
-    placeholder: "Ex: São Paulo",
+    placeholder: "Ex: Sao Paulo",
     required: true,
     validate: (v) => (!v.trim() ? "Informe sua cidade" : null),
   },
@@ -104,10 +105,9 @@ const STEPS: StepDef[] = [
     id: "vehicle_brand",
     field: "vehicle_brand",
     title: "Qual a marca do seu carro?",
-    subtitle: "Selecione a marca do veículo",
+    subtitle: "Selecione a marca do veiculo",
     icon: Car,
-    type: "select",
-    selectOptions: VEHICLE_BRANDS,
+    type: "brand_picker",
     required: true,
     validate: (v) => (!v ? "Selecione a marca" : null),
   },
@@ -115,27 +115,23 @@ const STEPS: StepDef[] = [
     id: "vehicle_model",
     field: "vehicle_model",
     title: "Qual o modelo?",
-    subtitle: "Ex: Civic, Onix, HB20, Corolla",
+    subtitle: "Comece a digitar para buscar modelos da marca selecionada",
     icon: Car,
-    type: "text",
-    placeholder: "Digite o modelo do veículo",
+    type: "model_picker",
+    placeholder: "Buscar modelo...",
     required: true,
     validate: (v) => (!v.trim() ? "Informe o modelo" : null),
   },
   {
     id: "vehicle_year",
     field: "vehicle_year",
-    title: "Qual o ano do veículo?",
-    subtitle: "Ano de fabricação",
-    icon: Calendar,
-    type: "text",
-    placeholder: "Ex: 2020",
-    maxLength: 4,
+    title: "Qual o ano do veiculo?",
+    subtitle: "Selecione o ano de fabricacao",
+    icon: Car,
+    type: "year_picker",
     required: true,
     validate: (v) => {
-      const y = parseInt(v);
-      if (!v.trim() || isNaN(y)) return "Informe o ano";
-      if (y < 2000 || y > new Date().getFullYear() + 1) return "Ano inválido";
+      if (!v.trim()) return "Selecione o ano";
       return null;
     },
   },
@@ -154,60 +150,60 @@ const STEPS: StepDef[] = [
   {
     id: "urgency",
     field: "urgency",
-    title: "Quando você precisa vender?",
-    subtitle: "Quanto mais urgente, mais rápido conectamos com lojistas",
+    title: "Quando voce precisa vender?",
+    subtitle: "Quanto mais urgente, mais rapido conectamos com lojistas",
     icon: Clock,
     type: "options",
     options: URGENCY_OPTIONS,
     required: true,
-    validate: (v) => (!v ? "Selecione a urgência" : null),
+    validate: (v) => (!v ? "Selecione a urgencia" : null),
   },
   {
     id: "discount_acceptance",
     field: "discount_acceptance",
     title: "Aceita propostas abaixo da FIPE?",
-    subtitle: "Lojistas compram para revender — propostas abaixo da tabela são comuns no mercado",
+    subtitle: "Lojistas compram para revender - propostas abaixo da tabela sao comuns no mercado",
     icon: TrendingDown,
     type: "options",
     options: DISCOUNT_OPTIONS,
     required: true,
-    validate: (v) => (!v ? "Selecione uma opção" : null),
+    validate: (v) => (!v ? "Selecione uma opcao" : null),
   },
   {
     id: "docs_status",
     field: "docs_status",
-    title: "Como está a documentação?",
-    subtitle: "Documentação em dia facilita propostas melhores",
+    title: "Como esta a documentacao?",
+    subtitle: "Documentacao em dia facilita propostas melhores",
     icon: FileText,
     type: "options",
     options: DOCS_OPTIONS,
     required: true,
-    validate: (v) => (!v ? "Selecione uma opção" : null),
+    validate: (v) => (!v ? "Selecione uma opcao" : null),
   },
   {
     id: "finance_status",
     field: "finance_status",
-    title: "O veículo tem financiamento ativo?",
-    subtitle: "Isso não impede a venda, apenas precisamos saber",
+    title: "O veiculo tem financiamento ativo?",
+    subtitle: "Isso nao impede a venda, apenas precisamos saber",
     icon: Banknote,
     type: "options",
     options: FINANCE_OPTIONS,
     required: true,
-    validate: (v) => (!v ? "Selecione uma opção" : null),
+    validate: (v) => (!v ? "Selecione uma opcao" : null),
   },
   {
     id: "photos",
     field: "photos",
-    title: "Tem fotos do veículo?",
-    subtitle: "Opcional — mas fotos aumentam as chances de propostas melhores",
+    title: "Tem fotos do veiculo?",
+    subtitle: "Opcional - mas fotos aumentam as chances de propostas melhores",
     icon: Camera,
     type: "photos",
   },
   {
     id: "consent",
     field: "lgpd_consent",
-    title: "Quase lá! Confirme para receber propostas",
-    subtitle: "Seus dados são protegidos conforme a LGPD",
+    title: "Quase la! Confirme para receber propostas",
+    subtitle: "Seus dados sao protegidos conforme a LGPD",
     icon: Check,
     type: "consent",
     required: true,
@@ -248,6 +244,16 @@ interface TypeformFlowProps {
   onComplete?: () => void;
 }
 
+interface FipeModel {
+  code: string;
+  name: string;
+}
+
+interface FipeYear {
+  code: string;
+  name: string;
+}
+
 export default function TypeformFlow({ initialData, onComplete }: TypeformFlowProps) {
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState<"next" | "prev">("next");
@@ -274,6 +280,18 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   const [submitResult, setSubmitResult] = useState<{ score?: number; tier?: string } | null>(null);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  // FIPE state
+  const [brandSearch, setBrandSearch] = useState("");
+  const [selectedBrandCode, setSelectedBrandCode] = useState("");
+  const [fipeModels, setFipeModels] = useState<FipeModel[]>([]);
+  const [modelSearch, setModelSearch] = useState("");
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [selectedModelCode, setSelectedModelCode] = useState("");
+  const [fipeYears, setFipeYears] = useState<FipeYear[]>([]);
+  const [loadingYears, setLoadingYears] = useState(false);
+  const [allBrands, setAllBrands] = useState<FipeBrand[]>([]);
+  const [showAllBrands, setShowAllBrands] = useState(false);
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const fileRefs = useRef<(HTMLInputElement | null)[]>([]);
   const hasTrackedStart = useRef(false);
@@ -298,6 +316,54 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     }
   }, []);
 
+  // Load all brands on mount (for "other" brands)
+  useEffect(() => {
+    fetch("/api/fipe?type=brands")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setAllBrands(data.data.map((b: { code: string; name: string }) => ({
+            code: b.code,
+            name: b.name,
+            logo: "",
+          })));
+        }
+      })
+      .catch(() => { });
+  }, []);
+
+  // Fetch models when brand changes
+  useEffect(() => {
+    if (!selectedBrandCode) {
+      setFipeModels([]);
+      return;
+    }
+    setLoadingModels(true);
+    fetch(`/api/fipe?type=models&brandCode=${selectedBrandCode}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setFipeModels(data.data);
+      })
+      .catch(() => { })
+      .finally(() => setLoadingModels(false));
+  }, [selectedBrandCode]);
+
+  // Fetch years when model changes
+  useEffect(() => {
+    if (!selectedBrandCode || !selectedModelCode) {
+      setFipeYears([]);
+      return;
+    }
+    setLoadingYears(true);
+    fetch(`/api/fipe?type=years&brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setFipeYears(data.data);
+      })
+      .catch(() => { })
+      .finally(() => setLoadingYears(false));
+  }, [selectedBrandCode, selectedModelCode]);
+
   const setValue = (field: string, value: string) => {
     const stepDef = STEPS.find((s) => s.field === field);
     const formatted = stepDef?.format ? stepDef.format(value) : value;
@@ -309,7 +375,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     if (step.type === "photos") return true;
     if (step.type === "consent") {
       if (formValues.lgpd_consent !== "true") {
-        setError("Você precisa aceitar para continuar");
+        setError("Voce precisa aceitar para continuar");
         return false;
       }
       return true;
@@ -328,7 +394,6 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     if (isAnimating) return;
     if (!validateCurrent()) return;
 
-    // Track step milestones
     if (currentStep === 6) trackEvent({ event: "form_step_1" });
     if (currentStep === 11) trackEvent({ event: "form_step_2" });
 
@@ -356,10 +421,9 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     }, 300);
   }, [currentStep, isAnimating]);
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && step.type !== "photos") {
+      if (e.key === "Enter" && step.type !== "photos" && step.type !== "brand_picker" && step.type !== "model_picker" && step.type !== "year_picker") {
         e.preventDefault();
         goNext();
       }
@@ -443,21 +507,20 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
           </h1>
           <p className="text-gray-500 dark:text-gray-400 text-lg mb-6">
             Recebemos seus dados. Nossa equipe vai validar e lojistas da sua
-            região poderão enviar propostas em breve.
+            regiao poderao enviar propostas em breve.
           </p>
           {submitResult?.tier && (
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${
-              submitResult.tier === "hot"
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${submitResult.tier === "hot"
                 ? "bg-red-50 text-red-700 border-red-200"
                 : submitResult.tier === "warm"
-                ? "bg-amber-50 text-amber-700 border-amber-200"
-                : "bg-blue-50 text-blue-700 border-blue-200"
-            }`}>
+                  ? "bg-amber-50 text-amber-700 border-amber-200"
+                  : "bg-blue-50 text-blue-700 border-blue-200"
+              }`}>
               {submitResult.tier === "hot"
-                ? "Prioridade alta — retornaremos rápido!"
+                ? "Prioridade alta - retornaremos rapido!"
                 : submitResult.tier === "warm"
-                ? "Boas chances — em breve você receberá propostas"
-                : "Recebido — analisaremos seu veículo"}
+                  ? "Boas chances - em breve voce recebera propostas"
+                  : "Recebido - analisaremos seu veiculo"}
             </div>
           )}
           <p className="text-gray-400 dark:text-gray-500 text-sm mt-6">
@@ -468,9 +531,299 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     );
   }
 
+  // ------ Brand picker ------
+  const renderBrandPicker = () => {
+    const displayBrands = showAllBrands
+      ? allBrands.filter((b) =>
+        brandSearch ? b.name.toLowerCase().includes(brandSearch.toLowerCase()) : true
+      )
+      : POPULAR_BRANDS.filter((b) =>
+        brandSearch ? b.name.toLowerCase().includes(brandSearch.toLowerCase()) : true
+      );
+
+    return (
+      <div>
+        {/* Search */}
+        <div className="relative mb-5">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Buscar marca..."
+            value={brandSearch}
+            onChange={(e) => setBrandSearch(e.target.value)}
+            className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+            autoFocus
+          />
+        </div>
+
+        {/* Brand grid */}
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-[400px] overflow-y-auto pr-1">
+          {displayBrands.map((brand) => {
+            const isSelected = formValues.vehicle_brand === brand.name;
+            const displayName = getDisplayName(brand.name);
+            const popularBrand = POPULAR_BRANDS.find((b) => b.code === brand.code);
+            const logo = popularBrand?.logo || brand.logo;
+
+            return (
+              <button
+                key={brand.code}
+                type="button"
+                onClick={() => {
+                  setValue("vehicle_brand", brand.name);
+                  setSelectedBrandCode(brand.code);
+                  setModelSearch("");
+                  setValue("vehicle_model", "");
+                  setSelectedModelCode("");
+                  setValue("vehicle_year", "");
+                  // Auto-advance
+                  setTimeout(() => {
+                    if (!isAnimating && currentStep < totalSteps - 1) {
+                      setIsAnimating(true);
+                      setDirection("next");
+                      setError(null);
+                      setTimeout(() => {
+                        setCurrentStep((prev) => prev + 1);
+                        setIsAnimating(false);
+                      }, 300);
+                    }
+                  }, 250);
+                }}
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:scale-[1.03] ${isSelected
+                    ? "border-primary bg-primary/5 shadow-md scale-[1.03]"
+                    : "border-gray-200 hover:border-primary/40 hover:bg-gray-50"
+                  }`}
+              >
+                {logo ? (
+                  <div className="w-12 h-12 rounded-lg bg-white flex items-center justify-center overflow-hidden shadow-sm border border-gray-100">
+                    <img
+                      src={logo}
+                      alt={displayName}
+                      className="w-10 h-10 object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                        (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-lg font-bold text-gray-400">${displayName.charAt(0)}</span>`;
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                    <span className="text-lg font-bold text-gray-400">{displayName.charAt(0)}</span>
+                  </div>
+                )}
+                <span className={`text-xs font-medium text-center leading-tight ${isSelected ? "text-primary" : "text-gray-700"}`}>
+                  {displayName}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Show all toggle */}
+        {!showAllBrands && (
+          <button
+            type="button"
+            onClick={() => setShowAllBrands(true)}
+            className="mt-4 text-sm text-primary hover:underline cursor-pointer flex items-center gap-1 mx-auto"
+          >
+            <ChevronDown className="w-4 h-4" />
+            Ver todas as marcas ({allBrands.length})
+          </button>
+        )}
+        {showAllBrands && (
+          <button
+            type="button"
+            onClick={() => setShowAllBrands(false)}
+            className="mt-4 text-sm text-gray-500 hover:underline cursor-pointer flex items-center gap-1 mx-auto"
+          >
+            Mostrar apenas populares
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  // ------ Model picker ------
+  const renderModelPicker = () => {
+    const filteredModels = fipeModels.filter((m) =>
+      modelSearch ? m.name.toLowerCase().includes(modelSearch.toLowerCase()) : true
+    );
+
+    return (
+      <div>
+        {/* Selected brand badge */}
+        <div className="mb-4 flex items-center gap-2">
+          <span className="text-sm text-gray-500">Marca:</span>
+          <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+            {getDisplayName(formValues.vehicle_brand)}
+          </span>
+        </div>
+
+        {/* Search */}
+        <div className="relative mb-4">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <input
+            ref={inputRef}
+            type="text"
+            placeholder="Buscar modelo..."
+            value={modelSearch}
+            onChange={(e) => setModelSearch(e.target.value)}
+            className="w-full bg-gray-50 border-2 border-gray-200 rounded-xl pl-12 pr-4 py-3.5 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
+            autoFocus
+          />
+        </div>
+
+        {loadingModels ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="ml-3 text-gray-500">Carregando modelos...</span>
+          </div>
+        ) : (
+          <div className="max-h-[350px] overflow-y-auto space-y-2 pr-1">
+            {filteredModels.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <Car className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                <p>Nenhum modelo encontrado</p>
+                <p className="text-xs mt-1">Tente outra busca</p>
+              </div>
+            ) : (
+              filteredModels.map((model) => {
+                const isSelected = formValues.vehicle_model === model.name;
+                // Extract short name (first part before specs)
+                const shortName = model.name.split(/\s+/).slice(0, 3).join(" ");
+
+                return (
+                  <button
+                    key={model.code}
+                    type="button"
+                    onClick={() => {
+                      setValue("vehicle_model", model.name);
+                      setSelectedModelCode(model.code);
+                      setValue("vehicle_year", "");
+                      // Auto-advance
+                      setTimeout(() => {
+                        if (!isAnimating && currentStep < totalSteps - 1) {
+                          setIsAnimating(true);
+                          setDirection("next");
+                          setError(null);
+                          setTimeout(() => {
+                            setCurrentStep((prev) => prev + 1);
+                            setIsAnimating(false);
+                          }, 300);
+                        }
+                      }, 250);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-gray-200 hover:border-primary/40 hover:bg-gray-50"
+                      }`}
+                  >
+                    <div className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? "bg-primary" : "bg-gray-300"}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className={`font-medium truncate ${isSelected ? "text-primary" : "text-gray-900"}`}>
+                        {shortName}
+                      </p>
+                      {model.name !== shortName && (
+                        <p className="text-xs text-gray-400 truncate">{model.name}</p>
+                      )}
+                    </div>
+                    {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                  </button>
+                );
+              })
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // ------ Year picker ------
+  const renderYearPicker = () => {
+    return (
+      <div>
+        {/* Selected brand + model badge */}
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-gray-500">Veiculo:</span>
+          <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">
+            {getDisplayName(formValues.vehicle_brand)}
+          </span>
+          <span className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-full truncate max-w-[250px]">
+            {formValues.vehicle_model.split(/\s+/).slice(0, 3).join(" ")}
+          </span>
+        </div>
+
+        {loadingYears ? (
+          <div className="flex items-center justify-center py-12">
+            <div className="w-8 h-8 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+            <span className="ml-3 text-gray-500">Carregando anos...</span>
+          </div>
+        ) : fipeYears.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[350px] overflow-y-auto pr-1">
+            {fipeYears.map((year) => {
+              const isSelected = formValues.vehicle_year === year.name;
+              return (
+                <button
+                  key={year.code}
+                  type="button"
+                  onClick={() => {
+                    setValue("vehicle_year", year.name);
+                    // Auto-advance
+                    setTimeout(() => {
+                      if (!isAnimating && currentStep < totalSteps - 1) {
+                        setIsAnimating(true);
+                        setDirection("next");
+                        setError(null);
+                        setTimeout(() => {
+                          setCurrentStep((prev) => prev + 1);
+                          setIsAnimating(false);
+                        }, 300);
+                      }
+                    }, 300);
+                  }}
+                  className={`py-4 px-4 rounded-xl border-2 text-center font-medium transition-all duration-200 cursor-pointer ${isSelected
+                      ? "border-primary bg-primary/5 text-primary shadow-sm scale-[1.02]"
+                      : "border-gray-200 text-gray-700 hover:border-primary/40 hover:bg-gray-50"
+                    }`}
+                >
+                  {year.name}
+                </button>
+              );
+            })}
+          </div>
+        ) : (
+          <div>
+            <p className="text-gray-500 text-sm mb-4">
+              Nao encontramos anos para este modelo na tabela FIPE. Digite o ano manualmente:
+            </p>
+            <input
+              ref={inputRef}
+              type="text"
+              placeholder="Ex: 2020"
+              value={formValues.vehicle_year}
+              onChange={(e) => setValue("vehicle_year", e.target.value)}
+              maxLength={9}
+              className="w-full bg-transparent border-b-3 border-gray-300 focus:border-primary text-2xl md:text-3xl font-medium py-3 outline-none transition-colors duration-300 placeholder:text-gray-300"
+              autoFocus
+            />
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // ------ Render step content ------
   const renderStepContent = () => {
     switch (step.type) {
+      case "brand_picker":
+        return renderBrandPicker();
+
+      case "model_picker":
+        return renderModelPicker();
+
+      case "year_picker":
+        return renderYearPicker();
+
       case "text":
       case "tel":
         return (
@@ -529,18 +882,16 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
                     }
                   }, 300);
                 }}
-                className={`group relative py-4 px-6 rounded-2xl border-2 text-left text-lg font-medium transition-all duration-200 cursor-pointer ${
-                  formValues[step.field] === opt.value
+                className={`group relative py-4 px-6 rounded-2xl border-2 text-left text-lg font-medium transition-all duration-200 cursor-pointer ${formValues[step.field] === opt.value
                     ? "border-primary bg-primary/5 text-primary shadow-md scale-[1.02]"
                     : "border-gray-200 text-gray-700 hover:border-primary/40 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 <span className="flex items-center gap-3">
-                  <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${
-                    formValues[step.field] === opt.value
+                  <span className={`w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all ${formValues[step.field] === opt.value
                       ? "border-primary bg-primary"
                       : "border-gray-300 group-hover:border-primary/40"
-                  }`}>
+                    }`}>
                     {formValues[step.field] === opt.value && (
                       <Check className="w-3.5 h-3.5 text-white" />
                     )}
@@ -603,9 +954,9 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
                 <span className="font-medium text-gray-900">{formValues.phone}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">Veículo</span>
-                <span className="font-medium text-gray-900">
-                  {formValues.vehicle_brand} {formValues.vehicle_model} {formValues.vehicle_year}
+                <span className="text-gray-500">Veiculo</span>
+                <span className="font-medium text-gray-900 truncate max-w-[200px]">
+                  {getDisplayName(formValues.vehicle_brand)} {formValues.vehicle_model.split(/\s+/).slice(0, 2).join(" ")} {formValues.vehicle_year}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
@@ -629,8 +980,8 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
               />
               <span className="text-sm text-gray-500 leading-relaxed group-hover:text-gray-700 transition-colors">
                 Autorizo o uso dos meus dados para receber propostas de lojistas
-                e contato via WhatsApp, conforme a Lei Geral de Proteção de
-                Dados (LGPD). Posso revogar esta autorização a qualquer momento.
+                e contato via WhatsApp, conforme a Lei Geral de Protecao de
+                Dados (LGPD). Posso revogar esta autorizacao a qualquer momento.
               </span>
             </label>
           </div>
@@ -671,13 +1022,12 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
         <div className="w-full max-w-xl">
           <div
             key={currentStep}
-            className={`transition-all duration-300 ${
-              isAnimating
+            className={`transition-all duration-300 ${isAnimating
                 ? direction === "next"
                   ? "opacity-0 translate-y-8"
                   : "opacity-0 -translate-y-8"
                 : "opacity-100 translate-y-0"
-            }`}
+              }`}
           >
             {/* Step icon */}
             <div className="mb-6">
@@ -717,11 +1067,10 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
           <button
             onClick={goPrev}
             disabled={currentStep === 0}
-            className={`flex items-center gap-2 py-2.5 px-5 rounded-xl font-medium transition-all cursor-pointer ${
-              currentStep === 0
+            className={`flex items-center gap-2 py-2.5 px-5 rounded-xl font-medium transition-all cursor-pointer ${currentStep === 0
                 ? "text-gray-300 dark:text-gray-600 cursor-not-allowed"
                 : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-            }`}
+              }`}
           >
             <ArrowLeft className="w-4 h-4" />
             Voltar
@@ -754,7 +1103,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
         {/* Enter hint */}
         <div className="hidden md:block text-center pb-3">
           <span className="text-xs text-gray-300">
-            Pressione <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-400 font-mono text-[10px]">Enter ↵</kbd> para continuar
+            Pressione <kbd className="px-1.5 py-0.5 bg-gray-100 rounded text-gray-400 font-mono text-[10px]">Enter</kbd> para continuar
           </span>
         </div>
       </div>
