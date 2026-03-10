@@ -12,7 +12,6 @@ interface HeroSectionProps {
     vehicle_brand: string;
     vehicle_model: string;
     vehicle_year: string;
-    city: string;
     phone: string;
   }) => void;
 }
@@ -22,7 +21,6 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
     vehicle_brand: "",
     vehicle_model: "",
     vehicle_year: "",
-    city: "",
     phone: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -56,7 +54,6 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
       newErrors.vehicle_model = "Informe o modelo";
     if (!formData.vehicle_year.trim())
       newErrors.vehicle_year = "Informe o ano";
-    if (!formData.city.trim()) newErrors.city = "Informe a cidade";
     if (!validatePhone(formData.phone)) newErrors.phone = "WhatsApp inválido";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -246,34 +243,19 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <input
-                    type="text"
-                    name="vehicle_year"
-                    placeholder="Ano"
-                    maxLength={4}
-                    value={formData.vehicle_year}
-                    onChange={handleChange}
-                    className={`input-field ${errors.vehicle_year ? "!border-red-400 !ring-red-100" : ""}`}
-                  />
-                  {errors.vehicle_year && (
-                    <p className="text-red-500 text-xs mt-1">{errors.vehicle_year}</p>
-                  )}
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    name="city"
-                    placeholder="Cidade"
-                    value={formData.city}
-                    onChange={handleChange}
-                    className={`input-field ${errors.city ? "!border-red-400 !ring-red-100" : ""}`}
-                  />
-                  {errors.city && (
-                    <p className="text-red-500 text-xs mt-1">{errors.city}</p>
-                  )}
-                </div>
+              <div>
+                <input
+                  type="text"
+                  name="vehicle_year"
+                  placeholder="Ano (ex: 2020)"
+                  maxLength={4}
+                  value={formData.vehicle_year}
+                  onChange={handleChange}
+                  className={`input-field ${errors.vehicle_year ? "!border-red-400 !ring-red-100" : ""}`}
+                />
+                {errors.vehicle_year && (
+                  <p className="text-red-500 text-xs mt-1">{errors.vehicle_year}</p>
+                )}
               </div>
 
               <div>
