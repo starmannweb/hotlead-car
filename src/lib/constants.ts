@@ -1,3 +1,9 @@
+export const BRAZILIAN_STATES = [
+  "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA",
+  "MG", "MS", "MT", "PA", "PB", "PE", "PI", "PR", "RJ", "RN",
+  "RO", "RR", "RS", "SC", "SE", "SP", "TO",
+];
+
 export const VEHICLE_BRANDS = [
   "Chevrolet",
   "Fiat",

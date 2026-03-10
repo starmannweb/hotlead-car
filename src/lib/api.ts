@@ -3,6 +3,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "/api/leads";
 export interface SubmitLeadPayload {
   name: string;
   phone: string;
+  state: string;
   city: string;
   vehicle_brand: string;
   vehicle_model: string;

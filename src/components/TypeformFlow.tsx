@@ -26,6 +26,7 @@ import {
   DOCS_OPTIONS,
   FINANCE_OPTIONS,
   PHOTO_LABELS,
+  BRAZILIAN_STATES,
 } from "@/lib/constants";
 import { formatPhone, validatePhone, formatKm } from "@/lib/validators";
 import { trackEvent, getUTMParams } from "@/lib/tracking";
@@ -76,6 +77,17 @@ const STEPS: StepDef[] = [
     maxLength: 16,
     validate: (v) => (!validatePhone(v) ? "Número inválido. Use DDD + número" : null),
     format: formatPhone,
+  },
+  {
+    id: "state",
+    field: "state",
+    title: "Qual o seu estado?",
+    subtitle: "Selecione a UF",
+    icon: MapPin,
+    type: "select",
+    selectOptions: BRAZILIAN_STATES,
+    required: true,
+    validate: (v) => (!v ? "Selecione o estado" : null),
   },
   {
     id: "city",
@@ -206,6 +218,25 @@ const STEPS: StepDef[] = [
 // Component
 // ---------------------------------------------------------------------------
 
+const fileToBase64 = (file: File, maxWidth = 800): Promise<string> =>
+  new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const scale = Math.min(1, maxWidth / img.width);
+        canvas.width = img.width * scale;
+        canvas.height = img.height * scale;
+        const ctx = canvas.getContext("2d")!;
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL("image/jpeg", 0.7));
+      };
+      img.src = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  });
+
 interface TypeformFlowProps {
   initialData?: {
     vehicle_brand?: string;
@@ -223,6 +254,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   const [formValues, setFormValues] = useState<Record<string, string>>({
     name: "",
     phone: initialData?.phone || "",
+    state: "",
     city: initialData?.city || "",
     vehicle_brand: initialData?.vehicle_brand || "",
     vehicle_model: initialData?.vehicle_model || "",
@@ -361,9 +393,13 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     setSubmitting(true);
     const utm = getUTMParams();
 
+    const validPhotos = photos.filter(Boolean) as File[];
+    const photoBase64 = await Promise.all(validPhotos.map((f) => fileToBase64(f)));
+
     const payload: SubmitLeadPayload = {
       name: formValues.name,
       phone: formValues.phone,
+      state: formValues.state,
       city: formValues.city,
       vehicle_brand: formValues.vehicle_brand,
       vehicle_model: formValues.vehicle_model,
@@ -373,7 +409,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
       discount_acceptance: formValues.discount_acceptance,
       docs_status: formValues.docs_status,
       finance_status: formValues.finance_status,
-      photos: photos.filter(Boolean).map((f) => f!.name),
+      photos: photoBase64,
       utm_source: utm.utm_source,
       utm_medium: utm.utm_medium,
       utm_campaign: utm.utm_campaign,
@@ -574,7 +610,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Cidade</span>
-                <span className="font-medium text-gray-900">{formValues.city}</span>
+                <span className="font-medium text-gray-900">{formValues.city} - {formValues.state}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Km</span>

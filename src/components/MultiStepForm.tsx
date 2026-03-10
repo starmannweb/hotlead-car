@@ -35,6 +35,7 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
   const [formData, setFormData] = useState({
     name: "",
     phone: initialData?.phone || "",
+    state: "",
     city: initialData?.city || "",
     vehicle_brand: initialData?.vehicle_brand || "",
     vehicle_model: initialData?.vehicle_model || "",

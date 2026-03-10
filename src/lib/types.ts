@@ -1,6 +1,7 @@
 export interface LeadData {
   name: string;
   phone: string;
+  state: string;
   city: string;
   vehicle_brand: string;
   vehicle_model: string;

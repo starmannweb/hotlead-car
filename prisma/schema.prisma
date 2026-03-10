@@ -19,6 +19,7 @@ model Lead {
   // Dados pessoais
   name  String
   phone String
+  state String @default("")
   city  String
 
   // Dados do veículo
@@ -54,4 +55,12 @@ model Lead {
   // Consentimento LGPD
   lgpdConsent   Boolean  @default(false)
   lgpdConsentAt DateTime?
+}
+
+model ViewLog {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  leadId    String
+  field     String
+  ip        String   @default("")
 }

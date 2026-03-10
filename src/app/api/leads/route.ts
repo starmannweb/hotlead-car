@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       phone,
+      state = "",
       city,
       vehicle_brand,
       vehicle_model,
@@ -39,6 +40,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         phone,
+        state,
         city,
         vehicleBrand: vehicle_brand,
         vehicleModel: vehicle_model,
