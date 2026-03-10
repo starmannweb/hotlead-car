@@ -127,37 +127,37 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-36">
         <div className="grid md:grid-cols-2 gap-10 lg:gap-20 items-center">
           {/* Left - Copy */}
-          <div className="text-center md:text-left animate-[fadeInUp_0.8s_ease-out]">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md text-white/90 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-white/20 shadow-[0_4px_12px_rgba(0,0,0,0.1)] hover:bg-white/20 transition-colors cursor-default">
+          <div className="w-full md:w-[55%] text-left md:pr-10 z-10 2xl:ml-12 mt-20 md:mt-0">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 sm:mb-8 shadow-[0_4px_20px_rgba(0,0,0,0.2)] animate-[fadeInDown_1s_ease-out] text-white/90 text-sm font-medium transition-colors cursor-default hover:bg-white/20">
               <Star className="w-4 h-4 text-accent animate-[spin_4s_linear_infinite]" fill="#ff6d00" />
               Marketplace #1 de oportunidades automotivas
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.1] tracking-tight">
               Venda seu carro{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light animate-pulse">rapido</span> e receba{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light animate-pulse">rápido</span> e receba{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-blue-300">propostas reais</span>
             </h1>
-            <p className="mt-6 text-lg sm:text-xl text-white/80 leading-relaxed max-w-lg mx-auto md:mx-0">
-              Cadastro simplificado. Mais de 500 lojistas verificados para garantir as melhores ofertas no seu veiculo em ate <strong className="text-white">24 horas</strong>.
+            <p className="mt-6 text-lg sm:text-xl text-white/80 leading-relaxed max-w-lg mx-auto md:mx-0 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+              Cadastro simplificado. Mais de 500 lojistas verificados para garantir as melhores ofertas no seu veículo em até <strong className="text-white">24 horas</strong>.
             </p>
 
             {/* Stats */}
             <div className="mt-10 grid grid-cols-3 gap-6 max-w-md mx-auto md:mx-0">
-              <div className="text-center md:text-left group cursor-default">
+              <div className="text-center md:text-left group cursor-default animate-[fadeInUp_1s_ease-out_0.4s_both]">
                 <div className="flex items-center gap-1.5 justify-center md:justify-start">
                   <Users className="w-4 h-4 text-accent group-hover:scale-125 transition-transform" />
                   <span className="text-2xl sm:text-3xl font-extrabold text-white">500+</span>
                 </div>
                 <p className="text-xs sm:text-sm text-white/60 mt-1">Lojistas cadastrados</p>
               </div>
-              <div className="text-center md:text-left group cursor-default">
+              <div className="text-center md:text-left group cursor-default animate-[fadeInUp_1s_ease-out_0.6s_both]">
                 <div className="flex items-center gap-1.5 justify-center md:justify-start">
                   <Clock className="w-4 h-4 text-secondary group-hover:scale-125 -rotate-90 group-hover:rotate-0 transition-all duration-300" />
                   <span className="text-2xl sm:text-3xl font-extrabold text-white">24h</span>
                 </div>
                 <p className="text-xs sm:text-sm text-white/60 mt-1">Para propostas</p>
               </div>
-              <div className="text-center md:text-left group cursor-default">
+              <div className="text-center md:text-left group cursor-default animate-[fadeInUp_1s_ease-out_0.8s_both]">
                 <div className="flex items-center gap-1.5 justify-center md:justify-start">
                   <ShieldCheck className="w-4 h-4 text-primary-light group-hover:scale-125 transition-transform" />
                   <span className="text-2xl sm:text-3xl font-extrabold text-white">100%</span>
@@ -228,9 +228,9 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
               </div>
 
               <p className="text-[11px] text-gray-400 text-center leading-snug mt-4">
-                Ao continuar, voce concorda com nossa{" "}
+                Ao continuar, você concorda com nossa{" "}
                 <a href="#" className="underline hover:text-gray-600 transition-colors">
-                  Politica de Privacidade
+                  Política de Privacidade
                 </a>
               </p>
             </form>
@@ -245,6 +245,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
         @keyframes fadeInLeft { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
       `}} />
     </section>
   );

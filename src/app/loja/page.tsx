@@ -454,7 +454,11 @@ export default function LojaPage() {
                                                         <div className="flex items-center gap-2">
                                                             <p className="font-medium text-gray-900 flex items-center gap-1">
                                                                 <Phone className="w-4 h-4 text-gray-400" />
-                                                                {phoneUnlocked ? lead.phone : maskPhone(lead.phone)}
+                                                                {phoneUnlocked ? (
+                                                                    <a href={`https://wa.me/55${lead.phone.replace(/\D/g, '')}?text=${encodeURIComponent('Olá, eu vi o seu contato na AutoOportunidade e fiquei interessado no seu veículo ' + lead.vehicleBrand + ' ' + lead.vehicleModel + '.')}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                                                        {lead.phone}
+                                                                    </a>
+                                                                ) : maskPhone(lead.phone)}
                                                             </p>
                                                             {!phoneUnlocked && (
                                                                 <button
