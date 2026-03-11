@@ -130,7 +130,7 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-36">
         <div className="grid md:grid-cols-2 gap-10 lg:gap-20 items-center">
           {/* Left - Copy */}
-          <div className="w-full lg:w-[60%] text-left z-10 2xl:ml-12">
+          <div className="w-full text-left z-10">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 mb-8 shadow-2xl animate-[fadeInDown_1s_ease-out] text-white/90 text-[13px] font-medium transition-all cursor-default hover:bg-white/15 hover:border-white/20">
               <div className="w-5 h-5 bg-accent rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(255,109,0,0.5)]">
                 <Star className="w-3 h-3 text-white" fill="currentColor" />
@@ -138,13 +138,13 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
               <span className="tracking-wide">Marketplace #1 de oportunidades automotivas</span>
             </div>
             
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.95] tracking-tight mb-8">
-              Venda seu carro <br className="hidden lg:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent-light to-secondary italic">rápido</span> e receba <br className="hidden lg:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light via-blue-400 to-blue-200">propostas</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.1] tracking-tight mb-8">
+              Venda seu carro <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent-light to-secondary italic">rápido</span> e receba <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light via-blue-400 to-blue-200">propostas</span> de lojistas
             </h1>
             
-            <p className="mt-8 text-lg sm:text-2xl text-white/70 leading-snug max-w-xl animate-[fadeInUp_1s_ease-out_0.2s_both] font-medium">
+            <p className="mt-8 text-lg sm:text-xl text-white/70 leading-relaxed max-w-xl animate-[fadeInUp_1s_ease-out_0.2s_both] font-medium">
               Simplificamos a sua venda direta para lojistas verificados. 
               Consiga as melhores ofertas em até <strong className="text-accent underline decoration-accent/30 underline-offset-4">24 horas</strong>.
             </p>
