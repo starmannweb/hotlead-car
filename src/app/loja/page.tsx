@@ -137,13 +137,24 @@ export default function LojaPage() {
             if (data.success) {
                 setUnlockedLeads((prev) => new Set([...prev, `${leadId}_${field}`]));
                 if (data.credits !== undefined) setCredits(data.credits);
+                if (data.lead) {
+                    setLeads((prev) =>
+                        prev.map((l) =>
+                            l.id === leadId ? { ...l, ...data.lead } : l
+                        )
+                    );
+                }
+                return true;
             } else if (res.status === 402) {
                 setBuyModalOpen(true);
+                return false;
             } else {
                 alert(data.message || "Erro ao desbloquear");
+                return false;
             }
         } catch {
             alert("Erro de conexao");
+            return false;
         } finally {
             setUnlocking(null);
         }
@@ -505,9 +516,10 @@ export default function LojaPage() {
                                                 )}
  
                                                 <button
-                                                    onClick={() => {
+                                                    onClick={async () => {
                                                         if (!detailsUnlocked && user?.role === "client") {
-                                                            unlockLead(lead.id, "details");
+                                                            const success = await unlockLead(lead.id, "details");
+                                                            if (!success) return;
                                                         }
                                                         setExpandedLeads((prev) => {
                                                             const next = new Set(prev);

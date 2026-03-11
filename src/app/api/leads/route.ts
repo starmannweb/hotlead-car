@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { calculateLeadScore } from "@/lib/scoring";
-import { getUnlockCost } from "@/lib/auth";
+import { getUnlockCost, getAuthUser } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -145,9 +145,34 @@ export async function GET(request: NextRequest) {
     // Calcular as regiões (unique) para enviar para o frontend e mostrar no menu de opções
     const uniqueRegions = Array.from(new Set(leads.map((l: any) => l.region).filter(Boolean))).sort();
 
+    const user = await getAuthUser();
+    let unlockedLeadIds = new Set<string>();
+
+    if (user?.role === "client") {
+      const views = await prisma.viewLog.findMany({
+        where: { userId: user.id },
+        select: { leadId: true }
+      });
+      unlockedLeadIds = new Set(views.map(v => v.leadId));
+    }
+
+    const maskedLeads = leads.map((lead) => {
+        if (user?.role === "admin" || user?.role === "seller") return lead;
+        
+        if (!unlockedLeadIds.has(lead.id)) {
+            return {
+                ...lead,
+                name: "***",
+                phone: "***",
+                km: "***"
+            };
+        }
+        return lead;
+    });
+
     return NextResponse.json({
       success: true,
-      data: leads,
+      data: maskedLeads,
       uniqueRegions,
       pagination: {
         page,

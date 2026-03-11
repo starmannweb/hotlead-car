@@ -119,15 +119,24 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
 
             <div className="grid grid-cols-3 gap-6">
               <div>
-                <div className="text-2xl font-bold text-white mb-1">500+</div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Users className="w-5 h-5 text-accent" />
+                  <div className="text-2xl font-bold text-white">500+</div>
+                </div>
                 <div className="text-sm font-medium text-slate-500">Lojistas Ativos</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-white mb-1">24h</div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <Clock className="w-5 h-5 text-secondary" />
+                  <div className="text-2xl font-bold text-white">24h</div>
+                </div>
                 <div className="text-sm font-medium text-slate-500">Propostas Rápidas</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-white mb-1">100%</div>
+                <div className="flex items-center gap-1.5 mb-1">
+                  <ShieldCheck className="w-5 h-5 text-primary-light" />
+                  <div className="text-2xl font-bold text-white">100%</div>
+                </div>
                 <div className="text-sm font-medium text-slate-500">Seguro e Grátis</div>
               </div>
             </div>

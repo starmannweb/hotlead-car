@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
             // Get lead to determine cost
             const lead = await prisma.lead.findUnique({
                 where: { id: leadId },
-                select: { tier: true, unlockCost: true },
+                select: { tier: true, unlockCost: true, name: true, phone: true, km: true },
             });
 
             if (!lead) {
@@ -181,6 +181,11 @@ export async function POST(request: NextRequest) {
                     success: true,
                     creditsUsed: cost,
                     credits: updatedUser.credits,
+                    lead: {
+                        name: lead.name,
+                        phone: lead.phone,
+                        km: lead.km
+                    }
                 });
             } else {
                 // Just log the new field view, no cost
@@ -198,6 +203,11 @@ export async function POST(request: NextRequest) {
                     success: true,
                     creditsUsed: 0,
                     credits: currentUser.credits, // unchanged
+                    lead: {
+                        name: lead.name,
+                        phone: lead.phone,
+                        km: lead.km
+                    }
                 });
             }
         }
