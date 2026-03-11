@@ -238,7 +238,7 @@ export default function AdminPage() {
     const headers = [
       "Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM",
       "Urgencia", "Desconto FIPE", "Documentacao", "Financiamento",
-      "Score", "Qualificacao", "Status", "Data",
+      "Pontuação", "Qualificacao", "Status", "Data",
     ];
     const rows = filteredLeads.map((l) => [
       l.name,
@@ -266,7 +266,7 @@ export default function AdminPage() {
     const headers = [
       "Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM",
       "Urgencia", "Desconto FIPE", "Documentacao", "Financiamento",
-      "Score", "Qualificacao", "Status", "Data",
+      "Pontuação", "Qualificacao", "Status", "Data",
     ];
     const rows = filteredLeads.map((l) => [
       l.name,
@@ -339,7 +339,7 @@ export default function AdminPage() {
       <table>
         <thead><tr>
           <th>Nome</th><th>Telefone</th><th>UF</th><th>Cidade</th>
-          <th>Veiculo</th><th>KM</th><th>Score</th>
+          <th>Veiculo</th><th>KM</th><th>Pontuação</th>
           <th>Qualificacao</th><th>Status</th><th>Data</th>
         </tr></thead>
         <tbody>${rows}</tbody>
@@ -515,7 +515,7 @@ export default function AdminPage() {
                 onChange={(e) => setSortBy(e.target.value as "score" | "recent")}
                 className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               >
-                <option value="score">Maior score</option>
+                <option value="score">Maior pontuação</option>
                 <option value="recent">Mais recentes</option>
               </select>
             </div>
@@ -570,7 +570,7 @@ export default function AdminPage() {
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${getTierColor(lead.tier)}`}
                           >
-                            {TIER_LABELS[lead.tier] || lead.tier} - Score {lead.score}/100
+                            {TIER_LABELS[lead.tier] || lead.tier} - Pontuação {lead.score}/100
                           </span>
                           <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                             {getStatusIcon(lead.status)}

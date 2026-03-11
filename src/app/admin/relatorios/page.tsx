@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
     BarChart3, Eye, Download, Users, ArrowLeft, Car,
     LogOut, Calendar, User, FileSpreadsheet, Clock,
-    Plus, Trash2, X, Banknote
+    Plus, Trash2, X, Banknote, Loader2
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -150,26 +150,26 @@ export default function RelatoriosPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <button onClick={() => router.push("/admin")} className="p-2 text-gray-400 hover:text-gray-600 cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
+                            <button onClick={() => router.push("/admin")} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center"><BarChart3 className="w-5 h-5 text-white" /></div>
-                                <span className="font-bold text-gray-900">Relatorios</span>
+                                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(0,82,204,0.3)]"><BarChart3 className="w-5 h-5 text-white" /></div>
+                                <span className="font-bold text-gray-900 dark:text-white">Relatorios</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
-                            <select value={days} onChange={(e) => setDays(parseInt(e.target.value))} className="px-3 py-2 rounded-lg border border-gray-200 text-sm text-gray-700">
+                            <select value={days} onChange={(e) => setDays(parseInt(e.target.value))} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary">
                                 <option value={7}>Ultimos 7 dias</option>
                                 <option value={30}>Ultimos 30 dias</option>
                                 <option value={90}>Ultimos 90 dias</option>
                             </select>
                             <ThemeToggle />
-                            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer"><LogOut className="w-5 h-5" /></button>
+                            <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"><LogOut className="w-5 h-5" /></button>
                         </div>
                     </div>
                 </div>
@@ -183,7 +183,7 @@ export default function RelatoriosPage() {
                         { id: "views", label: "Visualizacoes", icon: Eye },
                         { id: "users", label: "Usuarios", icon: Users },
                     ] as const).map((t) => (
-                        <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer ${tab === t.id ? "bg-primary text-white" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}>
+                        <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${tab === t.id ? "bg-primary text-white shadow-md shadow-primary/20" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"}`}>
                             <t.icon className="w-4 h-4" />{t.label}
                         </button>
                     ))}
@@ -193,50 +193,50 @@ export default function RelatoriosPage() {
                 {tab === "summary" && summary && (
                     <div className="space-y-6">
                         {/* Stats cards */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="bg-white rounded-xl border border-gray-200 p-5">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2"><Eye className="w-4 h-4" />Visualizacoes</div>
-                                <p className="text-3xl font-bold text-gray-900">{summary.totalViews}</p>
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Eye className="w-4 h-4" />Visualizacoes</div>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalViews}</p>
                             </div>
-                            <div className="bg-white rounded-xl border border-gray-200 p-5">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2"><Download className="w-4 h-4" />Exportacoes</div>
-                                <p className="text-3xl font-bold text-gray-900">{summary.totalExports}</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Download className="w-4 h-4" />Exportacoes</div>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalExports}</p>
                             </div>
-                            <div className="bg-white rounded-xl border border-gray-200 p-5">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2"><Users className="w-4 h-4" />Usuarios</div>
-                                <p className="text-3xl font-bold text-gray-900">{summary.totalUsers}</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Users className="w-4 h-4" />Usuarios</div>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalUsers}</p>
                             </div>
-                            <div className="bg-white rounded-xl border border-gray-200 p-5">
-                                <div className="flex items-center gap-2 text-gray-500 text-sm mb-2"><Car className="w-4 h-4" />Leads</div>
-                                <p className="text-3xl font-bold text-gray-900">{summary.totalLeads}</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Car className="w-4 h-4" />Leads</div>
+                                <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalLeads}</p>
                             </div>
-                            <div className="bg-white rounded-xl border border-gray-200 p-5">
-                                <div className="flex items-center gap-2 text-green-600 text-sm mb-2"><Banknote className="w-4 h-4" />Créditos Vendidos</div>
-                                <p className="text-3xl font-bold text-green-700">{summary.totalCreditsSold}</p>
+                            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
+                                <div className="flex items-center gap-2 text-green-600 dark:text-green-500 text-sm mb-2"><Banknote className="w-4 h-4" />Créditos Vendidos</div>
+                                <p className="text-3xl font-bold text-green-700 dark:text-green-400">{summary.totalCreditsSold}</p>
                             </div>
                         </div>
 
                         {/* Top viewers */}
-                        <div className="bg-white rounded-xl border border-gray-200 p-6">
-                            <h3 className="font-bold text-gray-900 mb-4">Top Visualizadores</h3>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
+                            <h3 className="font-bold text-gray-900 dark:text-white mb-4">Top Visualizadores</h3>
                             <div className="space-y-3">
                                 {summary.topViewers.map((v, idx) => (
-                                    <div key={v.userId || idx} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                                    <div key={v.userId || idx} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm font-bold text-gray-600">{idx + 1}</div>
+                                            <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-400">{idx + 1}</div>
                                             <div>
-                                                <p className="font-medium text-gray-900">{v.user?.name || "Anonimo"}</p>
-                                                <p className="text-xs text-gray-500">{v.user?.email}</p>
+                                                <p className="font-medium text-gray-900 dark:text-white">{v.user?.name || "Anonimo"}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">{v.user?.email}</p>
                                             </div>
                                             {v.user?.role && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${ROLE_COLORS[v.user.role] || ""}`}>{ROLE_LABELS[v.user.role]}</span>}
                                         </div>
                                         <div className="text-right">
-                                            <p className="font-bold text-gray-900">{v.viewCount}</p>
-                                            <p className="text-xs text-gray-500">visualizacoes</p>
+                                            <p className="font-bold text-gray-900 dark:text-white">{v.viewCount}</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">visualizacoes</p>
                                         </div>
                                     </div>
                                 ))}
-                                {summary.topViewers.length === 0 && <p className="text-gray-500 text-sm">Nenhuma visualizacao registrada.</p>}
+                                {summary.topViewers.length === 0 && <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">Nenhuma visualizacao registrada.</p>}
                             </div>
                         </div>
                     </div>
@@ -250,37 +250,37 @@ export default function RelatoriosPage() {
                                 <ArrowLeft className="w-4 h-4" /> Voltar para todos
                             </button>
                         )}
-                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                             <table className="w-full text-sm">
-                                <thead className="bg-gray-50 border-b border-gray-200">
+                                <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                     <tr>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700">Data/Hora</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700">Usuario</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700">Funcao</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700">Lead</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700">Campo</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700">Creditos</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Data/Hora</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Usuario</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Funcao</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Lead</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Campo</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Creditos</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                     {views.map((v) => (
-                                        <tr key={v.id} className="border-b border-gray-100 hover:bg-gray-50">
-                                            <td className="px-4 py-3 text-gray-600">
-                                                <div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5" />{new Date(v.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</div>
+                                        <tr key={v.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                            <td className="px-4 py-3 text-gray-600 dark:text-gray-400">
+                                                <div className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5 text-gray-400" />{new Date(v.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}</div>
                                             </td>
                                             <td className="px-4 py-3">
                                                 {v.user ? (
-                                                    <button onClick={() => { setSelectedUser(v.user!.id); setTab("views"); }} className="text-primary hover:underline cursor-pointer font-medium">{v.user.name}</button>
+                                                    <button onClick={() => { setSelectedUser(v.user!.id); setTab("views"); }} className="text-primary hover:underline cursor-pointer font-bold">{v.user.name}</button>
                                                 ) : <span className="text-gray-400">Anonimo</span>}
                                             </td>
                                             <td className="px-4 py-3">
                                                 {v.user?.role && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${ROLE_COLORS[v.user.role] || ""}`}>{ROLE_LABELS[v.user.role]}</span>}
                                             </td>
-                                            <td className="px-4 py-3 text-gray-900">
+                                            <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
                                                 {v.lead ? `${v.lead.vehicleBrand} ${v.lead.vehicleModel}` : v.leadId === "export" ? "Exportacao" : v.leadId}
                                             </td>
-                                            <td className="px-4 py-3 text-gray-600">{v.field}</td>
-                                            <td className="px-4 py-3">{v.creditsUsed > 0 ? <span className="text-amber-600 font-bold">{v.creditsUsed}</span> : <span className="text-gray-400">0</span>}</td>
+                                            <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{v.field}</td>
+                                            <td className="px-4 py-3">{v.creditsUsed > 0 ? <span className="text-amber-600 dark:text-amber-400 font-bold">-{v.creditsUsed}</span> : <span className="text-gray-400">0</span>}</td>
                                         </tr>
                                     ))}
                                     {views.length === 0 && <tr><td colSpan={6} className="text-center text-gray-500 py-8">Nenhuma visualizacao registrada.</td></tr>}
@@ -298,46 +298,46 @@ export default function RelatoriosPage() {
                                 <Plus className="w-4 h-4" /> Criar Usuário
                             </button>
                         </div>
-                        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
                         <table className="w-full text-sm">
-                            <thead className="bg-gray-50 border-b border-gray-200">
+                            <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Usuario</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Funcao</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Creditos</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Visualizacoes</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Exportacoes</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Cadastro</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700">Acoes</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Usuario</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Funcao</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Creditos</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Visualizacoes</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Exportacoes</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Cadastro</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Acoes</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                 {users.map((u) => (
-                                    <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
+                                    <tr key={u.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center"><User className="w-4 h-4 text-gray-500" /></div>
-                                                <div><p className="font-medium text-gray-900">{u.name}</p><p className="text-xs text-gray-500">{u.email}</p></div>
+                                                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center"><User className="w-4 h-4 text-gray-500 dark:text-gray-400" /></div>
+                                                <div><p className="font-bold text-gray-900 dark:text-white">{u.name}</p><p className="text-xs text-gray-500 dark:text-gray-400">{u.email}</p></div>
                                             </div>
                                         </td>
                                         <td className="px-4 py-3"><span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${ROLE_COLORS[u.role] || ""}`}>{ROLE_LABELS[u.role]}</span></td>
-                                        <td className="px-4 py-3 font-bold text-amber-600">{u.credits}</td>
-                                        <td className="px-4 py-3 font-medium">{u._count.viewLogs}</td>
-                                        <td className="px-4 py-3 font-medium">{u._count.exportLogs}</td>
-                                        <td className="px-4 py-3 text-gray-600">{new Date(u.createdAt).toLocaleDateString("pt-BR")}</td>
+                                        <td className="px-4 py-3 font-bold text-amber-600 dark:text-amber-400">{u.credits}</td>
+                                        <td className="px-4 py-3 font-bold text-gray-700 dark:text-gray-300">{u._count.viewLogs}</td>
+                                        <td className="px-4 py-3 font-bold text-gray-700 dark:text-gray-300">{u._count.exportLogs}</td>
+                                        <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{new Date(u.createdAt).toLocaleDateString("pt-BR")}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-3">
                                                 <button onClick={() => { setSelectedUser(u.id); setTab("views"); }} className="flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer" title="Ver Atividade">
-                                                    <Eye className="w-4 h-4" />
+                                                    <Eye className="w-5 h-5" />
                                                 </button>
                                                 <button onClick={() => handleDeleteUser(u.id)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-600 cursor-pointer" title="Remover Usuário">
-                                                    <Trash2 className="w-4 h-4" />
+                                                    <Trash2 className="w-5 h-5" />
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))}
-                                {users.length === 0 && <tr><td colSpan={7} className="text-center text-gray-500 py-8">Nenhum usuario cadastrado.</td></tr>}
+                                {users.length === 0 && <tr><td colSpan={7} className="text-center text-gray-500 dark:text-gray-400 py-8">Nenhum usuario cadastrado.</td></tr>}
                             </tbody>
                         </table>
                         </div>
@@ -347,37 +347,38 @@ export default function RelatoriosPage() {
 
             {/* User creation modal */}
             {userModalOpen && (
-                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-                        <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-                            <h2 className="text-lg font-bold text-gray-900">Novo Usuário</h2>
-                            <button onClick={() => setUserModalOpen(false)} className="text-gray-400 hover:text-gray-600 cursor-pointer">
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 dark:border-gray-700 animate-[fadeInUp_0.3s_ease-out]">
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                            <h2 className="text-xl font-bold text-gray-900 dark:text-white">Novo Usuário</h2>
+                            <button onClick={() => setUserModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
                                 <X className="w-5 h-5" />
                             </button>
                         </div>
-                        <form onSubmit={handleCreateUser} className="p-5 space-y-4">
+                        <form onSubmit={handleCreateUser} className="p-6 space-y-5">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Nome completo</label>
-                                <input required type="text" value={newUserForm.name} onChange={e => setNewUserForm({ ...newUserForm, name: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Nome completo</label>
+                                <input required type="text" value={newUserForm.name} onChange={e => setNewUserForm({ ...newUserForm, name: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">E-mail de acesso</label>
-                                <input required type="email" value={newUserForm.email} onChange={e => setNewUserForm({ ...newUserForm, email: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">E-mail de acesso</label>
+                                <input required type="email" value={newUserForm.email} onChange={e => setNewUserForm({ ...newUserForm, email: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Função no painel</label>
-                                <select required value={newUserForm.role} onChange={e => setNewUserForm({ ...newUserForm, role: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none">
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Função no painel</label>
+                                <select required value={newUserForm.role} onChange={e => setNewUserForm({ ...newUserForm, role: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
                                     <option value="client">Lojista / Cliente (Compra Leads)</option>
                                     <option value="seller">Vendedor (Opcional interno)</option>
                                     <option value="admin">Administrador Geral</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1.5">Senha</label>
-                                <input required minLength={6} type="password" value={newUserForm.password} onChange={e => setNewUserForm({ ...newUserForm, password: e.target.value })} className="w-full px-3 py-2 rounded-lg border border-gray-300 text-gray-900 focus:ring-2 focus:ring-primary focus:border-primary outline-none" />
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Senha</label>
+                                <input required minLength={6} type="password" value={newUserForm.password} onChange={e => setNewUserForm({ ...newUserForm, password: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
                             </div>
                             <div className="pt-2">
-                                <button type="submit" disabled={isSubmittingUser} className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 disabled:opacity-70">
+                                <button type="submit" disabled={isSubmittingUser} className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 disabled:opacity-70 shadow-lg shadow-primary/20 transition-all active:scale-95">
+                                    {isSubmittingUser ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
                                     {isSubmittingUser ? "Criando..." : "Criar Usuário"}
                                 </button>
                             </div>

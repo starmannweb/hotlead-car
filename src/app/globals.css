@@ -2,6 +2,15 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+}
+
 @theme {
   --color-primary: #0052cc;
   --color-primary-dark: #003d99;

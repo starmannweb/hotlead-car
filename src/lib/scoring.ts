@@ -1,7 +1,7 @@
 /**
  * Sistema de Scoring/Qualificação de Leads
  *
- * Score de 0-100 pontos, dividido em 3 tiers:
+ * Pontuação de 0-100 pontos, dividido em 3 tiers:
  * - HOT (70-100): Lead altamente qualificado, prioridade máxima
  * - WARM (40-69): Lead com potencial, precisa de follow-up
  * - COLD (0-39): Lead frio, baixa probabilidade de conversão

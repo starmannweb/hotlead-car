@@ -272,29 +272,29 @@ export default function LojaPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
             {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-10">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-4">
                             <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+                                <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(255,109,0,0.3)]">
                                     <Car className="w-5 h-5 text-white" />
                                 </div>
-                                <span className="font-bold text-gray-900">Painel de Leads</span>
+                                <span className="font-bold text-gray-900 dark:text-white">Painel de Leads</span>
                             </div>
                             {user && (
-                                <span className="text-sm text-gray-500">
-                                    Olá, <strong>{user.name}</strong>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Olá, <strong className="text-gray-900 dark:text-white">{user.name}</strong>
                                 </span>
                             )}
                         </div>
                         <div className="flex items-center gap-4">
                             {/* Credits badge */}
-                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                                <Coins className="w-4 h-4 text-amber-600" />
-                                <span className="text-sm font-bold text-amber-700">{credits} creditos</span>
+                            <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+                                <Coins className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                                <span className="text-sm font-bold text-amber-700 dark:text-amber-300">{credits} creditos</span>
                             </div>
 
                             {/* Lead counters */}
@@ -327,21 +327,21 @@ export default function LojaPage() {
 
             {/* Filters */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-6">
                     <div className="flex flex-wrap items-center gap-4">
                         {/* Tier Filter */}
-                        <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
+                        <div className="flex-1 min-w-[300px] md:flex-initial">
+                            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">
                                 <Filter className="w-3.5 h-3.5 inline mr-1" />Qualificacao
                             </label>
                             <div className="flex gap-2">
                                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
                                     <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${filter === tier
-                                        ? tier === "hot" ? "bg-red-100 text-red-700"
-                                            : tier === "warm" ? "bg-yellow-100 text-yellow-700"
-                                                : tier === "cold" ? "bg-blue-100 text-blue-700"
-                                                    : "bg-gray-200 text-gray-900"
-                                        : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                                        ? tier === "hot" ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
+                                            : tier === "warm" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400"
+                                                : tier === "cold" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
+                                                    : "bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-white"
+                                        : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
                                         }`}>
                                         {tier === "all" ? "Todos" : TIER_LABELS[tier]}
                                     </button>
@@ -351,25 +351,25 @@ export default function LojaPage() {
 
                         {/* Region filter */}
                         <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Região</label>
-                            <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs">
+                            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Região</label>
+                            <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs">
                                 <option value="all">Todas as Regiões</option>
                                 {states.map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                         </div>
-
+ 
                         {/* Sort */}
                         <div>
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Ordenar</label>
-                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "recent" | "score")} className="px-3 py-1.5 rounded-lg border border-gray-200 bg-white text-gray-900 text-xs">
+                            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Ordenar</label>
+                            <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "recent" | "score")} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs">
                                 <option value="recent">Mais recentes</option>
-                                <option value="score">Maior score</option>
+                                <option value="score">Maior pontuação</option>
                             </select>
                         </div>
-
+ 
                         {/* Search */}
                         <div className="flex-1 min-w-[200px]">
-                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">
+                            <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">
                                 <Search className="w-3.5 h-3.5 inline mr-1" />Buscar
                             </label>
                             <input
@@ -377,21 +377,19 @@ export default function LojaPage() {
                                 placeholder="Marca, modelo ou cidade..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-gray-200 text-gray-900 text-xs focus:ring-1 focus:ring-primary focus:border-primary"
+                                className="w-full px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs focus:ring-1 focus:ring-primary focus:border-primary"
                             />
                         </div>
-
-                        <div className="ml-auto text-sm text-gray-500">{filteredLeads.length} lead(s)</div>
+ 
+                        <div className="ml-auto text-sm text-gray-500 dark:text-gray-400">{filteredLeads.length} lead(s)</div>
                     </div>
-                </div>
-
-                {/* Leads List */}
+                </div>                {/* Leads List */}
                 <div className="space-y-4">
                     {filteredLeads.length === 0 ? (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-                            <Car className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum lead encontrado</h3>
-                            <p className="text-gray-500">Os leads aparecerao aqui quando forem cadastrados.</p>
+                        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
+                            <Car className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhum lead encontrado</h3>
+                            <p className="text-gray-500 dark:text-gray-400">Os leads aparecerao aqui quando forem cadastrados.</p>
                         </div>
                     ) : (
                         filteredLeads.map((lead) => {
@@ -402,34 +400,34 @@ export default function LojaPage() {
                             const phoneUnlocked = itemUnlocked;
                             const kmUnlocked = itemUnlocked;
                             const detailsUnlocked = itemUnlocked;
-
+ 
                             return (
-                                <div key={lead.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                                <div key={lead.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
                                     <div className="p-5">
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 {/* Tier badge */}
                                                 <div className="flex items-center gap-3 mb-4">
                                                     {getTierIcon(lead.tier)}
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${getTierColor(lead.tier)}`}>
-                                                        {TIER_LABELS[lead.tier] || lead.tier} - Score {lead.score}/100
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${getTierColor(lead.tier)} dark:bg-opacity-10`}>
+                                                        {TIER_LABELS[lead.tier] || lead.tier} - Pontuação {lead.score}/100
                                                     </span>
-                                                    <span className="flex items-center gap-1 text-sm text-gray-500">
+                                                    <span className="flex items-center gap-1 text-sm text-gray-500 dark:text-gray-400">
                                                         {getStatusIcon(lead.status)}
                                                         {STATUS_LABELS[lead.status] || lead.status}
                                                     </span>
-                                                    <span className="text-xs text-gray-400">
+                                                    <span className="text-xs text-gray-400 dark:text-gray-500">
                                                         {new Date(lead.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}
                                                     </span>
                                                 </div>
-
+ 
                                                 {/* Lead info */}
                                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                                     {/* Name - lockable */}
                                                     <div>
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Nome</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nome</p>
                                                         <div className="flex items-center gap-2">
-                                                            <p className="font-semibold text-gray-900">
+                                                            <p className="font-semibold text-gray-900 dark:text-white">
                                                                 {nameUnlocked ? lead.name : maskValue(lead.name)}
                                                             </p>
                                                             {nameUnlocked && user?.role !== "admin" && user?.role !== "seller" && (
@@ -437,12 +435,12 @@ export default function LojaPage() {
                                                             )}
                                                         </div>
                                                     </div>
-
+ 
                                                     {/* Phone - lockable */}
                                                     <div>
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contato</p>
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Contato</p>
                                                         <div className="flex items-center gap-2">
-                                                            <p className="font-medium text-gray-900 flex items-center gap-1">
+                                                            <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                                                                 <Phone className="w-4 h-4 text-gray-400" />
                                                                 {phoneUnlocked ? (
                                                                     <a href={`https://wa.me/55${lead.phone.replace(/\D/g, '')}?text=${encodeURIComponent('Olá, eu vi o seu contato na AutoOportunidade e fiquei interessado no seu veículo ' + lead.vehicleBrand + ' ' + lead.vehicleModel + '.')}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
@@ -452,26 +450,26 @@ export default function LojaPage() {
                                                             </p>
                                                         </div>
                                                     </div>
-
+ 
                                                     {/* Location - always visible */}
                                                     <div>
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Localidade</p>
-                                                        <p className="font-medium text-gray-900 flex items-center gap-1">
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Localidade</p>
+                                                        <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1">
                                                             <MapPin className="w-4 h-4 text-gray-400" />
                                                             {lead.city}{lead.state ? ` - ${lead.state}` : ""}
-                                                            {lead.region && <span className="text-gray-500 text-xs ml-1">({lead.region})</span>}
+                                                            {lead.region && <span className="text-gray-500 dark:text-gray-400 text-xs ml-1">({lead.region})</span>}
                                                         </p>
                                                     </div>
-
+ 
                                                     {/* Vehicle & KM */}
                                                     <div>
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Veículo</p>
-                                                        <p className="font-medium text-gray-900 leading-tight">
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Veículo</p>
+                                                        <p className="font-medium text-gray-900 dark:text-white leading-tight">
                                                             {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear}
                                                         </p>
                                                         
                                                         <div className="flex items-center gap-2 mt-1">
-                                                            <p className="text-sm font-medium text-gray-600 flex items-center gap-1">
+                                                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                                                                 <Gauge className="w-4 h-4 text-gray-400" />
                                                                 {kmUnlocked ? lead.km : '*** km'}
                                                             </p>
@@ -479,7 +477,7 @@ export default function LojaPage() {
                                                     </div>
                                                 </div>
                                             </div>
-
+ 
                                             {/* Actions */}
                                             <div className="ml-4 flex flex-col gap-2 items-end">
                                                 {/* Cost indicator */}
@@ -488,7 +486,7 @@ export default function LojaPage() {
                                                       <button
                                                           onClick={() => unlockLead(lead.id, "all")}
                                                           disabled={unlocking === lead.id}
-                                                          className="flex items-center gap-1 text-sm bg-amber-500 text-white hover:bg-amber-600 px-3 py-1.5 rounded-lg border border-amber-600 transition-colors shadow-sm"
+                                                          className="flex items-center gap-1 text-sm bg-amber-500 text-white hover:bg-amber-600 px-3 py-1.5 rounded-lg border border-amber-600 transition-colors shadow-sm cursor-pointer"
                                                           title={`Desbloquear contato`}
                                                       >
                                                           {unlocking === lead.id ? (
@@ -501,7 +499,7 @@ export default function LojaPage() {
                                                       </button>
                                                     </div>
                                                 )}
-
+ 
                                                 <button
                                                     onClick={() => {
                                                         if (!detailsUnlocked && user?.role === "client") {
@@ -513,7 +511,7 @@ export default function LojaPage() {
                                                             return next;
                                                         });
                                                     }}
-                                                    className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary cursor-pointer mt-2"
+                                                    className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-primary cursor-pointer mt-2"
                                                 >
                                                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                                     {isExpanded ? "Recolher detalhes" : "Ver detalhes"}
@@ -521,27 +519,27 @@ export default function LojaPage() {
                                             </div>
                                         </div>
                                     </div>
-
+ 
                                     {/* Expanded details */}
                                     {isExpanded && (
-                                        <div className="border-t border-gray-100 p-5 bg-gray-50/50">
+                                        <div className="border-t border-gray-100 dark:border-gray-700 p-5 bg-gray-50/50 dark:bg-gray-800/50">
                                             <div className="flex flex-col lg:flex-row gap-4 mb-4">
-                                                <div className="flex-1 bg-white rounded-lg p-4">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2">Veículo</p>
-                                                    <p className="font-semibold text-gray-900 text-lg">
+                                                <div className="flex-1 bg-white dark:bg-gray-700 rounded-lg p-4">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Veículo</p>
+                                                    <p className="font-semibold text-gray-900 dark:text-white text-lg">
                                                         {lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear} - {lead.km} km
                                                     </p>
                                                 </div>
-
+ 
                                                 {photos.length > 0 && (
-                                                    <div className="bg-white rounded-lg p-4">
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                    <div className="bg-white dark:bg-gray-700 rounded-lg p-4">
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                                             <ImageIcon className="w-3.5 h-3.5" /> Fotos ({photos.length})
                                                         </p>
                                                         {detailsUnlocked || user?.role === "admin" || user?.role === "seller" ? (
                                                             <div className="flex gap-2">
                                                                 {photos.map((photo, idx) => (
-                                                                    <button key={idx} onClick={() => setPhotoModal({ photos, index: idx })} className="w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-primary cursor-pointer">
+                                                                    <button key={idx} onClick={() => setPhotoModal({ photos, index: idx })} className="w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-600 hover:border-primary transition-colors cursor-pointer">
                                                                         <img src={photo} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
                                                                     </button>
                                                                 ))}
@@ -549,8 +547,8 @@ export default function LojaPage() {
                                                         ) : (
                                                             <div className="flex gap-2">
                                                                 {photos.map((_, idx) => (
-                                                                    <div key={idx} className="w-16 h-16 rounded-lg bg-gray-200 flex items-center justify-center border-2 border-gray-300">
-                                                                        <Lock className="w-5 h-5 text-gray-400" />
+                                                                    <div key={idx} className="w-16 h-16 rounded-lg bg-gray-200 dark:bg-gray-800 flex items-center justify-center border-2 border-gray-300 dark:border-gray-700">
+                                                                        <Lock className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                                                                     </div>
                                                                 ))}
                                                             </div>
@@ -558,24 +556,24 @@ export default function LojaPage() {
                                                     </div>
                                                 )}
                                             </div>
-
+ 
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                                <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                                         <Clock className="w-3.5 h-3.5" /> Urgência
                                                     </p>
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
                                                         {lead.urgency === "hoje" && "Hoje"}
                                                         {lead.urgency === "3dias" && "3 dias"}
                                                         {lead.urgency === "7dias" && "7 dias"}
                                                         {lead.urgency === "sem_pressa" && "Sem pressa"}
                                                     </p>
                                                 </div>
-                                                <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                                         <TrendingDown className="w-3.5 h-3.5" /> Desconto FIPE
                                                     </p>
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
                                                         {lead.discountAcceptance === "acima_20" && "Acima de 20%"}
                                                         {lead.discountAcceptance === "10_20" && "Entre 10 a 20%"}
                                                         {lead.discountAcceptance === "fipe" && "Tabela FIPE"}
@@ -584,21 +582,21 @@ export default function LojaPage() {
                                                         {lead.discountAcceptance === "10" && "10% abaixo"}
                                                     </p>
                                                 </div>
-                                                <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                                         <FileText className="w-3.5 h-3.5" /> Documentação
                                                     </p>
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
                                                         {lead.docsStatus === "regular" && "Regular"}
                                                         {lead.docsStatus === "pendencias" && "Pendencias"}
                                                         {lead.docsStatus === "nao_sei" && "Nao sei"}
                                                     </p>
                                                 </div>
-                                                <div className="bg-white rounded-lg p-3">
-                                                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                                <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
+                                                    <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                                         <Banknote className="w-3.5 h-3.5" /> Financiamento
                                                     </p>
-                                                    <p className="font-medium text-gray-900">
+                                                    <p className="font-medium text-gray-900 dark:text-white">
                                                         {lead.financeStatus === "nao" ? "Quitado" : "Com financiamento"}
                                                     </p>
                                                 </div>
@@ -614,8 +612,8 @@ export default function LojaPage() {
 
             {/* Photo modal */}
             {photoModal && (
-                <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setPhotoModal(null)}>
-                    <div className="relative max-w-3xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
+                <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4 backdrop-blur-sm" onClick={() => setPhotoModal(null)}>
+                    <div className="relative max-w-5xl max-h-[90vh]" onClick={(e) => e.stopPropagation()}>
                         <button onClick={() => setPhotoModal(null)} className="absolute -top-10 right-0 text-white hover:text-gray-300 cursor-pointer">
                             <X className="w-6 h-6" />
                         </button>
@@ -635,41 +633,41 @@ export default function LojaPage() {
 
             {/* Buy Credits Modal */}
             {buyModalOpen && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6 relative animate-[fadeInUp_0.3s_ease-out]">
-                        <button onClick={() => { setBuyModalOpen(false); setPixData(null); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-sm w-full p-8 relative animate-[fadeInUp_0.3s_ease-out] border border-gray-100 dark:border-gray-700">
+                        <button onClick={() => { setBuyModalOpen(false); setPixData(null); }} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
                             <X className="w-5 h-5" />
                         </button>
 
                         {!pixData ? (
                             <>
-                                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 mb-4 mx-auto">
-                                    <Coins className="w-6 h-6" />
+                                <div className="w-16 h-16 bg-amber-100 dark:bg-amber-900/30 rounded-full flex items-center justify-center text-amber-600 dark:text-amber-400 mb-6 mx-auto">
+                                    <Coins className="w-8 h-8" />
                                 </div>
-                                <h3 className="text-lg font-bold text-center text-gray-900 mb-2">Compre Créditos</h3>
-                                <p className="text-sm text-center text-gray-600 mb-6">
+                                <h3 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">Compre Créditos</h3>
+                                <p className="text-sm text-center text-gray-600 dark:text-gray-400 mb-8">
                                     Para visualizar os dados reais dos clientes mais qualificados, você precisa adquirir um pacote de créditos.
                                 </p>
                                 
-                                <div className="space-y-3 mb-4">
-                                    <div className="border border-gray-200 rounded-lg p-3 text-center cursor-pointer hover:border-primary transition" onClick={() => handleGeneratePix(30, 30)}>
-                                        <p className="font-bold text-gray-800 text-lg">30 Créditos</p>
-                                        <p className="text-sm text-gray-500">Por R$ 30,00</p>
+                                <div className="space-y-4 mb-6">
+                                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-center cursor-pointer hover:border-primary dark:hover:border-primary transition bg-gray-50 dark:bg-gray-700/50" onClick={() => handleGeneratePix(30, 30)}>
+                                        <p className="font-bold text-gray-800 dark:text-white text-lg">30 Créditos</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Por R$ 30,00</p>
                                     </div>
-
-                                    <div className="border border-green-200 bg-green-50 relative rounded-lg p-3 text-center cursor-pointer hover:bg-green-100 transition" onClick={() => handleGeneratePix(55, 60)}>
-                                        <span className="absolute -top-2.5 right-2 bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Mais Popular</span>
-                                        <p className="font-bold text-green-800 text-lg flex items-center justify-center gap-1">
-                                            <Flame className="w-4 h-4" /> 60 Créditos
+ 
+                                    <div className="border-2 border-green-200 dark:border-green-900/50 bg-green-50 dark:bg-green-900/20 relative rounded-xl p-4 text-center cursor-pointer hover:bg-green-100 dark:hover:bg-green-900/30 transition shadow-sm" onClick={() => handleGeneratePix(55, 60)}>
+                                        <span className="absolute -top-3 right-4 bg-green-600 text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">Mais Popular</span>
+                                        <p className="font-bold text-green-800 dark:text-green-400 text-xl flex items-center justify-center gap-1">
+                                            <Flame className="w-5 h-5" /> 60 Créditos
                                         </p>
-                                        <p className="text-sm text-green-700">Por R$ 55,00 (Economize R$5)</p>
+                                        <p className="text-sm text-green-700 dark:text-green-500 font-medium">Por R$ 55,00 (Economize R$5)</p>
                                     </div>
-
-                                    <div className="border shadow-sm border-gray-200 bg-gray-50 rounded-lg p-3 text-center cursor-pointer hover:border-primary transition" onClick={() => handleGeneratePix(130, 150)}>
-                                        <p className="font-bold text-gray-800 text-lg flex items-center justify-center gap-1">
-                                            <TrendingUp className="w-4 h-4 text-blue-600" /> 150 Créditos
+ 
+                                    <div className="border border-gray-200 dark:border-gray-700 rounded-xl p-4 text-center cursor-pointer hover:border-primary dark:hover:border-primary transition" onClick={() => handleGeneratePix(130, 150)}>
+                                        <p className="font-bold text-gray-800 dark:text-white text-lg flex items-center justify-center gap-1">
+                                            <TrendingUp className="w-5 h-5 text-blue-600" /> 150 Créditos
                                         </p>
-                                        <p className="text-sm text-gray-500">Por R$ 130,00 (Melhor custo/benefício)</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400">Por R$ 130,00 (Melhor custo/benefício)</p>
                                     </div>
                                 </div>
 
@@ -690,11 +688,13 @@ export default function LojaPage() {
                                     </>
                                 ) : (
                                     <>
-                                        <h3 className="text-lg font-bold text-gray-900 mb-2">Pague pelo PIX</h3>
-                                        <p className="text-sm text-gray-600 mb-4">Escaneie o QR Code abaixo ou copie e cole a chave no seu app bancário.</p>
-                                        <img src={pixData.qrCodeUrl} alt="QR Code PIX" className="w-48 h-48 mx-auto mb-4 border" />
-
-                                        <div className="bg-gray-100 p-2 rounded-lg break-all text-xs text-gray-600 mb-4 font-mono select-all">
+                                        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Pague pelo PIX</h3>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Escaneie o QR Code abaixo ou copie e cole a chave no seu app bancário.</p>
+                                        <div className="bg-white p-4 rounded-xl mb-4 inline-block">
+                                            <img src={pixData.qrCodeUrl} alt="QR Code PIX" className="w-48 h-48 mx-auto" />
+                                        </div>
+ 
+                                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-xl break-all text-xs text-gray-600 dark:text-gray-300 mb-4 font-mono select-all border border-gray-200 dark:border-gray-600">
                                             {pixData.pixCopiaECola}
                                         </div>
 
@@ -711,16 +711,16 @@ export default function LojaPage() {
 
             {/* Notification Toast */}
             {newLeadNotification && (
-                <div className="fixed bottom-6 right-6 z-50 animate-[fadeInUp_0.4s_ease-out] shadow-xl rounded-xl border border-green-200 bg-white p-4 flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 flex-shrink-0 animate-pulse">
-                        <Bell className="w-5 h-5" />
+                <div className="fixed bottom-6 right-6 z-50 animate-[fadeInUp_0.4s_ease-out] shadow-2xl rounded-2xl border border-green-200 dark:border-green-800 bg-white dark:bg-gray-800 p-5 flex items-center gap-4">
+                    <div className="w-12 h-12 bg-green-100 dark:bg-green-900/40 rounded-full flex items-center justify-center text-green-600 dark:text-green-400 flex-shrink-0 animate-pulse">
+                        <Bell className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="font-bold text-gray-900 text-sm">Oba! Novo lead!</p>
-                        <p className="text-xs text-gray-500">Acabamos de receber uma nova oportunidade.</p>
+                        <p className="font-bold text-gray-900 dark:text-white text-base">Oba! Novo lead!</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">Acabamos de receber uma nova oportunidade.</p>
                     </div>
-                    <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 ml-2">
-                        <X className="w-4 h-4" />
+                    <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 ml-2 cursor-pointer">
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
             )}

@@ -132,7 +132,7 @@ export default function PainelPage() {
 
     const logExport = async (format: string) => { try { await fetch("/api/leads/view-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: "export", field: `export_${format}` }) }); } catch { /* */ } };
     const exportCSV = () => {
-        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Score", "Qualificacao", "Status", "Data"];
+        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Pontuação", "Qualificacao", "Status", "Data"];
         const rows = filteredLeads.map((l) => [l.name, l.phone, l.state, l.city, l.vehicleBrand, l.vehicleModel, l.vehicleYear, l.km, l.score, TIER_LABELS[l.tier] || l.tier, STATUS_LABELS[l.status] || l.status, new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })]);
         const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
         const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
@@ -140,7 +140,7 @@ export default function PainelPage() {
         logExport("csv");
     };
     const exportExcel = () => {
-        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Score", "Qualificacao", "Status", "Data"];
+        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Pontuação", "Qualificacao", "Status", "Data"];
         const rows = filteredLeads.map((l) => [l.name, l.phone, l.state, l.city, l.vehicleBrand, l.vehicleModel, l.vehicleYear, l.km, l.score, TIER_LABELS[l.tier] || l.tier, STATUS_LABELS[l.status] || l.status, new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })]);
         let t = "<table><thead><tr>"; headers.forEach((h) => (t += `<th>${h}</th>`)); t += "</tr></thead><tbody>"; rows.forEach((r) => { t += "<tr>"; r.forEach((c) => (t += `<td>${c}</td>`)); t += "</tr>"; }); t += "</tbody></table>";
         const blob = new Blob([`<html><head><meta charset="utf-8"></head><body>${t}</body></html>`], { type: "application/vnd.ms-excel;charset=utf-8;" });
@@ -213,7 +213,7 @@ export default function PainelPage() {
                         <div>
                             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Ordenar</label>
                             <select value={sortBy} onChange={(e) => setSortBy(e.target.value as "recent" | "score")} className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-900 text-xs">
-                                <option value="score">Maior score</option>
+                                <option value="score">Maior pontuação</option>
                                 <option value="recent">Mais recentes</option>
                             </select>
                         </div>
@@ -243,7 +243,7 @@ export default function PainelPage() {
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-3 mb-4">
                                                     {getTierIcon(lead.tier)}
-                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${getTierColor(lead.tier)}`}>{TIER_LABELS[lead.tier]} - Score {lead.score}/100</span>
+                                                    <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${getTierColor(lead.tier)}`}>{TIER_LABELS[lead.tier]} - Pontuação {lead.score}/100</span>
                                                     <span className="flex items-center gap-1 text-sm text-gray-500">{getStatusIcon(lead.status)} {STATUS_LABELS[lead.status] || lead.status}</span>
                                                     <span className="text-xs text-gray-400">{new Date(lead.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
                                                 </div>
