@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
         score: scoring.score,
         tier: scoring.tier,
         qualified: scoring.qualified,
-        unlockCost: getUnlockCost(scoring.tier),
+        unlockCost: getUnlockCost(scoring.score),
         photos: JSON.stringify(photos),
         utmSource: utm_source,
         utmMedium: utm_medium,

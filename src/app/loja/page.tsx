@@ -336,12 +336,15 @@ export default function LojaPage() {
                             </label>
                             <div className="flex gap-2">
                                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
-                                    <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors cursor-pointer ${filter === tier
-                                        ? tier === "hot" ? "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400"
-                                            : tier === "warm" ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-400"
-                                                : tier === "cold" ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
-                                                    : "bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-white"
-                                        : "bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                    <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${filter === tier
+                                        ? tier === "hot" ? "bg-red-500 text-white shadow-md shadow-red-500/20"
+                                            : tier === "warm" ? "bg-amber-500 text-white shadow-md shadow-amber-500/20"
+                                                : tier === "cold" ? "bg-blue-500 text-white shadow-md shadow-blue-500/20"
+                                                    : "bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-900"
+                                        : tier === "hot" ? "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 dark:text-red-400"
+                                            : tier === "warm" ? "bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40 dark:text-amber-400"
+                                                : tier === "cold" ? "bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 dark:text-blue-400"
+                                                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                                         }`}>
                                         {tier === "all" ? "Todos" : TIER_LABELS[tier]}
                                     </button>
@@ -493,10 +496,11 @@ export default function LojaPage() {
                                                                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                                             ) : (
                                                                 <>
-                                                                  <Eye className="w-4 h-4" /> Desbloquear Card
+                                                                  <Eye className="w-4 h-4" /> Desbloquear Contato
                                                                 </>
                                                             )}
                                                       </button>
+                                                      <span className="text-[10px] text-gray-500 dark:text-gray-400 px-1 font-medium">{lead.unlockCost || 1} crédito(s)</span>
                                                     </div>
                                                 )}
  

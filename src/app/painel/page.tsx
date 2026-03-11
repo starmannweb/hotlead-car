@@ -192,7 +192,7 @@ export default function PainelPage() {
                             </label>
                             <div className="flex gap-2">
                                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
-                                    <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer ${filter === tier ? tier === "hot" ? "bg-red-100 text-red-700" : tier === "warm" ? "bg-yellow-100 text-yellow-700" : tier === "cold" ? "bg-blue-100 text-blue-700" : "bg-gray-200 text-gray-900" : "bg-gray-50 text-gray-600 hover:bg-gray-100"}`}>{tier === "all" ? "Todos" : TIER_LABELS[tier]}</button>
+                                    <button key={tier} onClick={() => setFilter(tier)} className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${filter === tier ? tier === "hot" ? "bg-red-500 text-white shadow-md shadow-red-500/20" : tier === "warm" ? "bg-amber-500 text-white shadow-md shadow-amber-500/20" : tier === "cold" ? "bg-blue-500 text-white shadow-md shadow-blue-500/20" : "bg-gray-800 text-white" : tier === "hot" ? "bg-red-50 text-red-600 hover:bg-red-100" : tier === "warm" ? "bg-amber-50 text-amber-600 hover:bg-amber-100" : tier === "cold" ? "bg-blue-50 text-blue-600 hover:bg-blue-100" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>{tier === "all" ? "Todos" : TIER_LABELS[tier]}</button>
                                 ))}
                             </div>
                         </div>

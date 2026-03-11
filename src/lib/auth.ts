@@ -77,13 +77,19 @@ export function getTokenName() {
 }
 
 /**
- * Calculate unlock cost based on lead score/tier
+ * Calculate unlock cost based on lead score
  */
-export function getUnlockCost(tier: string): number {
-    switch (tier) {
-        case "hot": return 30;
-        case "warm": return 15;
-        case "cold": return 5;
-        default: return 5;
-    }
+export function getUnlockCost(score: number): number {
+    // 90-100 = 30 credits
+    // 80-89 = 25 credits
+    // 70-79 = 20 credits
+    // 60-69 = 15 credits
+    // 50-59 = 10 credits
+    // < 50 = 5 credits
+    if (score >= 90) return 30;
+    if (score >= 80) return 25;
+    if (score >= 70) return 20;
+    if (score >= 60) return 15;
+    if (score >= 50) return 10;
+    return 5;
 }
