@@ -34,6 +34,7 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
 
   const [formData, setFormData] = useState({
     name: "",
+    email: "",
     phone: initialData?.phone || "",
     state: "",
     city: initialData?.city || "",
@@ -107,6 +108,7 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
   const validateStep1 = (): boolean => {
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = "Informe seu nome";
+    if (!formData.email.trim() || !/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "E-mail inválido";
     if (!validatePhone(formData.phone)) newErrors.phone = "WhatsApp inválido";
     if (!formData.city.trim()) newErrors.city = "Informe a cidade";
     if (!formData.vehicle_brand) newErrors.vehicle_brand = "Selecione a marca";
@@ -147,18 +149,17 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
     setSubmitting(true);
 
     const utm = getUTMParams();
-    const leadData: LeadData = {
+    const leadData = {
       ...formData,
       photos: photoPreviewUrls.filter(Boolean) as string[],
       utm_source: utm.utm_source,
       utm_medium: utm.utm_medium,
       utm_campaign: utm.utm_campaign,
       gclid: utm.gclid,
-      created_at: new Date().toISOString(),
       lgpd_consent: lgpdConsent,
     };
 
-    const result = await submitLead(leadData);
+    const result = await submitLead(leadData as any);
 
     if (result.success) {
       trackEvent({ event: "form_submit" });
@@ -232,6 +233,19 @@ export default function MultiStepForm({ initialData }: MultiStepFormProps) {
                 className={`input-field ${errors.name ? "!border-red-400" : ""}`}
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">E-mail</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Seu melhor e-mail"
+                value={formData.email}
+                onChange={handleChange}
+                className={`input-field ${errors.email ? "!border-red-400" : ""}`}
+              />
+              {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -4,7 +4,7 @@ import { getAuthUser } from "@/lib/auth";
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
         const currentUser = await getAuthUser();
@@ -12,7 +12,7 @@ export async function DELETE(
             return NextResponse.json({ success: false, message: "Sem permissao" }, { status: 403 });
         }
 
-        const id = params.id;
+        const { id } = await params;
         
         // Cannot delete yourself
         if (currentUser.id === id) {
