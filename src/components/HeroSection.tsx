@@ -138,15 +138,15 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
               <span className="tracking-wide">Marketplace #1 de oportunidades automotivas</span>
             </div>
             
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.1] tracking-tight mb-8">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-[1.1] tracking-tight mb-8">
               Venda seu carro <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent-light to-secondary italic">rápido</span> e receba <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light via-blue-400 to-blue-200">propostas</span> de lojistas
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light via-blue-400 to-blue-200">propostas</span>
             </h1>
             
-            <p className="mt-8 text-lg sm:text-xl text-white/70 leading-relaxed max-w-xl animate-[fadeInUp_1s_ease-out_0.2s_both] font-medium">
+            <p className="mt-8 text-lg sm:text-xl text-white/70 leading-relaxed max-w-lg animate-[fadeInUp_1s_ease-out_0.2s_both] font-medium">
               Simplificamos a sua venda direta para lojistas verificados. 
-              Consiga as melhores ofertas em até <strong className="text-accent underline decoration-accent/30 underline-offset-4">24 horas</strong>.
+              Consiga as melhores ofertas em até <strong className="text-accent">24 horas</strong>.
             </p>
 
             {/* Stats */}
