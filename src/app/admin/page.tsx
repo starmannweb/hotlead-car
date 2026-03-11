@@ -440,10 +440,14 @@ export default function AdminPage() {
                 Relatórios
               </button>
 
-              <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer" title="Sair">
+              <ThemeToggle />
+              <button 
+                onClick={handleLogout} 
+                className="p-2 text-gray-400 hover:text-red-500 cursor-pointer transition-colors" 
+                title="Sair"
+              >
                 <LogOut className="w-5 h-5" />
               </button>
-              <ThemeToggle />
             </div>
           </div>
         </div>
