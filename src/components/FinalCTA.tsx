@@ -27,35 +27,36 @@ export default function FinalCTA({ onCtaClick }: FinalCTAProps) {
       </div>
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm text-white/90 px-4 py-2 rounded-full text-sm font-medium mb-8 border border-white/10">
-          <Sparkles className="w-4 h-4" />
-          Comece agora — é gratuito
+        <div className="inline-flex items-center gap-2 bg-black/10 backdrop-blur-md text-white px-5 py-2 rounded-full text-[13px] font-bold uppercase tracking-wider mb-10 border border-white/10 shadow-xl">
+          <Sparkles className="w-4 h-4 text-white" />
+          Oportunidade única — 100% Grátis
         </div>
 
-        <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
-          Precisa vender seu carro{" "}
-          <span className="underline decoration-white/30 decoration-4 underline-offset-8">
-            rápido?
-          </span>
+        <h2 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tight">
+          Não perca tempo. <br />
+          Venda por um <span className="italic opacity-90">preço justo</span>.
         </h2>
-        <p className="mt-6 text-xl sm:text-2xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-          Receba propostas de lojistas verificados. Sem compromisso, sem
-          burocracia.
+        
+        <p className="mt-8 text-xl sm:text-2xl text-white/80 max-w-2xl mx-auto leading-snug font-medium">
+          Junte-se a milhares de proprietários que negociaram seus carros com lojistas verificados em tempo recorde.
         </p>
 
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-6">
           <button
             onClick={onCtaClick}
-            className="inline-flex items-center gap-2 bg-white text-accent font-bold py-4 px-10 rounded-xl text-lg transition-all duration-300 hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98] shadow-2xl cursor-pointer animate-pulse-glow"
+            className="group relative inline-flex items-center gap-3 bg-white text-slate-900 font-black py-5 px-12 rounded-[22px] text-xl transition-all duration-300 hover:scale-[1.05] hover:shadow-[0_30px_60px_-15px_rgba(255,255,255,0.3)] active:scale-95 cursor-pointer overflow-hidden"
           >
-            Cadastrar meu carro
-            <ArrowRight className="w-5 h-5" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white via-slate-50 to-white group-hover:bg-slate-50 transition-colors" />
+            <span className="relative z-10 flex items-center gap-2">
+              QUERO RECEBER PROPOSTAS
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1.5 transition-transform duration-300" />
+            </span>
           </button>
           <a
             href="#como-funciona"
-            className="text-white/70 hover:text-white font-medium text-base transition-colors underline underline-offset-4"
+            className="text-white/80 hover:text-white font-bold text-lg transition-colors border-b-2 border-white/20 hover:border-white"
           >
-            Veja como funciona
+            Ver como funciona
           </a>
         </div>
 

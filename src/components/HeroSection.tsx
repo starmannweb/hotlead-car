@@ -130,18 +130,23 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32 md:py-36">
         <div className="grid md:grid-cols-2 gap-10 lg:gap-20 items-center">
           {/* Left - Copy */}
-          <div className="w-full md:w-[55%] text-left md:pr-10 z-10 2xl:ml-12 mt-20 md:mt-0">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-6 sm:mb-8 shadow-[0_4px_20px_rgba(0,0,0,0.2)] animate-[fadeInDown_1s_ease-out] text-white/90 text-sm font-medium transition-colors cursor-default hover:bg-white/20">
-              <Star className="w-4 h-4 text-accent animate-[spin_4s_linear_infinite]" fill="#ff6d00" />
-              Marketplace #1 de oportunidades automotivas
+          <div className="w-full lg:w-[60%] text-left z-10 2xl:ml-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 backdrop-blur-xl border border-white/10 mb-8 shadow-2xl animate-[fadeInDown_1s_ease-out] text-white/90 text-[13px] font-medium transition-all cursor-default hover:bg-white/15 hover:border-white/20">
+              <div className="w-5 h-5 bg-accent rounded-full flex items-center justify-center shadow-[0_0_15px_rgba(255,109,0,0.5)]">
+                <Star className="w-3 h-3 text-white" fill="currentColor" />
+              </div>
+              <span className="tracking-wide">Marketplace #1 de oportunidades automotivas</span>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-white leading-[1.1] tracking-tight">
-              Venda seu carro{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent to-accent-light animate-pulse">rápido</span> e receba{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light to-blue-300">propostas reais</span>
+            
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl xl:text-8xl font-black text-white leading-[0.95] tracking-tight mb-8">
+              Venda seu carro <br className="hidden lg:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent via-accent-light to-secondary italic">rápido</span> e receba <br className="hidden lg:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-light via-blue-400 to-blue-200">propostas</span>
             </h1>
-            <p className="mt-6 text-lg sm:text-xl text-white/80 leading-relaxed max-w-lg mx-auto md:mx-0 animate-[fadeInUp_1s_ease-out_0.2s_both]">
-              Cadastro simplificado. Mais de 500 lojistas verificados para garantir as melhores ofertas no seu veículo em até <strong className="text-white">24 horas</strong>.
+            
+            <p className="mt-8 text-lg sm:text-2xl text-white/70 leading-snug max-w-xl animate-[fadeInUp_1s_ease-out_0.2s_both] font-medium">
+              Simplificamos a sua venda direta para lojistas verificados. 
+              Consiga as melhores ofertas em até <strong className="text-accent underline decoration-accent/30 underline-offset-4">24 horas</strong>.
             </p>
 
             {/* Stats */}
@@ -171,86 +176,111 @@ export default function HeroSection({ onQuickSubmit }: HeroSectionProps) {
           </div>
 
           {/* Right - Form (Simplified and with nice effects) */}
-          <div className="w-full max-w-md mx-auto md:mx-0 md:ml-auto animate-[fadeInLeft_1s_ease-out]">
-            <form
-              onSubmit={handleSubmit}
-              className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] p-7 sm:p-8 space-y-4 relative overflow-hidden group/form hover:shadow-[0_20px_60px_rgba(255,109,0,0.2)] transition-shadow duration-500"
-            >
-              {/* Top accent bar */}
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-accent via-accent-light to-secondary" />
+          <div className="w-full max-w-[440px] mx-auto md:mr-0 animate-[fadeInLeft_1s_ease-out]">
+            <div className="relative group/card">
+              {/* Outer glow effect */}
+              <div className="absolute -inset-1 bg-gradient-to-r from-accent to-secondary rounded-[40px] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+              
+              <form
+                onSubmit={handleSubmit}
+                className="relative bg-white/95 backdrop-blur-2xl rounded-[32px] shadow-2xl p-8 sm:p-10 space-y-5 overflow-hidden border border-white/20"
+              >
+                {/* Decorative corner */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-accent/5 rounded-full -mr-16 -mt-16 blur-3xl group-hover:bg-accent/10 transition-colors" />
 
-              <div className="text-center mb-6 pt-2">
-                <h2 className="text-2xl font-extrabold text-gray-900 leading-tight">
-                  Inicie seu cadastro
-                </h2>
-                <p className="text-sm text-gray-500 mt-2">
-                  Apenas 2 minutos • <span className="text-secondary font-semibold">100% gratuito</span>
-                </p>
-              </div>
+                <div className="relative z-10 text-center mb-8">
+                  <div className="inline-block px-3 py-1 rounded-full bg-secondary/10 text-secondary text-[10px] font-bold uppercase tracking-widest mb-3">
+                    Acesso Gratuito
+                  </div>
+                  <h2 className="text-3xl font-black text-slate-900 leading-tight">
+                    Inicie seu <span className="text-primary italic">cadastro</span>
+                  </h2>
+                  <p className="text-sm text-slate-500 mt-2 font-medium">
+                    Apenas 2 minutos para receber propostas
+                  </p>
+                </div>
 
-              <div>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Seu nome completo"
-                  value={formData.name}
-                  onChange={handleChange}
-                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.name ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
-                />
-                {errors.name && (
-                  <p className="text-red-500 text-xs mt-1 animate-[shake_0.5s_ease-in-out]">{errors.name}</p>
-                )}
-              </div>
+                <div className="relative z-10 space-y-4">
+                  <div className="group/input">
+                    <div className={`relative flex items-center bg-slate-50 border-2 rounded-2xl transition-all duration-300 ${errors.name ? "border-red-400 bg-red-50/30" : "border-slate-100 focus-within:border-primary focus-within:bg-white group-hover/input:border-slate-200"}`}>
+                      <div className="pl-4 text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <Users className="w-5 h-5" />
+                      </div>
+                      <input
+                        type="text"
+                        name="name"
+                        placeholder="Nome completo"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="w-full bg-transparent px-4 py-4 text-base focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium"
+                      />
+                    </div>
+                    {errors.name && (
+                      <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-2 animate-[shake_0.5s_ease-in-out]">{errors.name}</p>
+                    )}
+                  </div>
 
-              <div>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Seu melhor e-mail"
-                  value={formData.email}
-                  onChange={handleChange}
-                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.email ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1 animate-[shake_0.5s_ease-in-out]">{errors.email}</p>
-                )}
-              </div>
+                  <div className="group/input">
+                    <div className={`relative flex items-center bg-slate-50 border-2 rounded-2xl transition-all duration-300 ${errors.email ? "border-red-400 bg-red-50/30" : "border-slate-100 focus-within:border-primary focus-within:bg-white group-hover/input:border-slate-200"}`}>
+                      <div className="pl-4 text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <Star className="w-5 h-5" />
+                      </div>
+                      <input
+                        type="email"
+                        name="email"
+                        placeholder="Seu melhor e-mail"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="w-full bg-transparent px-4 py-4 text-base focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium"
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-2 animate-[shake_0.5s_ease-in-out]">{errors.email}</p>
+                    )}
+                  </div>
 
-              <div>
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="WhatsApp (ex: 11 99999-9999)"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  maxLength={16}
-                  className={`w-full bg-gray-50 border-2 border-gray-200 rounded-xl px-4 py-3 text-base focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300 ${errors.phone ? "!border-red-400 !bg-red-50" : "hover:border-gray-300"}`}
-                />
-                {errors.phone && (
-                  <p className="text-red-500 text-xs mt-1 animate-[shake_0.5s_ease-in-out]">{errors.phone}</p>
-                )}
-              </div>
+                  <div className="group/input">
+                    <div className={`relative flex items-center bg-slate-50 border-2 rounded-2xl transition-all duration-300 ${errors.phone ? "border-red-400 bg-red-50/30" : "border-slate-100 focus-within:border-primary focus-within:bg-white group-hover/input:border-slate-200"}`}>
+                      <div className="pl-4 text-slate-400 group-focus-within/input:text-primary transition-colors">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                      </div>
+                      <input
+                        type="tel"
+                        name="phone"
+                        placeholder="WhatsApp / Telefone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        maxLength={16}
+                        className="w-full bg-transparent px-4 py-4 text-base focus:outline-none text-slate-900 placeholder:text-slate-400 font-medium"
+                      />
+                    </div>
+                    {errors.phone && (
+                      <p className="text-red-500 text-[11px] font-bold mt-1.5 ml-2 animate-[shake_0.5s_ease-in-out]">{errors.phone}</p>
+                    )}
+                  </div>
+                </div>
 
-              <div className="pt-2">
-                <button
-                  type="submit"
-                  className="w-full relative overflow-hidden bg-primary text-white font-bold text-lg py-4 rounded-xl flex items-center justify-center gap-2 transition-transform duration-300 hover:scale-[1.02] hover:shadow-[0_10px_20px_rgba(10,55,160,0.3)] group-hover/btn"
-                >
-                  <span className="relative z-10 flex items-center gap-2">
-                    Continuar agora
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary via-blue-500 to-primary opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
-                </button>
-              </div>
+                <div className="pt-4 relative z-10">
+                  <button
+                    type="submit"
+                    className="w-full group/btn relative bg-primary text-white font-bold text-lg py-5 rounded-[20px] transition-all duration-500 hover:scale-[1.02] hover:shadow-[0_20px_40px_-10px_rgba(10,55,160,0.5)] active:scale-95 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-primary via-blue-500 to-primary group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      RECEBER PROPOSTAS
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
+                    </span>
+                  </button>
+                </div>
 
-              <p className="text-[11px] text-gray-400 text-center leading-snug mt-4">
-                Ao continuar, você concorda com nossa{" "}
-                <a href="#" className="underline hover:text-gray-600 transition-colors">
-                  Política de Privacidade
-                </a>
-              </p>
-            </form>
+                <div className="relative z-10 pt-4 text-center">
+                  <p className="text-[10px] text-slate-400 font-medium leading-relaxed">
+                    Seus dados estão protegidos. Ao clicar você concorda com os <br />
+                    <a href="#" className="text-primary hover:underline underline-offset-2">Termos de Uso</a> e <a href="#" className="text-primary hover:underline underline-offset-2">Privacidade</a>.
+                  </p>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
