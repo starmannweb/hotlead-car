@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     try {
         const user = await getAuthUser();
         if (!user) {
-            return NextResponse.json({ success: false, message: "Nao autenticado" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Não autenticado" }, { status: 401 });
         }
 
         const { searchParams } = new URL(request.url);
@@ -44,13 +44,13 @@ export async function GET(request: NextRequest) {
             }
 
             const users = await prisma.user.findMany({
-                where: { isActive: true },
                 select: {
                     id: true,
                     name: true,
                     email: true,
                     role: true,
                     credits: true,
+                    isActive: true,
                     createdAt: true,
                     _count: {
                         select: {

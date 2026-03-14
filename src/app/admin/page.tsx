@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Car, Download, MapPin, Eye, Search, FileText,
+  Car, Download, MapPin, Search, FileText,
   FileSpreadsheet, XCircle, CheckCircle, Calendar,
   TrendingDown, Banknote, LogOut, TrendingUp, Flame,
-  Snowflake, Trash2, EyeOff, BarChart3, Bell, X, Phone, Clock, ChevronDown, ChevronUp, Image as ImageIcon, Filter
+  Snowflake, Trash2, BarChart3, Bell, X, Phone, Clock, ChevronDown, ChevronUp, Image as ImageIcon, Filter
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Lead } from "@prisma/client";
@@ -34,7 +34,6 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"score" | "recent">("score");
   const [searchQuery, setSearchQuery] = useState("");
-  const [revealedFields, setRevealedFields] = useState<Record<string, Set<string>>>({});
   const [expandedLeads, setExpandedLeads] = useState<Set<string>>(new Set());
   const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -108,38 +107,6 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Erro ao remover lead:", error);
     }
-  };
-
-  const logView = async (leadId: string, field: string) => {
-    try {
-      await fetch("/api/leads/view-log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ leadId, field }),
-      });
-    } catch (error) {
-      console.error("Erro ao registrar log:", error);
-    }
-  };
-
-  const toggleField = (leadId: string, field: string) => {
-    setRevealedFields((prev) => {
-      const next = { ...prev };
-      if (!next[leadId]) next[leadId] = new Set();
-      const fieldSet = new Set(next[leadId]);
-      if (fieldSet.has(field)) {
-        fieldSet.delete(field);
-      } else {
-        fieldSet.add(field);
-        logView(leadId, field);
-      }
-      next[leadId] = fieldSet;
-      return next;
-    });
-  };
-
-  const isFieldRevealed = (leadId: string, field: string) => {
-    return revealedFields[leadId]?.has(field) || false;
   };
 
   const toggleExpand = (leadId: string) => {
@@ -222,23 +189,12 @@ export default function AdminPage() {
     }
   };
 
-  const maskValue = (value: string) => {
-    if (!value) return "***";
-    if (value.length <= 3) return "***";
-    return value.substring(0, 2) + "*".repeat(Math.max(value.length - 2, 3));
-  };
-
-  const maskPhone = (phone: string) => {
-    if (!phone) return "***";
-    return phone.replace(/\d(?=\d{2})/g, "*");
-  };
-
   // ---- Export functions ----
   const exportCSV = () => {
     const headers = [
       "Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM",
-      "Urgencia", "Desconto FIPE", "Documentacao", "Financiamento",
-      "Pontuação", "Qualificacao", "Status", "Data",
+      "Urgência", "Desconto FIPE", "Documentação", "Financiamento",
+      "Pontuação", "Qualificação", "Status", "Data",
     ];
     const rows = filteredLeads.map((l) => [
       l.name,
@@ -265,8 +221,8 @@ export default function AdminPage() {
   const exportExcel = () => {
     const headers = [
       "Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM",
-      "Urgencia", "Desconto FIPE", "Documentacao", "Financiamento",
-      "Pontuação", "Qualificacao", "Status", "Data",
+      "Urgência", "Desconto FIPE", "Documentação", "Financiamento",
+      "Pontuação", "Qualificação", "Status", "Data",
     ];
     const rows = filteredLeads.map((l) => [
       l.name,
@@ -339,8 +295,8 @@ export default function AdminPage() {
       <table>
         <thead><tr>
           <th>Nome</th><th>Telefone</th><th>UF</th><th>Cidade</th>
-          <th>Veiculo</th><th>KM</th><th>Pontuação</th>
-          <th>Qualificacao</th><th>Status</th><th>Data</th>
+          <th>Veículo</th><th>KM</th><th>Pontuação</th>
+          <th>Qualificação</th><th>Status</th><th>Data</th>
         </tr></thead>
         <tbody>${rows}</tbody>
       </table></body></html>`);
@@ -588,40 +544,20 @@ export default function AdminPage() {
                           </span>
                         </div>
 
-                        {/* Lead info with eye toggle */}
+                        {/* Lead info */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                           <div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Nome</p>
-                            <div className="flex items-center gap-2">
-                              <p className="font-semibold text-gray-900 dark:text-white">
-                                {isFieldRevealed(lead.id, "name") ? lead.name : maskValue(lead.name)}
-                              </p>
-                              <button
-                                onClick={() => toggleField(lead.id, "name")}
-                                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
-                                title={isFieldRevealed(lead.id, "name") ? "Ocultar" : "Revelar"}
-                              >
-                                {isFieldRevealed(lead.id, "name") ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                              </button>
-                            </div>
+                            <p className="font-semibold text-gray-900 dark:text-white">{lead.name}</p>
                           </div>
 
                           <div>
                             <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">Contato</p>
                             <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1 text-sm">
-                                  <Phone className="w-3.5 h-3.5 text-gray-400" />
-                                  {isFieldRevealed(lead.id, "phone") ? lead.phone : maskPhone(lead.phone)}
-                                </p>
-                                <button
-                                  onClick={() => toggleField(lead.id, "phone")}
-                                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 cursor-pointer"
-                                  title={isFieldRevealed(lead.id, "phone") ? "Ocultar" : "Revelar"}
-                                >
-                                  {isFieldRevealed(lead.id, "phone") ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                </button>
-                              </div>
+                              <p className="font-medium text-gray-900 dark:text-white flex items-center gap-1 text-sm">
+                                <Phone className="w-3.5 h-3.5 text-gray-400" />
+                                {lead.phone}
+                              </p>
                               {((lead as any).email) && (
                                 <p className="text-xs text-gray-500 truncate max-w-[150px]" title={(lead as any).email}>
                                   {(lead as any).email}
@@ -747,8 +683,8 @@ export default function AdminPage() {
                           </p>
                           <p className="font-medium text-gray-900 dark:text-white">
                             {lead.docsStatus === "regular" && "Regular"}
-                            {lead.docsStatus === "pendencias" && "Pendencias"}
-                            {lead.docsStatus === "nao_sei" && "Nao sei"}
+                            {lead.docsStatus === "pendencias" && "Pendências"}
+                            {lead.docsStatus === "nao_sei" && "Não sei"}
                           </p>
                         </div>
                         <div className="bg-white dark:bg-gray-700 rounded-lg p-3">

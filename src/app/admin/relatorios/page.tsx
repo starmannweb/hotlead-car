@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import {
     BarChart3, Eye, Download, Users, ArrowLeft, Car,
     LogOut, Calendar, User, FileSpreadsheet, Clock,
-    Plus, Trash2, X, Banknote, Loader2
+    Plus, Trash2, X, Banknote, Loader2, Pencil, ShieldCheck
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -25,6 +25,7 @@ interface UserSummary {
     email: string;
     role: string;
     credits: number;
+    isActive?: boolean;
     createdAt: string;
     _count: { viewLogs: number; exportLogs: number };
 }
@@ -55,6 +56,10 @@ export default function RelatoriosPage() {
     const [userModalOpen, setUserModalOpen] = useState(false);
     const [isSubmittingUser, setIsSubmittingUser] = useState(false);
     const [newUserForm, setNewUserForm] = useState({ name: "", email: "", role: "client", password: "" });
+    const [editUserModalOpen, setEditUserModalOpen] = useState(false);
+    const [isSavingUser, setIsSavingUser] = useState(false);
+    const [editingUserId, setEditingUserId] = useState<string | null>(null);
+    const [editUserForm, setEditUserForm] = useState({ name: "", email: "", role: "client", credits: 0, password: "", isActive: true });
 
     useEffect(() => {
         checkAuth();
@@ -142,6 +147,54 @@ export default function RelatoriosPage() {
         } catch (error) {
             console.error("Erro ao remover usuário:", error);
             alert("Erro de conexão.");
+        }
+    };
+
+    const openEditUserModal = (user: UserSummary) => {
+        setEditingUserId(user.id);
+        setEditUserForm({
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            credits: user.credits,
+            password: "",
+            isActive: user.isActive ?? true,
+        });
+        setEditUserModalOpen(true);
+    };
+
+    const handleUpdateUser = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!editingUserId) return;
+
+        setIsSavingUser(true);
+        try {
+            const res = await fetch(`/api/users/${editingUserId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    ...editUserForm,
+                    name: editUserForm.name.trim(),
+                    email: editUserForm.email.trim().toLowerCase(),
+                    password: editUserForm.password.trim(),
+                }),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                alert("Usuario atualizado com sucesso!");
+                setEditUserModalOpen(false);
+                setEditingUserId(null);
+                setEditUserForm({ name: "", email: "", role: "client", credits: 0, password: "", isActive: true });
+                fetchUsers();
+            } else {
+                alert(data.message || "Erro ao atualizar usuario.");
+            }
+        } catch (error) {
+            console.error("Erro ao atualizar usuario:", error);
+            alert("Erro de conexao.");
+        } finally {
+            setIsSavingUser(false);
         }
     };
 
@@ -307,6 +360,7 @@ export default function RelatoriosPage() {
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Creditos</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Visualizacoes</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Exportacoes</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Status</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Cadastro</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Acoes</th>
                                 </tr>
@@ -324,11 +378,19 @@ export default function RelatoriosPage() {
                                         <td className="px-4 py-3 font-bold text-amber-600 dark:text-amber-400">{u.credits}</td>
                                         <td className="px-4 py-3 font-bold text-gray-700 dark:text-gray-300">{u._count.viewLogs}</td>
                                         <td className="px-4 py-3 font-bold text-gray-700 dark:text-gray-300">{u._count.exportLogs}</td>
+                                        <td className="px-4 py-3">
+                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${u.isActive ? "bg-emerald-100 text-emerald-700" : "bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"}`}>
+                                                {u.isActive ? "Ativo" : "Inativo"}
+                                            </span>
+                                        </td>
                                         <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{new Date(u.createdAt).toLocaleDateString("pt-BR")}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-3">
                                                 <button onClick={() => { setSelectedUser(u.id); setTab("views"); }} className="flex items-center gap-1 text-xs text-primary hover:underline cursor-pointer" title="Ver Atividade">
                                                     <Eye className="w-5 h-5" />
+                                                </button>
+                                                <button onClick={() => openEditUserModal(u)} className="flex items-center gap-1 text-xs text-gray-500 hover:text-primary cursor-pointer" title="Editar Usuário">
+                                                    <Pencil className="w-5 h-5" />
                                                 </button>
                                                 <button onClick={() => handleDeleteUser(u.id)} className="flex items-center gap-1 text-xs text-gray-400 hover:text-red-600 cursor-pointer" title="Remover Usuário">
                                                     <Trash2 className="w-5 h-5" />
@@ -337,7 +399,7 @@ export default function RelatoriosPage() {
                                         </td>
                                     </tr>
                                 ))}
-                                {users.length === 0 && <tr><td colSpan={7} className="text-center text-gray-500 dark:text-gray-400 py-8">Nenhum usuario cadastrado.</td></tr>}
+                                {users.length === 0 && <tr><td colSpan={8} className="text-center text-gray-500 dark:text-gray-400 py-8">Nenhum usuario cadastrado.</td></tr>}
                             </tbody>
                         </table>
                         </div>
@@ -380,6 +442,66 @@ export default function RelatoriosPage() {
                                 <button type="submit" disabled={isSubmittingUser} className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 disabled:opacity-70 shadow-lg shadow-primary/20 transition-all active:scale-95">
                                     {isSubmittingUser ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
                                     {isSubmittingUser ? "Criando..." : "Criar Usuário"}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {editUserModalOpen && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden border border-gray-100 dark:border-gray-700 animate-[fadeInUp_0.3s_ease-out]">
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Editar Usuário</h2>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Ajuste senha, função, créditos e status de acesso.</p>
+                            </div>
+                            <button onClick={() => setEditUserModalOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+                        <form onSubmit={handleUpdateUser} className="p-6 space-y-5">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Nome completo</label>
+                                <input required type="text" value={editUserForm.name} onChange={e => setEditUserForm({ ...editUserForm, name: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">E-mail de acesso</label>
+                                <input required type="email" value={editUserForm.email} onChange={e => setEditUserForm({ ...editUserForm, email: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                            </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Função</label>
+                                    <select value={editUserForm.role} onChange={e => setEditUserForm({ ...editUserForm, role: e.target.value })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all">
+                                        <option value="client">Lojista / Cliente</option>
+                                        <option value="seller">Vendedor</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Créditos</label>
+                                    <input type="number" min={0} value={editUserForm.credits} onChange={e => setEditUserForm({ ...editUserForm, credits: Number(e.target.value) || 0 })} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                                </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Nova senha</label>
+                                <input minLength={6} type="password" value={editUserForm.password} onChange={e => setEditUserForm({ ...editUserForm, password: e.target.value })} placeholder="Deixe em branco para manter a atual" className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" />
+                            </div>
+                            <label className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 px-4 py-3 cursor-pointer">
+                                <div className="flex items-center gap-3">
+                                    <ShieldCheck className="w-4 h-4 text-primary" />
+                                    <div>
+                                        <p className="text-sm font-bold text-gray-900 dark:text-white">Conta ativa</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-400">Quando inativa, o usuário perde o acesso ao painel.</p>
+                                    </div>
+                                </div>
+                                <input type="checkbox" checked={editUserForm.isActive} onChange={e => setEditUserForm({ ...editUserForm, isActive: e.target.checked })} className="h-4 w-4 accent-primary" />
+                            </label>
+                            <div className="pt-2">
+                                <button type="submit" disabled={isSavingUser} className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 disabled:opacity-70 shadow-lg shadow-primary/20 transition-all active:scale-95">
+                                    {isSavingUser ? <Loader2 className="w-5 h-5 animate-spin" /> : <Pencil className="w-5 h-5" />}
+                                    {isSavingUser ? "Salvando..." : "Salvar Alterações"}
                                 </button>
                             </div>
                         </form>
