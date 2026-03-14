@@ -3,6 +3,52 @@ import { prisma } from "@/lib/prisma";
 import { calculateLeadScore } from "@/lib/scoring";
 import { getUnlockCost, getAuthUser } from "@/lib/auth";
 
+type IbgeMunicipio = {
+  id: number;
+  nome: string;
+  microrregiao?: {
+    nome?: string;
+    mesorregiao?: { nome?: string };
+  };
+};
+
+const BAIXADA_SANTISTA_CITIES = new Set([
+  "santos",
+  "sao vicente",
+  "guaruja",
+  "praia grande",
+  "cubatao",
+  "bertioga",
+  "mongagua",
+  "itanhaem",
+  "peruibe",
+]);
+
+function normalizeText(value: string): string {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+}
+
+function normalizeRegionLabel(region: string, city: string, state: string): string {
+  const normalizedRegion = normalizeText(region || "");
+  const normalizedCity = normalizeText(city || "");
+
+  const cityIsBaixada = state.toUpperCase() === "SP" && BAIXADA_SANTISTA_CITIES.has(normalizedCity);
+  if (cityIsBaixada && !normalizedRegion) {
+    return "Baixada Santista";
+  }
+
+  const regionSuggestsBaixada =
+    normalizedRegion.includes("baixada santista") ||
+    normalizedRegion === "santos" ||
+    (normalizedRegion.includes("metropolitana") && normalizedRegion.includes("sao paulo") && cityIsBaixada);
+
+  if (cityIsBaixada && regionSuggestsBaixada) {
+    return "Baixada Santista";
+  }
+
+  return region;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -41,22 +87,38 @@ export async function POST(request: NextRequest) {
     const ip = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "0.0.0.0";
 
     // Mapeia cidade para Região (IBGE)
-    let region = city || ""; // Fallback
+    let region = "";
     if (city && state) {
       try {
         const ibgeRes = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/municipios`);
         if (ibgeRes.ok) {
-          const municipios = await ibgeRes.json();
+          const municipios = (await ibgeRes.json()) as IbgeMunicipio[];
           const pCity = city.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-          const match = municipios.find((m: any) =>
+          const match = municipios.find((m) =>
             m.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() === pCity
           );
-          if (match && match.microrregiao && match.microrregiao.mesorregiao) {
-            region = match.microrregiao.mesorregiao.nome;
+
+          if (match) {
+            const metroRes = await fetch(`https://servicodados.ibge.gov.br/api/v1/localidades/regioes-metropolitanas?municipio=${match.id}`);
+            if (metroRes.ok) {
+              const metros = (await metroRes.json()) as Array<{ nome?: string }>;
+              if (Array.isArray(metros) && metros.length > 0 && metros[0]?.nome) {
+                region = metros[0].nome;
+              }
+            }
+
+            if (!region && match.microrregiao?.nome) {
+              region = match.microrregiao.nome;
+            }
+            if (!region && match.microrregiao?.mesorregiao?.nome) {
+              region = match.microrregiao.mesorregiao.nome;
+            }
           }
+
+          region = normalizeRegionLabel(region, city, state);
         }
       } catch (error) {
-        console.error("Erro ao buscar região no IBGE", error);
+        console.error("Erro ao buscar regiao no IBGE", error);
       }
     }
 
@@ -157,17 +219,21 @@ export async function GET(request: NextRequest) {
     }
 
     const maskedLeads = leads.map((lead) => {
-        if (user?.role === "admin" || user?.role === "seller") return lead;
-        
+        const leadWithRegion = {
+          ...lead,
+          region: normalizeRegionLabel(lead.region || "", lead.city, lead.state || ""),
+        };
+
+        if (user?.role === "admin" || user?.role === "seller") return leadWithRegion;
+
         if (!unlockedLeadIds.has(lead.id)) {
             return {
-                ...lead,
+                ...leadWithRegion,
                 name: "***",
-                phone: "***",
-                km: "***"
+                phone: "***"
             };
         }
-        return lead;
+        return leadWithRegion;
     });
 
     return NextResponse.json({

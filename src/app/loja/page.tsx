@@ -199,7 +199,7 @@ export default function LojaPage() {
                     setPixData(null);
                 }, 2000);
             } else {
-                alert("Pagamento ainda nao detectado. Tente novamente.");
+                alert("Pagamento ainda não detectado. Tente novamente.");
             }
         } catch {
         } finally {
@@ -256,7 +256,7 @@ export default function LojaPage() {
     // Filtering and sorting
     const filteredLeads = leads
         .filter((l) => filter === "all" || l.tier === filter)
-        .filter((l) => stateFilter === "all" || l.region === stateFilter || l.state === stateFilter)
+        .filter((l) => stateFilter === "all" || l.region === stateFilter)
         .filter((l) => {
             if (!searchQuery) return true;
             const q = searchQuery.toLowerCase();
@@ -272,7 +272,7 @@ export default function LojaPage() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-    const states = Array.from(new Set(leads.map(l => l.region || l.state))).filter(Boolean).sort();
+    const states = Array.from(new Set(leads.map((l) => l.region).filter(Boolean) as string[])).sort();
 
     if (loading) {
         return (
@@ -343,7 +343,7 @@ export default function LojaPage() {
                         {/* Tier Filter */}
                         <div className="flex-1 min-w-[300px] md:flex-initial">
                             <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">
-                                <Filter className="w-3.5 h-3.5 inline mr-1" />Qualificacao
+                                <Filter className="w-3.5 h-3.5 inline mr-1" />Qualificação
                             </label>
                             <div className="flex gap-2">
                                 {(["all", "hot", "warm", "cold"] as const).map((tier) => (
@@ -409,11 +409,14 @@ export default function LojaPage() {
                         filteredLeads.map((lead) => {
                             const photos = getPhotos(lead);
                             const isExpanded = expandedLeads.has(lead.id);
-                            const itemUnlocked = isUnlocked(lead.id);
-                            const nameUnlocked = itemUnlocked;
-                            const phoneUnlocked = itemUnlocked;
-                            const kmUnlocked = itemUnlocked;
-                            const detailsUnlocked = itemUnlocked;
+                            const contactUnlocked =
+                                user?.role === "admin" ||
+                                user?.role === "seller" ||
+                                isUnlocked(lead.id) ||
+                                (lead.name !== "***" && lead.phone !== "***");
+                            const nameUnlocked = contactUnlocked;
+                            const phoneUnlocked = contactUnlocked;
+                            const photosUnlocked = contactUnlocked;
  
                             return (
                                 <div key={lead.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-md transition-shadow">
@@ -485,7 +488,7 @@ export default function LojaPage() {
                                                         <div className="flex items-center gap-2 mt-1">
                                                             <p className="text-sm font-medium text-gray-600 dark:text-gray-400 flex items-center gap-1">
                                                                 <Gauge className="w-4 h-4 text-gray-400" />
-                                                                {kmUnlocked ? lead.km : '*** km'}
+                                                                {lead.km}
                                                             </p>
                                                         </div>
                                                     </div>
@@ -495,7 +498,7 @@ export default function LojaPage() {
                                             {/* Actions */}
                                             <div className="ml-4 flex flex-col gap-2 items-end">
                                                 {/* Cost indicator */}
-                                                {!itemUnlocked && user?.role === "client" && (
+                                                {!contactUnlocked && user?.role === "client" && (
                                                     <div className="flex flex-col items-center gap-2">
                                                       <button
                                                           onClick={() => unlockLead(lead.id, "all")}
@@ -516,11 +519,7 @@ export default function LojaPage() {
                                                 )}
  
                                                 <button
-                                                    onClick={async () => {
-                                                        if (!detailsUnlocked && user?.role === "client") {
-                                                            const success = await unlockLead(lead.id, "details");
-                                                            if (!success) return;
-                                                        }
+                                                    onClick={() => {
                                                         setExpandedLeads((prev) => {
                                                             const next = new Set(prev);
                                                             next.has(lead.id) ? next.delete(lead.id) : next.add(lead.id);
@@ -552,7 +551,7 @@ export default function LojaPage() {
                                                         <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                                             <ImageIcon className="w-3.5 h-3.5" /> Fotos ({photos.length})
                                                         </p>
-                                                        {detailsUnlocked || user?.role === "admin" || user?.role === "seller" ? (
+                                                        {photosUnlocked ? (
                                                             <div className="flex gap-2">
                                                                 {photos.map((photo, idx) => (
                                                                     <button key={idx} onClick={() => setPhotoModal({ photos, index: idx })} className="w-16 h-16 rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-600 hover:border-primary transition-colors cursor-pointer">
@@ -604,8 +603,8 @@ export default function LojaPage() {
                                                     </p>
                                                     <p className="font-medium text-gray-900 dark:text-white">
                                                         {lead.docsStatus === "regular" && "Regular"}
-                                                        {lead.docsStatus === "pendencias" && "Pendencias"}
-                                                        {lead.docsStatus === "nao_sei" && "Nao sei"}
+                                                        {lead.docsStatus === "pendencias" && "Pendências"}
+                                                        {lead.docsStatus === "nao_sei" && "Não sei"}
                                                     </p>
                                                 </div>
                                                 <div className="bg-white dark:bg-gray-700 rounded-lg p-3">
