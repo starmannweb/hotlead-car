@@ -78,21 +78,6 @@ export default function AdminPage() {
     }
   };
 
-  const updateStatus = async (id: string, status: string) => {
-    try {
-      const response = await fetch(`/api/leads/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (response.ok) {
-        fetchLeads();
-      }
-    } catch (error) {
-      console.error("Erro ao atualizar status:", error);
-    }
-  };
-
   const deleteLead = async (id: string) => {
     if (!confirm("Tem certeza que deseja apagar este lead? Esta ação não pode ser desfeita.")) return;
     try {
@@ -589,15 +574,9 @@ export default function AdminPage() {
 
                       {/* Actions */}
                       <div className="ml-4 flex flex-col gap-2 items-end">
-                        <select
-                          value={lead.status}
-                          onChange={(e) => updateStatus(lead.id, e.target.value)}
-                          className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
-                        >
-                          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-                            <option key={value} value={value}>{label}</option>
-                          ))}
-                        </select>
+                        <div className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-200 text-sm font-medium">
+                          {STATUS_LABELS[lead.status] || lead.status}
+                        </div>
                         <div className="flex flex-col items-end gap-3 h-full justify-between">
                           <button
                             onClick={() => toggleExpand(lead.id)}

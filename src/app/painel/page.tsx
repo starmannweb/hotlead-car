@@ -132,7 +132,7 @@ export default function PainelPage() {
 
     const logExport = async (format: string) => { try { await fetch("/api/leads/view-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: "export", field: `export_${format}` }) }); } catch { /* */ } };
     const exportCSV = () => {
-        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Pontuação", "Qualificacao", "Status", "Data"];
+        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Pontuação", "Qualificação", "Status", "Data"];
         const rows = filteredLeads.map((l) => [l.name, l.phone, l.state, l.city, l.vehicleBrand, l.vehicleModel, l.vehicleYear, l.km, l.score, TIER_LABELS[l.tier] || l.tier, STATUS_LABELS[l.status] || l.status, new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })]);
         const csv = [headers, ...rows].map((r) => r.map((c) => `"${c}"`).join(",")).join("\n");
         const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
@@ -140,7 +140,7 @@ export default function PainelPage() {
         logExport("csv");
     };
     const exportExcel = () => {
-        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Pontuação", "Qualificacao", "Status", "Data"];
+        const headers = ["Nome", "Telefone", "Estado", "Cidade", "Marca", "Modelo", "Ano", "KM", "Pontuação", "Qualificação", "Status", "Data"];
         const rows = filteredLeads.map((l) => [l.name, l.phone, l.state, l.city, l.vehicleBrand, l.vehicleModel, l.vehicleYear, l.km, l.score, TIER_LABELS[l.tier] || l.tier, STATUS_LABELS[l.status] || l.status, new Date(l.createdAt).toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })]);
         let t = "<table><thead><tr>"; headers.forEach((h) => (t += `<th>${h}</th>`)); t += "</tr></thead><tbody>"; rows.forEach((r) => { t += "<tr>"; r.forEach((c) => (t += `<td>${c}</td>`)); t += "</tr>"; }); t += "</tbody></table>";
         const blob = new Blob([`<html><head><meta charset="utf-8"></head><body>${t}</body></html>`], { type: "application/vnd.ms-excel;charset=utf-8;" });
@@ -304,7 +304,7 @@ export default function PainelPage() {
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                                 <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Urgência</p><p className="font-medium text-gray-900">{lead.urgency === "hoje" && "Hoje"}{lead.urgency === "3dias" && "3 dias"}{lead.urgency === "7dias" && "7 dias"}{lead.urgency === "sem_pressa" && "Sem pressa"}</p></div>
                                                 <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Desconto FIPE</p><p className="font-medium text-gray-900">{lead.discountAcceptance === "acima_20" && "Acima de 20%"}{lead.discountAcceptance === "10_20" && "Entre 10 a 20%"}{lead.discountAcceptance === "fipe" && "Tabela FIPE"}{lead.discountAcceptance === "20" && "20% abaixo"}{lead.discountAcceptance === "15" && "15% abaixo"}{lead.discountAcceptance === "10" && "10% abaixo"}</p></div>
-                                                <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Documentação</p><p className="font-medium text-gray-900">{lead.docsStatus === "regular" && "Regular"}{lead.docsStatus === "pendencias" && "Pendencias"}{lead.docsStatus === "nao_sei" && "Não sei"}</p></div>
+                                                <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Documentação</p><p className="font-medium text-gray-900">{lead.docsStatus === "regular" && "Regular"}{lead.docsStatus === "pendencias" && "Pendências"}{lead.docsStatus === "nao_sei" && "Não sei"}</p></div>
                                                 <div className="bg-white rounded-lg p-3"><p className="text-xs text-gray-500">Financiamento</p><p className="font-medium text-gray-900">{lead.financeStatus === "nao" ? "Quitado" : "Com financiamento"}</p></div>
                                             </div>
                                         </div>

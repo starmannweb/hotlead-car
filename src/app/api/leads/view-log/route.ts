@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getAuthUser();
     if (!user) {
-      return NextResponse.json({ success: false, message: "Nao autenticado" }, { status: 401 });
+      return NextResponse.json({ success: false, message: "Não autenticado" }, { status: 401 });
     }
 
     const { searchParams } = new URL(request.url);

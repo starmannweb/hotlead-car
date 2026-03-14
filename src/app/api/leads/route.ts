@@ -31,9 +31,16 @@ function normalizeText(value: string): string {
 function normalizeRegionLabel(region: string, city: string, state: string): string {
   const normalizedRegion = normalizeText(region || "");
   const normalizedCity = normalizeText(city || "");
+  const normalizedState = normalizeText(state || "");
 
   const cityIsBaixada = state.toUpperCase() === "SP" && BAIXADA_SANTISTA_CITIES.has(normalizedCity);
-  if (cityIsBaixada && !normalizedRegion) {
+  const regionLooksLikeState =
+    !normalizedRegion ||
+    normalizedRegion === normalizedState ||
+    normalizedRegion === "sp" ||
+    normalizedRegion === "sao paulo";
+
+  if (cityIsBaixada && regionLooksLikeState) {
     return "Baixada Santista";
   }
 
@@ -44,6 +51,10 @@ function normalizeRegionLabel(region: string, city: string, state: string): stri
 
   if (cityIsBaixada && regionSuggestsBaixada) {
     return "Baixada Santista";
+  }
+
+  if (regionLooksLikeState) {
+    return "";
   }
 
   return region;
@@ -205,7 +216,13 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Calcular as regiões (unique) para enviar para o frontend e mostrar no menu de opções
-    const uniqueRegions = Array.from(new Set(leads.map((l: any) => l.region).filter(Boolean))).sort();
+    const uniqueRegions = Array.from(
+      new Set(
+        leads
+          .map((l: any) => normalizeRegionLabel(l.region || "", l.city, l.state || ""))
+          .filter(Boolean)
+      )
+    ).sort();
 
     const user = await getAuthUser();
     let unlockedLeadIds = new Set<string>();

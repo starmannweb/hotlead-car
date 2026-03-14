@@ -10,7 +10,7 @@ import {
   URGENCY_OPTIONS, DISCOUNT_OPTIONS, DOCS_OPTIONS,
   FINANCE_OPTIONS, PHOTO_LABELS, BRAZILIAN_STATES,
 } from "@/lib/constants";
-import { POPULAR_BRANDS, getDisplayName } from "@/lib/fipe";
+import { POPULAR_BRANDS, getDisplayName, resolveBrandLogo } from "@/lib/fipe";
 import type { FipeBrand } from "@/lib/fipe";
 import { formatPhone, validatePhone, formatKm } from "@/lib/validators";
 import { trackEvent, getUTMParams } from "@/lib/tracking";
@@ -23,7 +23,7 @@ import type { SubmitLeadPayload } from "@/lib/api";
 interface StepDef {
   id: string; field: string; title: string; subtitle?: string;
   icon: React.ElementType;
-  type: "text" | "tel" | "select" | "options" | "photos" | "consent" | "brand_picker" | "model_picker" | "year_picker" | "state_city";
+  type: "text" | "tel" | "select" | "options" | "photos" | "consent" | "brand_picker" | "model_picker" | "year_picker" | "version_picker" | "state_city";
   placeholder?: string;
   options?: { value: string; label: string }[];
   selectOptions?: string[];
@@ -38,8 +38,9 @@ const STEPS: StepDef[] = [
   { id: "phone", field: "phone", title: "Qual seu WhatsApp?", subtitle: "Os lojistas entrarão em contato por aqui", icon: Phone, type: "tel", placeholder: "(11) 99999-9999", required: true, maxLength: 16, validate: (v) => (!validatePhone(v) ? "Número inválido. Use DDD + número" : null), format: formatPhone },
   { id: "state_city", field: "state", title: "Onde você está?", subtitle: "Selecione o estado e depois a cidade", icon: MapPin, type: "state_city", required: true, validate: (_v, extra) => { if (!extra?.state) return "Selecione o estado"; if (!extra?.city) return "Selecione a cidade"; return null; } },
   { id: "vehicle_brand", field: "vehicle_brand", title: "Qual a marca do seu carro?", subtitle: "Selecione a marca do veículo", icon: Car, type: "brand_picker", required: true, validate: (v) => (!v ? "Selecione a marca" : null) },
-  { id: "vehicle_model", field: "vehicle_model", title: "Qual o modelo?", subtitle: "Comece a digitar para buscar modelos", icon: Car, type: "model_picker", placeholder: "Buscar modelo...", required: true, validate: (v) => (!v.trim() ? "Informe o modelo" : null) },
-  { id: "vehicle_year", field: "vehicle_year", title: "Qual o ano do veículo?", subtitle: "Selecione o ano de fabricação", icon: Car, type: "year_picker", required: true, validate: (v) => (!v.trim() ? "Selecione o ano" : null) },
+  { id: "vehicle_year", field: "vehicle_year", title: "Qual o ano do veículo?", subtitle: "Selecione o ano para filtrar os modelos corretos", icon: Car, type: "year_picker", required: true, validate: (v) => (!v.trim() ? "Selecione o ano" : null) },
+  { id: "vehicle_model", field: "vehicle_model", title: "Qual o modelo principal?", subtitle: "Modelos vinculados a marca e ao ano selecionado", icon: Car, type: "model_picker", placeholder: "Buscar modelo...", required: true, validate: (v) => (!v.trim() ? "Informe o modelo" : null) },
+  { id: "vehicle_version", field: "vehicle_version", title: "Agora selecione a versão", subtitle: "Versões vinculadas à marca, modelo e ano", icon: Car, type: "version_picker", required: true, validate: (v) => (!v.trim() ? "Selecione a versão" : null) },
   { id: "km", field: "km", title: "Qual a quilometragem?", subtitle: "Valor aproximado em km", icon: Gauge, type: "text", placeholder: "Ex: 45.000", required: true, validate: (v) => (!v.trim() ? "Informe a quilometragem" : null), format: formatKm },
   { id: "urgency", field: "urgency", title: "Quando você precisa vender?", subtitle: "Quanto mais urgente, mais rápido conectamos", icon: Clock, type: "options", options: URGENCY_OPTIONS, required: true, validate: (v) => (!v ? "Selecione a urgência" : null) },
   { id: "discount_acceptance", field: "discount_acceptance", title: "Aceita propostas abaixo da FIPE?", subtitle: "Lojistas compram para revender - propostas abaixo da tabela são comuns", icon: TrendingDown, type: "options", options: DISCOUNT_OPTIONS, required: true, validate: (v) => (!v ? "Selecione uma opção" : null) },
@@ -69,6 +70,36 @@ const fileToBase64 = (file: File, maxWidth = 800): Promise<string> =>
     reader.readAsDataURL(file);
   });
 
+const normalizeText = (value: string) =>
+  value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+
+const getModelFamily = (modelName: string): string => {
+  const stopWords = new Set([
+    "flex", "turbo", "diesel", "gasolina", "alcool", "etanol",
+    "hibrido", "hibrida", "automatico", "automatica", "manual",
+    "cvt", "aut", "at", "mt", "tsi", "tdi", "mpi", "fsi",
+    "gdi", "4x4", "4wd", "2wd", "v6", "v8",
+  ]);
+
+  const tokens = modelName.split(/\s+/);
+  const family: string[] = [];
+
+  for (const token of tokens) {
+    const cleaned = token.replace(/[^a-zA-Z0-9À-ÿ-]/g, "");
+    if (!cleaned) continue;
+
+    const normalized = normalizeText(cleaned);
+    const isNumeric = /^\d+([.,]\d+)?$/.test(normalized);
+
+    if (family.length > 0 && (stopWords.has(normalized) || isNumeric)) break;
+
+    family.push(cleaned);
+    if (family.length >= 3) break;
+  }
+
+  return family.join(" ").trim();
+};
+
 interface FipeModel { code: string; name: string }
 interface FipeYear { code: string; name: string }
 
@@ -91,7 +122,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   const [formValues, setFormValues] = useState<Record<string, string>>({
     name: initialData?.name || "", email: initialData?.email || "", phone: initialData?.phone || "", state: "", city: "",
     vehicle_brand: "", vehicle_model: "",
-    vehicle_year: "", km: "", urgency: "",
+    vehicle_year: "", vehicle_version: "", km: "", urgency: "",
     discount_acceptance: "", docs_status: "", finance_status: "", lgpd_consent: "",
   });
   const [photos, setPhotos] = useState<(File | null)[]>(Array(PHOTO_LABELS.length).fill(null));
@@ -105,12 +136,14 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   // FIPE
   const [brandSearch, setBrandSearch] = useState("");
   const [selectedBrandCode, setSelectedBrandCode] = useState("");
+  const [fipeRawModels, setFipeRawModels] = useState<FipeModel[]>([]);
   const [fipeModels, setFipeModels] = useState<FipeModel[]>([]);
   const [modelSearch, setModelSearch] = useState("");
   const [loadingModels, setLoadingModels] = useState(false);
-  const [selectedModelCode, setSelectedModelCode] = useState("");
   const [fipeYears, setFipeYears] = useState<FipeYear[]>([]);
   const [loadingYears, setLoadingYears] = useState(false);
+  const [fipeVersions, setFipeVersions] = useState<FipeModel[]>([]);
+  const [loadingVersions, setLoadingVersions] = useState(false);
   const [allBrands, setAllBrands] = useState<FipeBrand[]>([]);
   const [showAllBrands, setShowAllBrands] = useState(false);
 
@@ -148,23 +181,82 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   // Load brands
   useEffect(() => {
     fetch("/api/fipe?type=brands").then(r => r.json()).then(data => {
-      if (data.success) setAllBrands(data.data.map((b: { code: string; name: string }) => ({ code: b.code, name: b.name, logo: "" })));
+      if (data.success) {
+        setAllBrands(
+          data.data.map((b: { code: string; name: string }) => ({
+            code: b.code,
+            name: b.name,
+            logo: resolveBrandLogo({ code: b.code, name: b.name }),
+          }))
+        );
+      }
     }).catch(() => { });
   }, []);
 
-  // Fetch models
+  // Fetch available years for selected brand
   useEffect(() => {
-    if (!selectedBrandCode) { setFipeModels([]); return; }
-    setLoadingModels(true);
-    fetch(`/api/fipe?type=models&brandCode=${selectedBrandCode}`).then(r => r.json()).then(d => { if (d.success) setFipeModels(d.data); }).catch(() => { }).finally(() => setLoadingModels(false));
+    if (!selectedBrandCode) {
+      setFipeYears([]);
+      return;
+    }
+
+    setLoadingYears(true);
+    fetch(`/api/fipe?type=years&brandCode=${selectedBrandCode}`)
+      .then(r => r.json())
+      .then(d => {
+        if (!d.success) return;
+        setFipeYears((d.data || []) as FipeYear[]);
+      })
+      .catch(() => { })
+      .finally(() => setLoadingYears(false));
   }, [selectedBrandCode]);
 
-  // Fetch years
+  // Fetch models (filtered by year when available)
   useEffect(() => {
-    if (!selectedBrandCode || !selectedModelCode) { setFipeYears([]); return; }
-    setLoadingYears(true);
-    fetch(`/api/fipe?type=years&brandCode=${selectedBrandCode}&modelCode=${selectedModelCode}`).then(r => r.json()).then(d => { if (d.success) setFipeYears(d.data); }).catch(() => { }).finally(() => setLoadingYears(false));
-  }, [selectedBrandCode, selectedModelCode]);
+    if (!selectedBrandCode) {
+      setFipeRawModels([]);
+      setFipeModels([]);
+      return;
+    }
+
+    setLoadingModels(true);
+    const yearParam = formValues.vehicle_year ? `&year=${encodeURIComponent(formValues.vehicle_year)}` : "";
+    fetch(`/api/fipe?type=models&brandCode=${selectedBrandCode}${yearParam}`)
+      .then(r => r.json())
+      .then(d => {
+        if (!d.success) return;
+        const rawModels = d.data as FipeModel[];
+        setFipeRawModels(rawModels);
+
+        const familiesMap = new Map<string, FipeModel>();
+        rawModels.forEach((m) => {
+          const family = getModelFamily(m.name);
+          if (family && !familiesMap.has(family)) {
+            familiesMap.set(family, { code: family, name: family });
+          }
+        });
+
+        const families = Array.from(familiesMap.values()).sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
+        setFipeModels(families);
+      })
+      .catch(() => { })
+      .finally(() => setLoadingModels(false));
+  }, [selectedBrandCode, formValues.vehicle_year]);
+
+  // Fetch versions linked to selected model and year
+  useEffect(() => {
+    if (!selectedBrandCode || !formValues.vehicle_model || !formValues.vehicle_year) {
+      setFipeVersions([]);
+      return;
+    }
+
+    setLoadingVersions(true);
+    fetch(`/api/fipe?type=versions&brandCode=${selectedBrandCode}&modelName=${encodeURIComponent(formValues.vehicle_model)}&year=${encodeURIComponent(formValues.vehicle_year)}`)
+      .then(r => r.json())
+      .then(d => { if (d.success) setFipeVersions(d.data || []); })
+      .catch(() => { })
+      .finally(() => setLoadingVersions(false));
+  }, [selectedBrandCode, formValues.vehicle_model, formValues.vehicle_year]);
 
   const fetchCities = (uf: string) => {
     setLoadingCities(true);
@@ -230,9 +322,10 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     const utm = getUTMParams();
     const validPhotos = photos.filter(Boolean) as File[];
     const photoBase64 = await Promise.all(validPhotos.map(f => fileToBase64(f)));
+    const finalVehicleModel = formValues.vehicle_version || formValues.vehicle_model;
     const payload: SubmitLeadPayload = {
       name: formValues.name, email: formValues.email, phone: formValues.phone, state: formValues.state, city: formValues.city,
-      vehicle_brand: formValues.vehicle_brand, vehicle_model: formValues.vehicle_model,
+      vehicle_brand: formValues.vehicle_brand, vehicle_model: finalVehicleModel,
       vehicle_year: formValues.vehicle_year, km: formValues.km, urgency: formValues.urgency,
       discount_acceptance: formValues.discount_acceptance, docs_status: formValues.docs_status,
       finance_status: formValues.finance_status, photos: photoBase64,
@@ -252,7 +345,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
         <div className="max-w-md w-full text-center animate-[fadeInUp_0.6s_ease-out]">
           <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8"><Check className="w-12 h-12 text-green-600" /></div>
           <h1 className="text-3xl font-extrabold text-gray-900 mb-4">Cadastro realizado!</h1>
-          <p className="text-gray-500 text-lg mb-6">Recebemos seus dados. Lojistas da sua regiao poderao enviar propostas em breve.</p>
+          <p className="text-gray-500 text-lg mb-6">Recebemos seus dados. Lojistas da sua região poderão enviar propostas em breve.</p>
           {submitResult?.tier && (
             <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border ${submitResult.tier === "hot" ? "bg-red-50 text-red-700 border-red-200" : submitResult.tier === "warm" ? "bg-amber-50 text-amber-700 border-amber-200" : "bg-blue-50 text-blue-700 border-blue-200"}`}>
               {submitResult.tier === "hot" ? "Prioridade alta!" : submitResult.tier === "warm" ? "Boas chances de propostas" : "Recebido - analisaremos"}
@@ -340,7 +433,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
 
         {/* GeoIP badge */}
         {geoDetected && formValues.city && !citySearch && (
-          <p className="text-xs text-gray-400 flex items-center gap-1"><MapPin className="w-3 h-3" />Detectado automaticamente pela sua localizacao</p>
+          <p className="text-xs text-gray-400 flex items-center gap-1"><MapPin className="w-3 h-3" />Detectado automaticamente pela sua localização</p>
         )}
       </div>
     );
@@ -362,11 +455,18 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
           {filtered.map(brand => {
             const isSelected = formValues.vehicle_brand === brand.name;
             const displayName = getDisplayName(brand.name);
-            const pop = POPULAR_BRANDS.find(b => b.code === brand.code);
-            const logo = pop?.logo || brand.logo;
+            const logo = brand.logo || resolveBrandLogo(brand);
             return (
               <button key={brand.code} type="button"
-                onClick={() => { setValue("vehicle_brand", brand.name); setSelectedBrandCode(brand.code); setModelSearch(""); setValue("vehicle_model", ""); setSelectedModelCode(""); setValue("vehicle_year", ""); autoAdvance(); }}
+                onClick={() => {
+                  setValue("vehicle_brand", brand.name);
+                  setSelectedBrandCode(brand.code);
+                  setModelSearch("");
+                  setValue("vehicle_model", "");
+                  setValue("vehicle_year", "");
+                  setValue("vehicle_version", "");
+                  autoAdvance();
+                }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-transparent hover:border-gray-200 hover:bg-gray-50"}`}
               >
                 {logo ? (
@@ -382,7 +482,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
               </button>
             );
           })}
-          {filtered.length === 0 && <p className="text-center text-gray-400 py-6">Marca nao encontrada</p>}
+          {filtered.length === 0 && <p className="text-center text-gray-400 py-6">Marca não encontrada</p>}
         </div>
         {!showAllBrands && <button type="button" onClick={() => setShowAllBrands(true)} className="mt-3 text-sm text-primary hover:underline cursor-pointer flex items-center gap-1 mx-auto"><ChevronDown className="w-4 h-4" />Ver todas as marcas ({allBrands.length})</button>}
         {showAllBrands && <button type="button" onClick={() => setShowAllBrands(false)} className="mt-3 text-sm text-gray-500 hover:underline cursor-pointer mx-auto block">Mostrar apenas populares</button>}
@@ -398,6 +498,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
         <div className="mb-4 flex items-center gap-2">
           <span className="text-sm text-gray-500">Marca:</span>
           <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">{getDisplayName(formValues.vehicle_brand)}</span>
+          {formValues.vehicle_year && <span className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{formValues.vehicle_year}</span>}
         </div>
         <div className="relative mb-4">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -415,7 +516,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
               const shortName = model.name.split(/\s+/).slice(0, 3).join(" ");
               return (
                 <button key={model.code} type="button"
-                  onClick={() => { setValue("vehicle_model", model.name); setSelectedModelCode(model.code); setValue("vehicle_year", ""); autoAdvance(); }}
+                  onClick={() => { setValue("vehicle_model", model.name); setValue("vehicle_version", ""); autoAdvance(); }}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected ? "border-primary bg-primary/5" : "border-transparent hover:border-gray-200 hover:bg-gray-50"}`}
                 >
                   <div className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? "bg-primary" : "bg-gray-300"}`} />
@@ -431,35 +532,73 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
   };
 
   /* ---------- YEAR PICKER ---------- */
-  const renderYearPicker = () => (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <span className="text-sm text-gray-500">Veiculo:</span>
-        <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">{getDisplayName(formValues.vehicle_brand)}</span>
-        <span className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-full truncate max-w-[250px]">{formValues.vehicle_model.split(/\s+/).slice(0, 3).join(" ")}</span>
+  const renderYearPicker = () => {
+    const currentYear = new Date().getFullYear();
+    const fallbackYears = Array.from({ length: currentYear - 1980 }, (_, idx) => ({ code: String(currentYear - idx), name: String(currentYear - idx) }));
+    const years = fipeYears.length > 0 ? fipeYears : fallbackYears;
+
+    return (
+      <div>
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-gray-500">Marca:</span>
+          <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">{getDisplayName(formValues.vehicle_brand)}</span>
+        </div>
+        {loadingYears ? (
+          <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 text-primary animate-spin" /><span className="ml-3 text-gray-500">Carregando anos...</span></div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[320px] overflow-y-auto pr-1">
+            {years.map((yearItem) => {
+              const yearValue = yearItem.name;
+              const isSelected = formValues.vehicle_year === yearValue;
+              return (
+                <button key={yearItem.code} type="button" onClick={() => { setValue("vehicle_year", yearValue); setValue("vehicle_model", ""); setValue("vehicle_version", ""); setModelSearch(""); autoAdvance(); }}
+                  className={`py-4 px-4 rounded-xl border-2 text-center font-medium transition-all cursor-pointer ${isSelected ? "border-primary bg-primary/5 text-primary scale-[1.02]" : "border-gray-200 text-gray-700 hover:border-primary/40 hover:bg-gray-50"}`}
+                >{yearValue}</button>
+              );
+            })}
+          </div>
+        )}
       </div>
-      {loadingYears ? (
-        <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 text-primary animate-spin" /><span className="ml-3 text-gray-500">Carregando anos...</span></div>
-      ) : fipeYears.length > 0 ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[320px] overflow-y-auto pr-1">
-          {fipeYears.map(y => {
-            const isSelected = formValues.vehicle_year === y.name;
-            return (
-              <button key={y.code} type="button" onClick={() => { setValue("vehicle_year", y.name); autoAdvance(); }}
-                className={`py-4 px-4 rounded-xl border-2 text-center font-medium transition-all cursor-pointer ${isSelected ? "border-primary bg-primary/5 text-primary scale-[1.02]" : "border-gray-200 text-gray-700 hover:border-primary/40 hover:bg-gray-50"}`}
-              >{y.name}</button>
-            );
-          })}
+    );
+  };
+
+  /* ---------- VERSION PICKER ---------- */
+  const renderVersionPicker = () => {
+    const versions = fipeVersions.length > 0
+      ? fipeVersions
+      : fipeRawModels.filter((m) => normalizeText(getModelFamily(m.name)) === normalizeText(formValues.vehicle_model));
+
+    return (
+      <div>
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-sm text-gray-500">Filtro:</span>
+          <span className="text-sm font-bold text-primary bg-primary/10 px-3 py-1 rounded-full">{getDisplayName(formValues.vehicle_brand)}</span>
+          <span className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{formValues.vehicle_model}</span>
+          <span className="text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-full">{formValues.vehicle_year}</span>
         </div>
-      ) : (
-        <div>
-          <p className="text-gray-500 text-sm mb-4">Nao encontramos anos na FIPE. Digite manualmente:</p>
-          <input ref={inputRef} type="text" placeholder="Ex: 2020" value={formValues.vehicle_year} onChange={e => setValue("vehicle_year", e.target.value)} maxLength={9}
-            className="w-full bg-transparent border-b-3 border-gray-300 focus:border-primary text-2xl font-medium py-3 outline-none transition-colors placeholder:text-gray-300" autoFocus />
-        </div>
-      )}
-    </div>
-  );
+        {loadingVersions ? (
+          <div className="flex items-center justify-center py-12"><Loader2 className="w-8 h-8 text-primary animate-spin" /><span className="ml-3 text-gray-500">Carregando versoes...</span></div>
+        ) : (
+          <div className="max-h-[320px] overflow-y-auto space-y-1 pr-1">
+            {versions.length === 0 ? (
+              <div className="text-center py-8 text-gray-400"><Car className="w-8 h-8 mx-auto mb-2 opacity-50" /><p>Nenhuma versao encontrada para este ano</p></div>
+            ) : versions.map((version) => {
+              const isSelected = formValues.vehicle_version === version.name;
+              return (
+                <button key={version.code} type="button" onClick={() => { setValue("vehicle_version", version.name); autoAdvance(); }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected ? "border-primary bg-primary/5" : "border-transparent hover:border-gray-200 hover:bg-gray-50"}`}
+                >
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${isSelected ? "bg-primary" : "bg-gray-300"}`} />
+                  <div className="flex-1 min-w-0"><p className={`font-medium truncate ${isSelected ? "text-primary" : "text-gray-900"}`}>{version.name}</p></div>
+                  {isSelected && <Check className="w-5 h-5 text-primary shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   /* ---------- RENDER STEP CONTENT ---------- */
   const renderStepContent = () => {
@@ -468,6 +607,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
       case "brand_picker": return renderBrandPicker();
       case "model_picker": return renderModelPicker();
       case "year_picker": return renderYearPicker();
+      case "version_picker": return renderVersionPicker();
       case "text": case "tel":
         return <input ref={inputRef} type={step.type} value={formValues[step.field]} onChange={e => setValue(step.field, e.target.value)} placeholder={step.placeholder} maxLength={step.maxLength}
           className="w-full bg-transparent border-b-3 border-gray-300 focus:border-primary text-2xl md:text-3xl font-medium py-3 outline-none transition-colors placeholder:text-gray-300" autoFocus />;
@@ -521,7 +661,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
         return (
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-2xl p-6 space-y-3">
-              {[["Nome", formValues.name], ["WhatsApp", formValues.phone], ["Veiculo", `${getDisplayName(formValues.vehicle_brand)} ${formValues.vehicle_model.split(/\s+/).slice(0, 2).join(" ")} ${formValues.vehicle_year}`], ["Local", `${formValues.city} - ${formValues.state}`], ["Km", formValues.km]].map(([l, v]) => (
+              {[["Nome", formValues.name], ["WhatsApp", formValues.phone], ["Veiculo", `${getDisplayName(formValues.vehicle_brand)} ${formValues.vehicle_version || formValues.vehicle_model} ${formValues.vehicle_year}`], ["Local", `${formValues.city} - ${formValues.state}`], ["Km", formValues.km]].map(([l, v]) => (
                 <div key={l} className="flex justify-between text-sm"><span className="text-gray-500">{l}</span><span className="font-medium text-gray-900 truncate max-w-[200px]">{v}</span></div>
               ))}
             </div>
@@ -570,3 +710,4 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
     </div>
   );
 }
+

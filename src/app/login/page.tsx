@@ -165,8 +165,8 @@ export default function LoginPage() {
                             className="text-sm text-white/40 hover:text-white/70 transition-colors cursor-pointer"
                         >
                             {mode === "login"
-                                ? "Ainda nao tem conta? Cadastre-se"
-                                : "Ja tem conta? Faca login"}
+                                ? "Ainda não tem conta? Cadastre-se"
+                                : "Já tem conta? Faça login"}
                         </button>
                     </div>
                 </div>

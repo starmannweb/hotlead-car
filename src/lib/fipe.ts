@@ -51,3 +51,37 @@ export function getDisplayName(fipeName: string): string {
     };
     return map[fipeName] || fipeName;
 }
+
+const EXTRA_BRAND_LOGOS: Record<string, string> = {
+    "chery": "https://logo.clearbit.com/cheryinternational.com",
+    "caoa chery": "https://logo.clearbit.com/cheryinternational.com",
+    "mini": "https://logo.clearbit.com/mini.com",
+    "ram": "https://logo.clearbit.com/ramtrucks.com",
+    "mercedes-benz": "https://logo.clearbit.com/mercedes-benz.com",
+    "volkswagen": "https://logo.clearbit.com/volkswagen.com",
+};
+
+function normalizeBrand(value: string): string {
+    return value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+}
+
+export function resolveBrandLogo(brand: { code?: string; name: string; logo?: string }): string {
+    if (brand.logo) return brand.logo;
+
+    if (brand.code) {
+        const byCode = POPULAR_BRANDS.find((b) => b.code === brand.code);
+        if (byCode?.logo) return byCode.logo;
+    }
+
+    const display = normalizeBrand(getDisplayName(brand.name));
+    if (EXTRA_BRAND_LOGOS[display]) return EXTRA_BRAND_LOGOS[display];
+
+    const raw = normalizeBrand(brand.name);
+    if (EXTRA_BRAND_LOGOS[raw]) return EXTRA_BRAND_LOGOS[raw];
+
+    return "";
+}

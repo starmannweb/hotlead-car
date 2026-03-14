@@ -273,6 +273,7 @@ export default function LojaPage() {
         });
 
     const states = Array.from(new Set(leads.map((l) => l.region).filter(Boolean) as string[])).sort();
+    const canBuyCredits = user?.role === "client";
 
     if (loading) {
         return (
@@ -303,10 +304,15 @@ export default function LojaPage() {
                         </div>
                         <div className="flex items-center gap-4">
                             {/* Credits badge */}
-                            <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+                            <button
+                                type="button"
+                                onClick={() => canBuyCredits && setBuyModalOpen(true)}
+                                className={`flex items-center gap-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2 ${canBuyCredits ? "cursor-pointer hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors" : "cursor-default"}`}
+                                title={canBuyCredits ? "Clique para comprar créditos" : "Saldo de créditos"}
+                            >
                                 <Coins className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                                 <span className="text-sm font-bold text-amber-700 dark:text-amber-300">{credits} creditos</span>
-                            </div>
+                            </button>
 
                             {/* Lead counters */}
                             <div className="hidden sm:flex items-center gap-3">

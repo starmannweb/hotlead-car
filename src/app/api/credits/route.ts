@@ -7,7 +7,7 @@ export async function GET() {
     try {
         const user = await getAuthUser();
         if (!user) {
-            return NextResponse.json({ success: false, message: "Nao autenticado" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Não autenticado" }, { status: 401 });
         }
 
         const [balance, transactions] = await Promise.all([
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     try {
         const user = await getAuthUser();
         if (!user) {
-            return NextResponse.json({ success: false, message: "Nao autenticado" }, { status: 401 });
+            return NextResponse.json({ success: false, message: "Não autenticado" }, { status: 401 });
         }
 
         const body = await request.json();
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
 
             if (!lead) {
                 return NextResponse.json(
-                    { success: false, message: "Lead nao encontrado" },
+                    { success: false, message: "Lead não encontrado" },
                     { status: 404 }
                 );
             }
