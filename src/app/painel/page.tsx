@@ -9,9 +9,12 @@ import {
     Image as ImageIcon, X, CheckCircle, XCircle, Calendar,
     Search, Filter, TrendingDown, Banknote, Bell
 } from "lucide-react";
+import { buildRegionOptions } from "@/lib/regions";
+import { notifyNewLeads, requestLeadNotificationPermission } from "@/lib/lead-notifications";
 
 interface Lead {
     id: string; name: string; phone: string; state: string; city: string;
+    region?: string;
     vehicleBrand: string; vehicleModel: string; vehicleYear: string;
     km: string; urgency: string; discountAcceptance: string; docsStatus: string;
     financeStatus: string; score: number; tier: string; status: string;
@@ -29,7 +32,7 @@ export default function PainelPage() {
     const [leads, setLeads] = useState<Lead[]>([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
-    const [stateFilter, setStateFilter] = useState("all");
+    const [regionFilter, setRegionFilter] = useState("all");
     const [statusFilter, setStatusFilter] = useState("all");
     const [sortBy, setSortBy] = useState<"recent" | "score">("score");
     const [searchQuery, setSearchQuery] = useState("");
@@ -38,11 +41,13 @@ export default function PainelPage() {
     const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
     const [exportMenuOpen, setExportMenuOpen] = useState(false);
     const [newLeadNotification, setNewLeadNotification] = useState(false);
-    const prevLeadsLen = useRef(0);
+    const [newLeadsCount, setNewLeadsCount] = useState(0);
+    const seenLeadIds = useRef<Set<string>>(new Set());
     const exportRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         checkAuth();
+        requestLeadNotificationPermission();
         const interval = setInterval(() => {
             fetchLeads(true);
         }, 30000);
@@ -68,12 +73,20 @@ export default function PainelPage() {
             const res = await fetch("/api/leads");
             const data = await res.json();
             if (data.success) {
-                setLeads(data.data);
-                if (isPolling && data.data.length > prevLeadsLen.current && prevLeadsLen.current > 0) {
-                    setNewLeadNotification(true);
-                    setTimeout(() => setNewLeadNotification(false), 5000);
+                const nextLeads = data.data as Lead[];
+                setLeads(nextLeads);
+
+                const nextIds = new Set(nextLeads.map((lead) => lead.id));
+                if (isPolling && seenLeadIds.current.size > 0) {
+                    const arrivedCount = nextLeads.filter((lead) => !seenLeadIds.current.has(lead.id)).length;
+                    if (arrivedCount > 0) {
+                        setNewLeadsCount(arrivedCount);
+                        notifyNewLeads(arrivedCount);
+                        setNewLeadNotification(true);
+                        setTimeout(() => setNewLeadNotification(false), 5000);
+                    }
                 }
-                prevLeadsLen.current = data.data.length;
+                seenLeadIds.current = nextIds;
             }
         } catch { /* erro silencioso */ } finally { setLoading(false); }
     };
@@ -123,12 +136,23 @@ export default function PainelPage() {
 
     const filteredLeads = leads
         .filter((l) => filter === "all" || l.tier === filter)
-        .filter((l) => stateFilter === "all" || l.state === stateFilter)
+        .filter((l) => regionFilter === "all" || (l.region || "") === regionFilter)
         .filter((l) => statusFilter === "all" || l.status === statusFilter)
-        .filter((l) => { if (!searchQuery) return true; const q = searchQuery.toLowerCase(); return l.vehicleBrand.toLowerCase().includes(q) || l.vehicleModel.toLowerCase().includes(q) || l.city.toLowerCase().includes(q); })
+        .filter((l) => {
+            if (!searchQuery) return true;
+            const q = searchQuery.toLowerCase();
+            return (
+                l.vehicleBrand.toLowerCase().includes(q) ||
+                l.vehicleModel.toLowerCase().includes(q) ||
+                l.city.toLowerCase().includes(q) ||
+                (l.region || "").toLowerCase().includes(q)
+            );
+        })
         .sort((a, b) => sortBy === "score" ? b.score - a.score : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-    const states = Array.from(new Set(leads.map(l => l.state))).filter(Boolean).sort();
+    const regions = buildRegionOptions(
+        Array.from(new Set(leads.map((lead) => (lead.region || "").trim()).filter(Boolean)))
+    );
 
     const logExport = async (format: string) => { try { await fetch("/api/leads/view-log", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ leadId: "export", field: `export_${format}` }) }); } catch { /* */ } };
     const exportCSV = () => {
@@ -198,9 +222,9 @@ export default function PainelPage() {
                         </div>
                         <div>
                             <label className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1.5 block">Região</label>
-                            <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-900 text-xs">
+                            <select value={regionFilter} onChange={(e) => setRegionFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-900 text-xs">
                                 <option value="all">Todas as Regiões</option>
-                                {states.map(s => <option key={s} value={s}>{s}</option>)}
+                                {regions.map((region) => <option key={region} value={region}>{region}</option>)}
                             </select>
                         </div>
                         <div>
@@ -337,7 +361,9 @@ export default function PainelPage() {
                         <Bell className="w-5 h-5" />
                     </div>
                     <div>
-                        <p className="font-bold text-gray-900 text-sm">Oba! Novo lead capturado!</p>
+                        <p className="font-bold text-gray-900 text-sm">
+                            {newLeadsCount > 1 ? `${newLeadsCount} novos leads capturados!` : "Oba! Novo lead capturado!"}
+                        </p>
                         <p className="text-xs text-gray-500">A lista foi atualizada com sucesso.</p>
                     </div>
                     <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 ml-2">

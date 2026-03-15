@@ -9,6 +9,8 @@ import {
   Snowflake, Trash2, BarChart3, Bell, X, Phone, Clock, ChevronDown, ChevronUp, Image as ImageIcon, Filter
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { buildRegionOptions } from "@/lib/regions";
+import { notifyNewLeads, requestLeadNotificationPermission } from "@/lib/lead-notifications";
 import { Lead } from "@prisma/client";
 
 const TIER_LABELS: Record<string, string> = {
@@ -30,7 +32,7 @@ export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<"all" | "hot" | "warm" | "cold">("all");
-  const [stateFilter, setStateFilter] = useState<string>("all");
+  const [regionFilter, setRegionFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"score" | "recent">("score");
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,11 +40,13 @@ export default function AdminPage() {
   const [photoModal, setPhotoModal] = useState<{ photos: string[]; index: number } | null>(null);
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const [newLeadNotification, setNewLeadNotification] = useState(false);
-  const prevLeadsLen = useRef(0);
+  const [newLeadsCount, setNewLeadsCount] = useState(0);
+  const seenLeadIds = useRef<Set<string>>(new Set());
   const exportRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchLeads();
+    requestLeadNotificationPermission();
     const interval = setInterval(() => {
       fetchLeads(true);
     }, 30000);
@@ -64,12 +68,21 @@ export default function AdminPage() {
       const response = await fetch("/api/leads");
       const data = await response.json();
       if (data.success) {
-        setLeads(data.data);
-        if (isPolling && data.data.length > prevLeadsLen.current && prevLeadsLen.current > 0) {
-          setNewLeadNotification(true);
-          setTimeout(() => setNewLeadNotification(false), 5000);
+        const nextLeads = data.data as Lead[];
+        setLeads(nextLeads);
+
+        const nextIds = new Set(nextLeads.map((lead) => lead.id));
+        if (isPolling && seenLeadIds.current.size > 0) {
+          const arrivedCount = nextLeads.filter((lead) => !seenLeadIds.current.has(lead.id)).length;
+          if (arrivedCount > 0) {
+            setNewLeadsCount(arrivedCount);
+            notifyNewLeads(arrivedCount);
+            setNewLeadNotification(true);
+            setTimeout(() => setNewLeadNotification(false), 5000);
+          }
         }
-        prevLeadsLen.current = data.data.length;
+
+        seenLeadIds.current = nextIds;
       }
     } catch (error) {
       console.error("Erro ao carregar leads:", error);
@@ -113,16 +126,24 @@ export default function AdminPage() {
 
   const filteredLeads = leads
     .filter((lead) => (filter === "all" ? true : lead.tier === filter))
-    .filter((lead) => (stateFilter === "all" ? true : (lead as any).state === stateFilter))
+    .filter((lead) => (regionFilter === "all" ? true : String((lead as any).region || "") === regionFilter))
     .filter((lead) => (statusFilter === "all" ? true : lead.status === statusFilter))
     .filter((lead) => {
       if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
-      return lead.vehicleBrand.toLowerCase().includes(q) || lead.vehicleModel.toLowerCase().includes(q) || lead.city.toLowerCase().includes(q) || lead.name.toLowerCase().includes(q);
+      return (
+        lead.vehicleBrand.toLowerCase().includes(q) ||
+        lead.vehicleModel.toLowerCase().includes(q) ||
+        lead.city.toLowerCase().includes(q) ||
+        lead.name.toLowerCase().includes(q) ||
+        String((lead as any).region || "").toLowerCase().includes(q)
+      );
     })
     .sort((a, b) => sortBy === "score" ? b.score - a.score : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const states = Array.from(new Set(leads.map(l => (l as any).state))).filter(Boolean).sort();
+  const regions = buildRegionOptions(
+    Array.from(new Set(leads.map((lead) => String((lead as any).region || "").trim()).filter(Boolean)))
+  );
 
   const getPhotos = (lead: Lead): string[] => {
     try {
@@ -432,13 +453,13 @@ export default function AdminPage() {
             <div>
               <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">Região</label>
               <select
-                value={stateFilter}
-                onChange={(e) => setStateFilter(e.target.value)}
+                value={regionFilter}
+                onChange={(e) => setRegionFilter(e.target.value)}
                 className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-primary"
               >
                 <option value="all">Todas as Regiões</option>
-                {states.map((s) => (
-                  <option key={s as string} value={s as string}>{s as string}</option>
+                {regions.map((region) => (
+                  <option key={region} value={region}>{region}</option>
                 ))}
               </select>
             </div>
@@ -727,7 +748,9 @@ export default function AdminPage() {
             <Bell className="w-5 h-5" />
           </div>
           <div>
-            <p className="font-bold text-gray-900 dark:text-white text-sm">Oba! Novo lead capturado!</p>
+            <p className="font-bold text-gray-900 dark:text-white text-sm">
+              {newLeadsCount > 1 ? `${newLeadsCount} novos leads capturados!` : "Oba! Novo lead capturado!"}
+            </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">A lista foi atualizada com sucesso.</p>
           </div>
           <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 ml-2 cursor-pointer">

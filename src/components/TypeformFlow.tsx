@@ -682,7 +682,6 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
       <div className="fixed top-1.5 left-0 right-0 z-40 bg-white/80 backdrop-blur-sm border-b border-gray-100">
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2"><div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center"><Car className="w-4 h-4 text-white" /></div><span className="font-bold text-gray-900 text-sm">AutoOportunidade</span></div>
-          <span className="text-xs text-gray-400 font-medium">{currentStep + 1} de {totalSteps}</span>
         </div>
       </div>
 

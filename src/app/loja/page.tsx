@@ -11,6 +11,8 @@ import {
     TrendingDown, Banknote, Bell, Loader2, Gauge
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { buildRegionOptions } from "@/lib/regions";
+import { notifyNewLeads, requestLeadNotificationPermission } from "@/lib/lead-notifications";
 
 interface Lead {
     id: string;
@@ -68,12 +70,14 @@ export default function LojaPage() {
     const [credits, setCredits] = useState(0);
     const [buyModalOpen, setBuyModalOpen] = useState(false);
     const [newLeadNotification, setNewLeadNotification] = useState(false);
+    const [newLeadsCount, setNewLeadsCount] = useState(0);
     const [pixData, setPixData] = useState<{ qrCodeUrl: string, pixCopiaECola: string, txid: string, message?: string } | null>(null);
     const [loadingPix, setLoadingPix] = useState(false);
-    const prevLeadsLen = useRef(0);
+    const seenLeadIds = useRef<Set<string>>(new Set());
 
     useEffect(() => {
         checkAuth();
+        requestLeadNotificationPermission();
         const interval = setInterval(() => {
             fetchLeads(true);
         }, 30000);
@@ -101,12 +105,20 @@ export default function LojaPage() {
             const res = await fetch("/api/leads");
             const data = await res.json();
             if (data.success) {
-                setLeads(data.data);
-                if (isPolling && data.data.length > prevLeadsLen.current && prevLeadsLen.current > 0) {
-                    setNewLeadNotification(true);
-                    setTimeout(() => setNewLeadNotification(false), 5000);
+                const nextLeads = data.data as Lead[];
+                setLeads(nextLeads);
+
+                const nextIds = new Set(nextLeads.map((lead) => lead.id));
+                if (isPolling && seenLeadIds.current.size > 0) {
+                    const arrivedCount = nextLeads.filter((lead) => !seenLeadIds.current.has(lead.id)).length;
+                    if (arrivedCount > 0) {
+                        setNewLeadsCount(arrivedCount);
+                        notifyNewLeads(arrivedCount);
+                        setNewLeadNotification(true);
+                        setTimeout(() => setNewLeadNotification(false), 5000);
+                    }
                 }
-                prevLeadsLen.current = data.data.length;
+                seenLeadIds.current = nextIds;
             }
         } catch (err) {
             console.error("Erro ao carregar leads:", err);
@@ -272,7 +284,9 @@ export default function LojaPage() {
             return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
         });
 
-    const states = Array.from(new Set(leads.map((l) => l.region).filter(Boolean) as string[])).sort();
+    const regions = buildRegionOptions(
+        Array.from(new Set(leads.map((lead) => (lead.region || "").trim()).filter(Boolean)))
+    );
     const canBuyCredits = user?.role === "client";
 
     if (loading) {
@@ -374,7 +388,7 @@ export default function LojaPage() {
                             <label className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Região</label>
                             <select value={stateFilter} onChange={(e) => setStateFilter(e.target.value)} className="px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-xs">
                                 <option value="all">Todas as Regiões</option>
-                                {states.map(s => <option key={s} value={s}>{s}</option>)}
+                                {regions.map((region) => <option key={region} value={region}>{region}</option>)}
                             </select>
                         </div>
  
@@ -737,7 +751,9 @@ export default function LojaPage() {
                         <Bell className="w-6 h-6" />
                     </div>
                     <div>
-                        <p className="font-bold text-gray-900 dark:text-white text-base">Oba! Novo lead!</p>
+                        <p className="font-bold text-gray-900 dark:text-white text-base">
+                            {newLeadsCount > 1 ? `${newLeadsCount} novos leads!` : "Oba! Novo lead!"}
+                        </p>
                         <p className="text-sm text-gray-500 dark:text-gray-400">Acabamos de receber uma nova oportunidade.</p>
                     </div>
                     <button onClick={() => setNewLeadNotification(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 ml-2 cursor-pointer">

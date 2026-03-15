@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { calculateLeadScore } from "@/lib/scoring";
 import { getUnlockCost, getAuthUser } from "@/lib/auth";
+import { canonicalRegionLabel } from "@/lib/regions";
 
 type IbgeMunicipio = {
   id: number;
@@ -11,54 +12,6 @@ type IbgeMunicipio = {
     mesorregiao?: { nome?: string };
   };
 };
-
-const BAIXADA_SANTISTA_CITIES = new Set([
-  "santos",
-  "sao vicente",
-  "guaruja",
-  "praia grande",
-  "cubatao",
-  "bertioga",
-  "mongagua",
-  "itanhaem",
-  "peruibe",
-]);
-
-function normalizeText(value: string): string {
-  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
-}
-
-function normalizeRegionLabel(region: string, city: string, state: string): string {
-  const normalizedRegion = normalizeText(region || "");
-  const normalizedCity = normalizeText(city || "");
-  const normalizedState = normalizeText(state || "");
-
-  const cityIsBaixada = state.toUpperCase() === "SP" && BAIXADA_SANTISTA_CITIES.has(normalizedCity);
-  const regionLooksLikeState =
-    !normalizedRegion ||
-    normalizedRegion === normalizedState ||
-    normalizedRegion === "sp" ||
-    normalizedRegion === "sao paulo";
-
-  if (cityIsBaixada && regionLooksLikeState) {
-    return "Baixada Santista";
-  }
-
-  const regionSuggestsBaixada =
-    normalizedRegion.includes("baixada santista") ||
-    normalizedRegion === "santos" ||
-    (normalizedRegion.includes("metropolitana") && normalizedRegion.includes("sao paulo") && cityIsBaixada);
-
-  if (cityIsBaixada && regionSuggestsBaixada) {
-    return "Baixada Santista";
-  }
-
-  if (regionLooksLikeState) {
-    return "";
-  }
-
-  return region;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -126,7 +79,7 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          region = normalizeRegionLabel(region, city, state);
+          region = canonicalRegionLabel(region, city, state);
         }
       } catch (error) {
         console.error("Erro ao buscar regiao no IBGE", error);
@@ -219,7 +172,7 @@ export async function GET(request: NextRequest) {
     const uniqueRegions = Array.from(
       new Set(
         leads
-          .map((l: any) => normalizeRegionLabel(l.region || "", l.city, l.state || ""))
+          .map((l: any) => canonicalRegionLabel(l.region || "", l.city, l.state || ""))
           .filter(Boolean)
       )
     ).sort();
@@ -238,7 +191,7 @@ export async function GET(request: NextRequest) {
     const maskedLeads = leads.map((lead) => {
         const leadWithRegion = {
           ...lead,
-          region: normalizeRegionLabel(lead.region || "", lead.city, lead.state || ""),
+          region: canonicalRegionLabel(lead.region || "", lead.city, lead.state || ""),
         };
 
         if (user?.role === "admin" || user?.role === "seller") return leadWithRegion;
