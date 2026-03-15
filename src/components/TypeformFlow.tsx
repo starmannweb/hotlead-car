@@ -456,6 +456,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
             const isSelected = formValues.vehicle_brand === brand.name;
             const displayName = getDisplayName(brand.name);
             const logo = brand.logo || resolveBrandLogo(brand);
+            const safeLogo = logo && logo.includes("cdn.simpleicons.org") ? logo : "";
             return (
               <button key={brand.code} type="button"
                 onClick={() => {
@@ -469,9 +470,9 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-left transition-all duration-200 cursor-pointer ${isSelected ? "border-primary bg-primary/5 shadow-sm" : "border-transparent hover:border-gray-200 hover:bg-gray-50"}`}
               >
-                {logo ? (
+                {safeLogo ? (
                   <div className="w-10 h-10 rounded-lg bg-white border border-gray-100 flex items-center justify-center overflow-hidden shadow-sm shrink-0">
-                    <img src={logo} alt={displayName} className="w-8 h-8 object-contain"
+                    <img src={safeLogo} alt={displayName} className="w-8 h-8 object-contain"
                       onError={e => { (e.target as HTMLImageElement).style.display = "none"; (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-sm font-bold text-gray-400">${displayName.charAt(0)}</span>`; }} />
                   </div>
                 ) : (
