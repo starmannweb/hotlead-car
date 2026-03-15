@@ -96,9 +96,16 @@ function simpleLogoByKey(key: string): string | null {
 }
 
 const BRAND_WIKIMEDIA_FILES: Record<string, string> = {
+    "byd": "BYD Auto 2022 logo.svg",
+    "chery": "Chery logo.svg",
+    "caoa chery": "Chery logo.svg",
     "fiat": "FIAT logo (2020).svg",
     "chevrolet": "Chevrolet bowtie 2023.svg",
     "gm - chevrolet": "Chevrolet bowtie 2023.svg",
+    "land rover": "Land Rover 1978 logo.svg",
+    "jaguar": "Jaguar 1979 logo.svg",
+    "lexus": "Lexus.svg",
+    "mercedes-benz": "Mercedes-Benz Star (1969-1986, 2025-).svg",
     "volkswagen": "Volkswagen logo 2019.svg",
     "vw - volkswagen": "Volkswagen logo 2019.svg",
     "kia": "KIA logo3.svg",
@@ -115,36 +122,40 @@ function officialLogoByKey(key: string): string | null {
     return wikimediaLogo(file);
 }
 
+function preferredLogoByKey(key: string): string {
+    return officialLogoByKey(key) || simpleLogoByKey(key) || "";
+}
+
 // Popular brands in Brazil with transparent SVG logos.
 export const POPULAR_BRANDS: FipeBrand[] = [
-    { code: "23", name: "GM - Chevrolet", logo: simpleLogoByKey("gm - chevrolet") || "" },
-    { code: "21", name: "Fiat", logo: simpleLogoByKey("fiat") || "" },
-    { code: "59", name: "VW - VolksWagen", logo: simpleLogoByKey("vw - volkswagen") || "" },
-    { code: "22", name: "Ford", logo: simpleLogoByKey("ford") || "" },
-    { code: "25", name: "Honda", logo: simpleLogoByKey("honda") || "" },
-    { code: "26", name: "Hyundai", logo: simpleLogoByKey("hyundai") || "" },
-    { code: "56", name: "Toyota", logo: simpleLogoByKey("toyota") || "" },
-    { code: "29", name: "Jeep", logo: simpleLogoByKey("jeep") || "" },
-    { code: "48", name: "Renault", logo: simpleLogoByKey("renault") || "" },
-    { code: "43", name: "Nissan", logo: simpleLogoByKey("nissan") || "" },
-    { code: "31", name: "Kia Motors", logo: simpleLogoByKey("kia motors") || "" },
-    { code: "41", name: "Mitsubishi", logo: simpleLogoByKey("mitsubishi") || "" },
-    { code: "44", name: "Peugeot", logo: simpleLogoByKey("peugeot") || "" },
-    { code: "13", name: "Citroen", logo: simpleLogoByKey("citroen") || "" },
-    { code: "7", name: "BMW", logo: simpleLogoByKey("bmw") || "" },
-    { code: "39", name: "Mercedes-Benz", logo: simpleLogoByKey("mercedes-benz") || "" },
-    { code: "6", name: "Audi", logo: simpleLogoByKey("audi") || "" },
-    { code: "58", name: "Volvo", logo: simpleLogoByKey("volvo") || "" },
-    { code: "55", name: "Suzuki", logo: simpleLogoByKey("suzuki") || "" },
-    { code: "238", name: "BYD", logo: simpleLogoByKey("byd") || "" },
-    { code: "240", name: "GWM", logo: simpleLogoByKey("gwm") || "" },
-    { code: "185", name: "RAM", logo: simpleLogoByKey("ram") || "" },
-    { code: "245", name: "Caoa Chery", logo: simpleLogoByKey("caoa chery") || "" },
-    { code: "54", name: "Subaru", logo: simpleLogoByKey("subaru") || "" },
-    { code: "47", name: "Porsche", logo: simpleLogoByKey("porsche") || "" },
-    { code: "33", name: "Land Rover", logo: simpleLogoByKey("land rover") || "" },
-    { code: "28", name: "Jaguar", logo: simpleLogoByKey("jaguar") || "" },
-    { code: "34", name: "Lexus", logo: simpleLogoByKey("lexus") || "" },
+    { code: "23", name: "GM - Chevrolet", logo: preferredLogoByKey("gm - chevrolet") },
+    { code: "21", name: "Fiat", logo: preferredLogoByKey("fiat") },
+    { code: "59", name: "VW - VolksWagen", logo: preferredLogoByKey("vw - volkswagen") },
+    { code: "22", name: "Ford", logo: preferredLogoByKey("ford") },
+    { code: "25", name: "Honda", logo: preferredLogoByKey("honda") },
+    { code: "26", name: "Hyundai", logo: preferredLogoByKey("hyundai") },
+    { code: "56", name: "Toyota", logo: preferredLogoByKey("toyota") },
+    { code: "29", name: "Jeep", logo: preferredLogoByKey("jeep") },
+    { code: "48", name: "Renault", logo: preferredLogoByKey("renault") },
+    { code: "43", name: "Nissan", logo: preferredLogoByKey("nissan") },
+    { code: "31", name: "Kia Motors", logo: preferredLogoByKey("kia motors") },
+    { code: "41", name: "Mitsubishi", logo: preferredLogoByKey("mitsubishi") },
+    { code: "44", name: "Peugeot", logo: preferredLogoByKey("peugeot") },
+    { code: "13", name: "Citroen", logo: preferredLogoByKey("citroen") },
+    { code: "7", name: "BMW", logo: preferredLogoByKey("bmw") },
+    { code: "39", name: "Mercedes-Benz", logo: preferredLogoByKey("mercedes-benz") },
+    { code: "6", name: "Audi", logo: preferredLogoByKey("audi") },
+    { code: "58", name: "Volvo", logo: preferredLogoByKey("volvo") },
+    { code: "55", name: "Suzuki", logo: preferredLogoByKey("suzuki") },
+    { code: "238", name: "BYD", logo: preferredLogoByKey("byd") },
+    { code: "240", name: "GWM", logo: preferredLogoByKey("gwm") },
+    { code: "185", name: "RAM", logo: preferredLogoByKey("ram") },
+    { code: "245", name: "Caoa Chery", logo: preferredLogoByKey("caoa chery") },
+    { code: "54", name: "Subaru", logo: preferredLogoByKey("subaru") },
+    { code: "47", name: "Porsche", logo: preferredLogoByKey("porsche") },
+    { code: "33", name: "Land Rover", logo: preferredLogoByKey("land rover") },
+    { code: "28", name: "Jaguar", logo: preferredLogoByKey("jaguar") },
+    { code: "34", name: "Lexus", logo: preferredLogoByKey("lexus") },
 ];
 
 // Simplified brand names for UI labels.
@@ -170,11 +181,8 @@ export function resolveBrandLogo(brand: { code?: string; name: string; logo?: st
     if (brand.code) {
         const keyByCode = BRAND_ICON_BY_CODE[brand.code];
         if (keyByCode) {
-            const byCodeOfficial = officialLogoByKey(keyByCode);
-            if (byCodeOfficial) return byCodeOfficial;
-
-            const byCodeIcon = simpleLogoByKey(keyByCode);
-            if (byCodeIcon) return byCodeIcon;
+            const byCodePreferred = preferredLogoByKey(keyByCode);
+            if (byCodePreferred) return byCodePreferred;
         }
 
         const byCode = POPULAR_BRANDS.find((b) => b.code === brand.code);
@@ -182,18 +190,12 @@ export function resolveBrandLogo(brand: { code?: string; name: string; logo?: st
     }
 
     const display = normalizeBrand(getDisplayName(brand.name));
-    const displayOfficial = officialLogoByKey(display);
-    if (displayOfficial) return displayOfficial;
-
-    const displayIcon = simpleLogoByKey(display);
-    if (displayIcon) return displayIcon;
+    const displayPreferred = preferredLogoByKey(display);
+    if (displayPreferred) return displayPreferred;
 
     const raw = normalizeBrand(brand.name);
-    const rawOfficial = officialLogoByKey(raw);
-    if (rawOfficial) return rawOfficial;
-
-    const rawIcon = simpleLogoByKey(raw);
-    if (rawIcon) return rawIcon;
+    const rawPreferred = preferredLogoByKey(raw);
+    if (rawPreferred) return rawPreferred;
 
     return brand.logo || "";
 }
