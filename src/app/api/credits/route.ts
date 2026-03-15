@@ -142,7 +142,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json(
                     {
                         success: false,
-                        message: "Creditos insuficientes",
+                        message: "Créditos insuficientes",
                         required: cost,
                         balance: currentUser?.credits || 0,
                     },

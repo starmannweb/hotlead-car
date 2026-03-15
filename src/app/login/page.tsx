@@ -51,7 +51,7 @@ export default function LoginPage() {
                 router.push("/loja");
             }
         } catch {
-            setError("Erro de conexao. Tente novamente.");
+            setError("Erro de conexão. Tente novamente.");
             setLoading(false);
         }
     };

@@ -182,17 +182,17 @@ export default function RelatoriosPage() {
             const data = await res.json();
 
             if (data.success) {
-                alert("Usuario atualizado com sucesso!");
+                alert("Usuário atualizado com sucesso!");
                 setEditUserModalOpen(false);
                 setEditingUserId(null);
                 setEditUserForm({ name: "", email: "", role: "client", credits: 0, password: "", isActive: true });
                 fetchUsers();
             } else {
-                alert(data.message || "Erro ao atualizar usuario.");
+                alert(data.message || "Erro ao atualizar usuário.");
             }
         } catch (error) {
-            console.error("Erro ao atualizar usuario:", error);
-            alert("Erro de conexao.");
+            console.error("Erro ao atualizar usuário:", error);
+            alert("Erro de conexão.");
         } finally {
             setIsSavingUser(false);
         }
@@ -212,14 +212,14 @@ export default function RelatoriosPage() {
                             <button onClick={() => router.push("/admin")} className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 cursor-pointer"><ArrowLeft className="w-5 h-5" /></button>
                             <div className="flex items-center gap-2">
                                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(0,82,204,0.3)]"><BarChart3 className="w-5 h-5 text-white" /></div>
-                                <span className="font-bold text-gray-900 dark:text-white">Relatorios</span>
+                                <span className="font-bold text-gray-900 dark:text-white">Relatórios</span>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
                             <select value={days} onChange={(e) => setDays(parseInt(e.target.value))} className="px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary">
-                                <option value={7}>Ultimos 7 dias</option>
-                                <option value={30}>Ultimos 30 dias</option>
-                                <option value={90}>Ultimos 90 dias</option>
+                                <option value={7}>Últimos 7 dias</option>
+                                <option value={30}>Últimos 30 dias</option>
+                                <option value={90}>Últimos 90 dias</option>
                             </select>
                             <ThemeToggle />
                             <button onClick={handleLogout} className="p-2 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"><LogOut className="w-5 h-5" /></button>
@@ -233,8 +233,8 @@ export default function RelatoriosPage() {
                 <div className="flex gap-2 mb-6">
                     {([
                         { id: "summary", label: "Resumo", icon: BarChart3 },
-                        { id: "views", label: "Visualizacoes", icon: Eye },
-                        { id: "users", label: "Usuarios", icon: Users },
+                        { id: "views", label: "Visualizações", icon: Eye },
+                        { id: "users", label: "Usuários", icon: Users },
                     ] as const).map((t) => (
                         <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium cursor-pointer transition-all ${tab === t.id ? "bg-primary text-white shadow-md shadow-primary/20" : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700"}`}>
                             <t.icon className="w-4 h-4" />{t.label}
@@ -248,7 +248,7 @@ export default function RelatoriosPage() {
                         {/* Stats cards */}
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
-                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Eye className="w-4 h-4" />Visualizacoes</div>
+                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Eye className="w-4 h-4" />Visualizações</div>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalViews}</p>
                             </div>
                             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
@@ -256,7 +256,7 @@ export default function RelatoriosPage() {
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalExports}</p>
                             </div>
                             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
-                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Users className="w-4 h-4" />Usuarios</div>
+                                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-2"><Users className="w-4 h-4" />Usuários</div>
                                 <p className="text-3xl font-bold text-gray-900 dark:text-white">{summary.totalUsers}</p>
                             </div>
                             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 shadow-sm">
@@ -278,18 +278,18 @@ export default function RelatoriosPage() {
                                         <div className="flex items-center gap-3">
                                             <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-sm font-bold text-gray-600 dark:text-gray-400">{idx + 1}</div>
                                             <div>
-                                                <p className="font-medium text-gray-900 dark:text-white">{v.user?.name || "Anonimo"}</p>
+                                                <p className="font-medium text-gray-900 dark:text-white">{v.user?.name || "Anônimo"}</p>
                                                 <p className="text-xs text-gray-500 dark:text-gray-400">{v.user?.email}</p>
                                             </div>
                                             {v.user?.role && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${ROLE_COLORS[v.user.role] || ""}`}>{ROLE_LABELS[v.user.role]}</span>}
                                         </div>
                                         <div className="text-right">
                                             <p className="font-bold text-gray-900 dark:text-white">{v.viewCount}</p>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400">visualizacoes</p>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">visualizações</p>
                                         </div>
                                     </div>
                                 ))}
-                                {summary.topViewers.length === 0 && <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">Nenhuma visualizacao registrada.</p>}
+                                {summary.topViewers.length === 0 && <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">Nenhuma visualização registrada.</p>}
                             </div>
                         </div>
                     </div>
@@ -308,11 +308,11 @@ export default function RelatoriosPage() {
                                 <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                     <tr>
                                         <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Data/Hora</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Usuario</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Funcao</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Usuário</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Função</th>
                                         <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Lead</th>
                                         <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Campo</th>
-                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Creditos</th>
+                                        <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Créditos</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -324,19 +324,19 @@ export default function RelatoriosPage() {
                                             <td className="px-4 py-3">
                                                 {v.user ? (
                                                     <button onClick={() => { setSelectedUser(v.user!.id); setTab("views"); }} className="text-primary hover:underline cursor-pointer font-bold">{v.user.name}</button>
-                                                ) : <span className="text-gray-400">Anonimo</span>}
+                                                ) : <span className="text-gray-400">Anônimo</span>}
                                             </td>
                                             <td className="px-4 py-3">
                                                 {v.user?.role && <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${ROLE_COLORS[v.user.role] || ""}`}>{ROLE_LABELS[v.user.role]}</span>}
                                             </td>
                                             <td className="px-4 py-3 text-gray-900 dark:text-white font-medium">
-                                                {v.lead ? `${v.lead.vehicleBrand} ${v.lead.vehicleModel}` : v.leadId === "export" ? "Exportacao" : v.leadId}
+                                                {v.lead ? `${v.lead.vehicleBrand} ${v.lead.vehicleModel}` : v.leadId === "export" ? "Exportação" : v.leadId}
                                             </td>
                                             <td className="px-4 py-3 text-gray-600 dark:text-gray-400">{v.field}</td>
                                             <td className="px-4 py-3">{v.creditsUsed > 0 ? <span className="text-amber-600 dark:text-amber-400 font-bold">-{v.creditsUsed}</span> : <span className="text-gray-400">0</span>}</td>
                                         </tr>
                                     ))}
-                                    {views.length === 0 && <tr><td colSpan={6} className="text-center text-gray-500 py-8">Nenhuma visualizacao registrada.</td></tr>}
+                                    {views.length === 0 && <tr><td colSpan={6} className="text-center text-gray-500 py-8">Nenhuma visualização registrada.</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -355,14 +355,14 @@ export default function RelatoriosPage() {
                         <table className="w-full text-sm">
                             <thead className="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                                 <tr>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Usuario</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Funcao</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Creditos</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Visualizacoes</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Usuário</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Função</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Créditos</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Visualizações</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Exportacoes</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Status</th>
                                     <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Cadastro</th>
-                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Acoes</th>
+                                    <th className="text-left px-4 py-3 font-medium text-gray-700 dark:text-gray-300">Ações</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -399,7 +399,7 @@ export default function RelatoriosPage() {
                                         </td>
                                     </tr>
                                 ))}
-                                {users.length === 0 && <tr><td colSpan={8} className="text-center text-gray-500 dark:text-gray-400 py-8">Nenhum usuario cadastrado.</td></tr>}
+                                {users.length === 0 && <tr><td colSpan={8} className="text-center text-gray-500 dark:text-gray-400 py-8">Nenhum usuário cadastrado.</td></tr>}
                             </tbody>
                         </table>
                         </div>

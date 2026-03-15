@@ -68,10 +68,10 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { label: "Como funciona", href: "#como-funciona" },
-                { label: "Beneficios", href: "#beneficios" },
+                { label: "Benefícios", href: "#beneficios" },
                 { label: "FAQ", href: "#faq" },
-                { label: "Cadastrar veiculo", href: "/cadastro" },
-                { label: "Area do Lojista", href: "/login" },
+                { label: "Cadastrar veículo", href: "/cadastro" },
+                { label: "Área do Lojista", href: "/login" },
               ].map((link) => (
                 <li key={link.label}>
                   <a

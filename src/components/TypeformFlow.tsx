@@ -661,7 +661,7 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
         return (
           <div className="space-y-6">
             <div className="bg-gray-50 rounded-2xl p-6 space-y-3">
-              {[["Nome", formValues.name], ["WhatsApp", formValues.phone], ["Veiculo", `${getDisplayName(formValues.vehicle_brand)} ${formValues.vehicle_version || formValues.vehicle_model} ${formValues.vehicle_year}`], ["Local", `${formValues.city} - ${formValues.state}`], ["Km", formValues.km]].map(([l, v]) => (
+              {[["Nome", formValues.name], ["WhatsApp", formValues.phone], ["Veículo", `${getDisplayName(formValues.vehicle_brand)} ${formValues.vehicle_version || formValues.vehicle_model} ${formValues.vehicle_year}`], ["Local", `${formValues.city} - ${formValues.state}`], ["Km", formValues.km]].map(([l, v]) => (
                 <div key={l} className="flex justify-between text-sm"><span className="text-gray-500">{l}</span><span className="font-medium text-gray-900 truncate max-w-[200px]">{v}</span></div>
               ))}
             </div>

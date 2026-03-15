@@ -516,7 +516,7 @@ export default function AdminPage() {
                 <Car className="w-8 h-8 text-gray-400" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhum lead encontrado</h3>
-              <p className="text-gray-500 dark:text-gray-400">Os leads aparecerao aqui quando forem capturados pelo formulario.</p>
+              <p className="text-gray-500 dark:text-gray-400">Os leads aparecerão aqui quando forem capturados pelo formulário.</p>
             </div>
           ) : (
             filteredLeads.map((lead) => {

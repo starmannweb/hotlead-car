@@ -295,7 +295,7 @@ export default function PainelPage() {
                                                         <p className="font-medium text-gray-900 flex items-center gap-1"><MapPin className="w-4 h-4 text-gray-400" />{lead.city}{lead.state ? ` - ${lead.state}` : ""}</p>
                                                     </div>
                                                     <div>
-                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Veiculo</p>
+                                                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Veículo</p>
                                                         <p className="font-medium text-gray-900">{lead.vehicleBrand} {lead.vehicleModel} {lead.vehicleYear}</p>
                                                     </div>
                                                 </div>

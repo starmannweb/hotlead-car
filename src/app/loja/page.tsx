@@ -165,7 +165,7 @@ export default function LojaPage() {
                 return false;
             }
         } catch {
-            alert("Erro de conexao");
+            alert("Erro de conexão");
             return false;
         } finally {
             setUnlocking(null);
@@ -423,7 +423,7 @@ export default function LojaPage() {
                         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-12 text-center">
                             <Car className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Nenhum lead encontrado</h3>
-                            <p className="text-gray-500 dark:text-gray-400">Os leads aparecerao aqui quando forem cadastrados.</p>
+                            <p className="text-gray-500 dark:text-gray-400">Os leads aparecerão aqui quando forem cadastrados.</p>
                         </div>
                     ) : (
                         filteredLeads.map((lead) => {

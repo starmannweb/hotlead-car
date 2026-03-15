@@ -1,4 +1,4 @@
-export const PRIORITY_REGIONS = ["Baixada Santista", "Regiao Metropolitana de SP"] as const;
+export const PRIORITY_REGIONS = ["Baixada Santista", "Região Metropolitana de SP"] as const;
 
 const BAIXADA_SANTISTA_CITIES = new Set([
   "santos",
