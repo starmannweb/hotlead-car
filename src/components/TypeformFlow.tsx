@@ -456,7 +456,11 @@ export default function TypeformFlow({ initialData, onComplete }: TypeformFlowPr
             const isSelected = formValues.vehicle_brand === brand.name;
             const displayName = getDisplayName(brand.name);
             const logo = brand.logo || resolveBrandLogo(brand);
-            const safeLogo = logo && logo.includes("cdn.simpleicons.org") ? logo : "";
+            const safeLogo = logo && (
+              logo.includes("cdn.simpleicons.org")
+              || logo.includes("commons.wikimedia.org/wiki/Special:FilePath/")
+              || logo.includes("upload.wikimedia.org/")
+            ) ? logo : "";
             return (
               <button key={brand.code} type="button"
                 onClick={() => {

@@ -15,6 +15,10 @@ function simpleIcon(slug: string, color?: string): string {
         : `https://cdn.simpleicons.org/${slug}`;
 }
 
+function wikimediaLogo(fileName: string): string {
+    return `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(fileName)}`;
+}
+
 type SimpleIconDef = { slug: string; color?: string };
 
 const BRAND_SIMPLE_ICONS: Record<string, SimpleIconDef> = {
@@ -91,6 +95,26 @@ function simpleLogoByKey(key: string): string | null {
     return simpleIcon(icon.slug, icon.color);
 }
 
+const BRAND_WIKIMEDIA_FILES: Record<string, string> = {
+    "fiat": "FIAT logo (2020).svg",
+    "chevrolet": "Chevrolet bowtie 2023.svg",
+    "gm - chevrolet": "Chevrolet bowtie 2023.svg",
+    "volkswagen": "Volkswagen logo 2019.svg",
+    "vw - volkswagen": "Volkswagen logo 2019.svg",
+    "kia": "KIA logo3.svg",
+    "kia motors": "KIA logo3.svg",
+    "renault": "Renault 2021.svg",
+    "peugeot": "Peugeot Logo.svg",
+    "gwm": "GWM 2025 logo.svg",
+    "great wall": "GWM 2025 logo.svg",
+};
+
+function officialLogoByKey(key: string): string | null {
+    const file = BRAND_WIKIMEDIA_FILES[key];
+    if (!file) return null;
+    return wikimediaLogo(file);
+}
+
 // Popular brands in Brazil with transparent SVG logos.
 export const POPULAR_BRANDS: FipeBrand[] = [
     { code: "23", name: "GM - Chevrolet", logo: simpleLogoByKey("gm - chevrolet") || "" },
@@ -146,6 +170,9 @@ export function resolveBrandLogo(brand: { code?: string; name: string; logo?: st
     if (brand.code) {
         const keyByCode = BRAND_ICON_BY_CODE[brand.code];
         if (keyByCode) {
+            const byCodeOfficial = officialLogoByKey(keyByCode);
+            if (byCodeOfficial) return byCodeOfficial;
+
             const byCodeIcon = simpleLogoByKey(keyByCode);
             if (byCodeIcon) return byCodeIcon;
         }
@@ -155,10 +182,16 @@ export function resolveBrandLogo(brand: { code?: string; name: string; logo?: st
     }
 
     const display = normalizeBrand(getDisplayName(brand.name));
+    const displayOfficial = officialLogoByKey(display);
+    if (displayOfficial) return displayOfficial;
+
     const displayIcon = simpleLogoByKey(display);
     if (displayIcon) return displayIcon;
 
     const raw = normalizeBrand(brand.name);
+    const rawOfficial = officialLogoByKey(raw);
+    if (rawOfficial) return rawOfficial;
+
     const rawIcon = simpleLogoByKey(raw);
     if (rawIcon) return rawIcon;
 
