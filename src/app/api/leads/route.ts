@@ -45,6 +45,9 @@ export async function POST(request: NextRequest) {
       discountAcceptance: discount_acceptance,
       docsStatus: docs_status,
       financeStatus: finance_status,
+      vehicleModel: vehicle_model,
+      vehicleYear: vehicle_year,
+      km,
     });
 
     // Pega IP do usuário
